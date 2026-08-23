@@ -91,7 +91,8 @@ scripts/provision-server-terminal.sh
 - **Vim-centric** - Evil mode in Emacs, vim keybinds everywhere
 - **Keyboard-driven** - AeroSpace WM, tmux, minimal mouse usage
 - **Terminal workflow** - Ghostty is native/minimal; tmux remains available for multiplexing
-- **Spokenly dictation** - Trackpad, Magic Mouse, and MX Master toggle through `Spokenly Toggle.app`; MacBook Fn remains the Spokenly push-to-talk shortcut
+- **Spokenly dictation** - MacBook and Ducky use Spokenly's direct Right Option shortcut; the MX Master thumb button toggles Spokenly through its helper app
+- **Three Finger Switcher** - One local recognizer arbitrates three-finger input: taps toggle Spokenly after release, right swipes open the app switcher with two-finger scrubbing, and left swipes route one context-aware line-clear shortcut
 
 ## Notes
 
@@ -99,6 +100,7 @@ scripts/provision-server-terminal.sh
 - [Custom Logitech, BetterTouchTool, and transcription shortcut reference](docs/shortcut-reference.md)
 - [MX Master 3S, Logitech Options+, and Spokenly setup](docs/logitech-options-spokenly.md)
 - [BetterTouchTool gesture setup](docs/btt/README.md)
+- [Native Three Finger Switcher](docs/three-finger-switcher.md)
 - [Ducky One 2 macOS setup](docs/ducky-one-2-setup.md)
 - [AirPods smart-routing banner investigation](docs/airpods-banner-dismiss.md)
 

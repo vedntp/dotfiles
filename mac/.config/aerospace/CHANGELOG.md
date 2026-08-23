@@ -1,5 +1,9 @@
 # Aerospace Configuration Changelog
 
+## 2026-08-21
+- Reassigned Option+Tab and Option+Shift+Tab from AeroSpace workspace cycling
+  and monitor movement to Herdr next-agent and previous-agent navigation.
+
 ## 2026-08-17
 - Upgraded the official AeroSpace app from `0.20.3-Beta` to `0.21.3-Beta`.
 - Removed the custom PR #2083 `AeroSpace Sticky.app`, its LaunchAgent, the

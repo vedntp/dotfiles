@@ -27,10 +27,9 @@ preserves the v1 behavior for all currently bound workspace keys.
 - `alt-[1-0]` - Switch to workspace 1-10
 - `alt-[a-z]` - Switch to letter workspace (except r, x reserved)
 - `alt-shift-[key]` - Move window to that workspace
-- `alt-tab` - Cycle non-empty workspaces on current monitor
+- `alt-tab` / `alt-shift-tab` - Herdr next / previous agent when Herdr is active
 - `alt-backtick` - Jump to next empty workspace
 - `cmd-shift-backtick` - Move window to first empty workspace on the other monitor
-- `alt-shift-tab` - Move workspace to next monitor
 
 **Layout**:
 - `alt-/` - Toggle tiles horizontal/vertical

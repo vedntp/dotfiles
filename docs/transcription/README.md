@@ -23,26 +23,36 @@ this dotfiles setup.
 Spokenly is the sole configured transcription provider. Additional providers
 should be audited independently before adding their shortcuts or device routes.
 
-## Current Spokenly Input Paths
+## Current Spokenly Input Path
 
-Three hands-free toggle inputs converge on the same background helper. MacBook
-Fn is a separate direct Spokenly push-to-talk control:
+Spokenly uses its direct Right Option shortcut with automatic activation:
 
 | Physical input | Owner | Action |
 | --- | --- | --- |
-| MacBook Fn held while speaking | Spokenly | Push-to-talk; release stops recording |
-| Trackpad 3-finger tap | BetterTouchTool | Opens `Spokenly Toggle.app` |
-| Magic Mouse TipTap Left, 1 Finger Fix | BetterTouchTool | Opens `Spokenly Toggle.app` |
-| MX Master auxiliary/thumb button | Logitech Options+ | Runs Smart Action `Spokenly Hands-Free`, which opens `Spokenly Toggle.app` |
+| MacBook physical Right Option | Spokenly | Activates the Default Mode directly |
+| Ducky physical right GUI, immediately right of right Alt | Native macOS Ducky modifier mapping, then Spokenly | Emits Right Option and activates the same Default Mode directly |
+| MacBook trackpad three-finger tap | Three Finger Switcher | On release, launches `Spokenly Toggle.app` and calls `spokenly://toggle` |
+| MX Master auxiliary/thumb button | Logitech Options+ | Opens `Spokenly Toggle.app`, which calls `spokenly://toggle` |
 
-`Spokenly Toggle.app` calls the official `spokenly://toggle` deeplink without
-foreground activation. Standalone Right Option is not a Spokenly toggle. It
-remains a native modifier in keyboard chords, and no repository-level
-standalone Right Option mechanism is configured. MacBook Fn remains available
-for push-to-talk.
+Three Finger Switcher exclusively arbitrates the MacBook trackpad's
+three-finger tap and horizontal swipe. A 5 to 600 ms tap with no more than
+2.0 mm of per-finger travel toggles Spokenly after release. A right swipe that
+reaches the existing threshold opens the app switcher with two-finger
+scrubbing. A left swipe reaches the same threshold, waits 40 ms for direction
+confirmation, then sends one context-aware line-clear shortcut. It uses
+`Ctrl+U` in Ghostty, Alacritty, Terminal, cmux, Warp, and iTerm2, is suppressed
+in Three Finger Switcher, Finder, Mail, Messages, Notes, Reminders, Calendar,
+and Photos, and uses `Cmd+Delete` in every other, unknown, or missing-bundle
+application. The frontmost application lookup is cached and adds negligible
+latency. See the
+[Spokenly input profile](spokenly/README.md) and the
+[Three Finger Switcher guide](../three-finger-switcher.md) for the live
+preference serialization, calibration, and verification steps.
 
-See the [Spokenly input profile](spokenly/README.md) for exact identifiers,
-live preference serialization, helper details, and verification steps.
+The competing unnamed Spokenly `threeFingerLight` mode was backed up and
+deleted, so Spokenly's built-in recognizer cannot race the switcher. The
+switcher's **Enable Three-Finger Gestures** menu item controls both tap and
+swipe behavior.
 
 ## Documentation Rules
 

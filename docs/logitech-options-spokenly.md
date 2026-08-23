@@ -83,11 +83,11 @@ explicit keyboard shortcuts:
 | Physical control | Assignment |
 | --- | --- |
 | Back button | `Ctrl+U` |
-| Forward button | `Ctrl+Tab`, next workspace |
+| Forward button | `Ctrl+Tab`, next tab |
 | Thumb wheel up | `Ctrl+Option+Shift+Tab` (raw; no custom Herdr workspace action) |
 | Thumb wheel down | `Ctrl+Option+Tab` (raw; no custom Herdr workspace action) |
 
-Herdr maps the Forward-button Ctrl+Tab chord to next workspace while retaining
+Herdr maps the Forward-button Ctrl+Tab chord to next tab while retaining
 the `Ctrl+B`, then `n`/`p` tab navigation sequences. The thumb-wheel chords have
 no custom Herdr workspace action.
 

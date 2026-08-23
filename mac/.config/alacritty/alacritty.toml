@@ -45,6 +45,8 @@ y = 10
 [keyboard]
 bindings = [
   { key = "Back", mods = "Alt", chars = "\u001b\u007f" },
+  { key = "PageUp", mods = "Control", chars = "\u0002P" },
+  { key = "PageDown", mods = "Control", chars = "\u0002N" },
   { key = "T", mods = "Command", action = "ReceiveChar" },
   { key = "T", mods = "Command|Shift", action = "ReceiveChar" },
   { key = "Z", mods = "Command", action = "ReceiveChar" },

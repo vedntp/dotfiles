@@ -20,13 +20,13 @@ the Ducky-specific preference.
 
 ## Spokenly keyboard behavior
 
-Standalone Right Option is not a Spokenly toggle. It remains a native modifier
-in keyboard chords, and no repository-level standalone Right Option mechanism
-is configured. The trackpad, Magic Mouse, and MX Master routes still use
-`Spokenly Toggle.app`. MacBook Fn remains Spokenly's push-to-talk shortcut.
+Spokenly's direct shortcut is native Right Option. On the MacBook, use physical
+Right Option. On the Ducky, use the physical right GUI key immediately to the
+right of right Alt. The Ducky-specific macOS mapping emits Right Option from
+that key, while right Alt remains Right Command.
 
-The Ducky hardware Fn key is firmware-only and is not exposed to macOS, so the
-Ducky has no Fn push-to-talk path.
+No Ducky key launches an adapter application or calls a Spokenly deeplink. The
+Ducky hardware Fn key remains firmware-only and is not exposed to macOS.
 
 ## Function Row
 

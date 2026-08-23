@@ -112,8 +112,7 @@ Additional rules:
 - `alt-1` through `alt-0`: switch to workspaces `1` through `10`.
 - Letter workspace bindings exist for `A B C D E F G I M N O P Q S T U V W Y Z`; `R` and `X` are commented out.
 - Move-to-workspace bindings mostly mirror switch bindings, but `alt-shift-e`, `alt-shift-r`, and `alt-shift-x` are commented out.
-- `alt-tab`: cycle through non-empty workspaces on the focused monitor.
-- `alt-shift-tab`: move current workspace to the next monitor, except for workspaces with forced monitor assignments.
+- `alt-tab` / `alt-shift-tab`: next / previous Herdr agent when Herdr is active.
 - `alt-backtick`: switch to the next empty workspace on the focused monitor.
 - `alt-shift-backtick`: move the focused window to the next empty workspace on the focused monitor.
 - `cmd-shift-backtick`: move the focused window to the first empty workspace on the non-focused monitor.

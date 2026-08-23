@@ -17,6 +17,11 @@ else
     IS_MAC=false
 fi
 
+# Prevent terminal bells from bouncing Alacritty's Dock icon.
+if [[ -n "$ALACRITTY_WINDOW_ID" ]]; then
+    printf '\e[?1042l'
+fi
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -252,6 +257,7 @@ alias cldp="claude --dangerously-skip-permissions --model sonnet --effort medium
 
 # codex
 alias cx="codex --yolo"
+alias oc="opencode --auto"
 
 # Usage aliases with model breakdown
 alias ccu="ccusage --since \$(date +%Y%m%d) -b"
@@ -279,3 +285,6 @@ path=("/Users/vp/.omnara/bin" $path)
 
 # To customize prompt, run `p10k configure` or edit ~/.dotfiles/mac/.p10k.zsh.
 [[ ! -f ~/.dotfiles/mac/.p10k.zsh ]] || source ~/.dotfiles/mac/.p10k.zsh
+
+# Added by Devin
+export PATH="/Users/vp/.codeium/windsurf/bin:$PATH"

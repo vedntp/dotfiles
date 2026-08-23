@@ -1,35 +1,30 @@
 # BetterTouchTool Gesture Setup
 
-Last audited: 2026-08-18
+Last audited: 2026-08-22
 
 ## Goal
 
 Keep BetterTouchTool inputs predictable across the MacBook trackpad and Magic
 Mouse. Logitech Options+ remains the owner of the MX Master 3S.
 
-The current setup uses BTT for MacBook trackpad gestures and keyboard adapters:
+The current setup uses BTT for the remaining MacBook trackpad and Magic Mouse
+gestures. Three Finger Switcher owns the MacBook trackpad's three-finger tap
+and horizontal swipe arbitration:
 
 - Triple F4 locks the screen through BTT's native Lock Screen action.
-- 3-finger swipe right opens BTT's native Application Switcher.
-- 3-finger swipe left sends `Cmd+Delete`.
-- 3-finger tap opens the background `Spokenly Toggle.app` helper, which calls
-  `spokenly://toggle` for hands-free dictation.
 - 4-finger tap sends `Return`.
 - In Codex only, 2-finger swipe right opens the chat switcher list with one
   `Ctrl+Tab` hold window. Lifting the final trackpad finger clicks the currently
   hovered chat and releases Control.
 - In Codex only, `Ctrl+B` toggles the sidebar organization between `By project`
   and `In one list`.
-- The MX Master Spokenly trigger is owned entirely by Logitech Options+ and a
-  background helper. BTT is not in that input path.
-- Magic Mouse TipTap Left (1 Finger Fix) opens the background
-  `Spokenly Toggle.app` helper for hands-free dictation.
 - Magic Mouse 1-finger tap performs a standard left click.
 - Magic Mouse 1-finger tap right performs a standard right click.
 - Magic Mouse 2-finger swipe right opens BTT's native Application Switcher.
 - Magic Mouse 3-finger tap performs a standard middle click globally.
 - In Codex only, Magic Mouse 3-finger tap sends `Return`.
-- 3-finger click is disabled and reserved for future use.
+- The former 3-finger click and swipe triggers are absent from the live BTT data
+  store so they cannot race Three Finger Switcher.
 - Ducky One 2 F4 passes through to BTT. F8 is handled outside BTT by
   `~/.local/bin/ducky-f8-aerospace-listener`, which calls
   `~/.local/bin/aerospace-toggle-enabled`, which toggles the official
@@ -53,6 +48,13 @@ Related input docs:
 
 - [Logitech Options+ and Spokenly setup](../logitech-options-spokenly.md)
 - [Spokenly transcription profile](../transcription/spokenly/README.md)
+- [Three Finger Switcher](../three-finger-switcher.md)
+
+The former Spokenly unnamed `threeFingerLight` mode was backed up and deleted
+when this ownership moved to Three Finger Switcher. To roll back, disable or
+quit the switcher, restore that `modes.v2` entry through Spokenly's settings,
+and leave the superseded BTT three-finger triggers disabled until the desired
+single owner is selected.
 
 ## Source of Truth
 
@@ -135,30 +137,31 @@ available again.
 
 ## Current Trackpad Gestures
 
-Current global trackpad gestures:
+Current global trackpad gestures still owned by BTT:
 
 | Gesture | BTT trigger type | BTT action / shortcut |
 | --- | --- | --- |
-| 3-finger swipe right | `101` | `46` / Application Switcher |
-| 3-finger swipe left | `100` | `55,51` / Cmd+Delete, delete to beginning of line |
-| 3-finger tap | `104` | `49` / launch `~/Applications/Spokenly Toggle.app` |
 | 4-finger tap | `110` | `36` / Return, sends Enter |
 
+Three Finger Switcher owns the MacBook trackpad's three-finger interactions.
+Its valid tap path waits for release, then launches `Spokenly Toggle.app`. A
+rightward horizontal movement that reaches the existing threshold opens the
+macOS app switcher, while a leftward movement emits one context-aware
+line-clear shortcut. See [the switcher guide](../three-finger-switcher.md) for
+the 5 to 600 ms tap window, 2.0 mm travel allowance, and application routing.
 Current BTT UUIDs:
 
 | Gesture | UUID |
 | --- | --- |
-| 3-finger swipe right | `D31D7DAB-04F5-4A03-8EB7-469C8B9F9B01` |
-| 3-finger swipe left | `94E64D33-7972-4F71-A04A-09A4D75C4B15` |
-| 3-finger tap | `CA4B9E78-76FB-4764-9301-A9937EE84D12` |
 | 4-finger tap | `A693727F-81DC-4CD4-B643-21A0D68705F8` |
-| 3-finger click | `44022E95-1E33-48C6-BAC4-D7838FFBD70A` |
 
-Disabled / reserved BTT triggers:
+Removed / superseded BTT triggers:
 
 | Gesture | BTT trigger type | Previous shortcut | UUID | Status |
 | --- | --- | --- | --- | --- |
-| 3-finger click | `112` | `36` / Return | `44022E95-1E33-48C6-BAC4-D7838FFBD70A` | Disabled; reserved for future use |
+| 3-finger swipe right | `101` | `46` / Application Switcher | `D31D7DAB-04F5-4A03-8EB7-469C8B9F9B01` | Removed from live data; superseded by Three Finger Switcher |
+| 3-finger swipe left | `100` | `55,51` / Cmd+Delete | `94E64D33-7972-4F71-A04A-09A4D75C4B15` | Removed from live data; superseded by context-aware Three Finger Switcher routing |
+| 3-finger click | `112` | `36` / Return | `44022E95-1E33-48C6-BAC4-D7838FFBD70A` | Removed from live data; no longer reserved |
 
 ## Triple F4 Lock
 
@@ -173,49 +176,7 @@ built-in F4 Search key is normalized to ordinary F4 by
 Single and double F4 presses no longer toggle Proton VPN and do not run a BTT
 action.
 
-## Trackpad Spokenly Adapter
 
-The global trackpad 3-finger tap is owned by BTT trigger
-`CA4B9E78-76FB-4764-9301-A9937EE84D12`. Its only assigned action is launch
-application action `49`, child action UUID
-`B676F40D-4709-4F32-BB12-271827448EAB`, targeting
-`~/Applications/Spokenly Toggle.app`.
-
-```text
-Trackpad 3-finger tap
-  -> BetterTouchTool
-  -> ~/Applications/Spokenly Toggle.app
-  -> spokenly://toggle
-  -> Spokenly hands-free toggle
-```
-
-The trigger-level `61` / Right Option shortcut is absent because Spokenly
-rejects that synthetic modifier event. The helper launch action is the current
-and permanent trackpad route.
-
-## MX Master Spokenly Adapter
-
-BTT is not used for the live MX Master Spokenly adapter. Logitech Options+
-owns the physical button and runs its Device-triggered Smart Action
-`Spokenly Hands-Free`. That action opens `~/Applications/Spokenly Toggle.app`,
-which calls `spokenly://toggle` without synthesizing a key event.
-
-### Removed Adapter Experiments
-
-The former global F20 trigger
-`1F6581F7-5158-4562-96BC-4651E63C893D` was removed on 2026-08-01. BTT did not
-receive the F20 or Hyper chord emitted by Logitech Options+. A second test
-mapped the Logitech thumb button to a modified middle-click and enabled BTT's
-high-level mouse recognition, but BTT still did not record the input while
-Logitech Options+ owned the mouse.
-
-BTT's generic keyboard action and dedicated modifier action both emitted
-synthetic Right Option events, but Spokenly ignored them. The blank normal
-mouse test trigger was moved to BTT's recoverable Trash. High-level mouse
-recognition and BTT's command-line socket were returned to their disabled
-state after testing. The later `Ctrl+Shift+B` trigger
-`00E52375-157C-4380-8CD7-B7CF310F18EC` was also removed after the physical
-thumb-button event failed to reach BTT.
 
 ## App-Specific Gestures
 
@@ -360,15 +321,14 @@ bundle ID `com.openai.codex`. Its relevant assignments are:
 
 | Physical control | Logitech assignment | Result |
 | --- | --- | --- |
-| Thumb wheel up | `Ctrl+B` | Runs the BTT sidebar toggle |
-| Thumb wheel down | `Cmd+Delete` | Deletes to the beginning of the line |
-| Forward button | `Cmd+K` | Opens Codex search |
+| Back button | `Cmd+Delete` | Deletes to the beginning of the line |
+| Forward button | `Shift+Return` | Inserts a new line without submitting |
+| Thumb wheel left | `Ctrl+Tab` | Switches to the next tab |
+| Thumb wheel right | `Cmd+K` | Opens Codex search |
 
-When testing the sidebar toggle, focus Codex and use one short thumb-wheel-up
-movement. If the sidebar does not visibly change, check BTT Usage Statistics
-for the `Ctrl+B` trigger. An increasing action count confirms that Logitech is
-reaching BTT; multiple increments from one movement point to duplicate input
-and should be absorbed by the debounce wrapper.
+The restored Logitech profile does not assign `Ctrl+B` to a mouse control.
+The Codex BTT sidebar trigger and its debounce wrapper remain available for a
+separate `Ctrl+B` source.
 
 #### 2026-07-30 Detached Action Incident
 
@@ -410,6 +370,12 @@ wrapper.
 
 ## App Switcher Mode
 
+The BTT app-switcher mode below is retained as historical configuration and
+rollback information for the MacBook trackpad. Its former three-finger
+trackpad trigger is disabled because Three Finger Switcher now owns both
+three-finger tap and horizontal swipe classification. The Magic Mouse
+two-finger app-switcher trigger remains active.
+
 BTT's special app switcher mode is enabled:
 
 ```sh
@@ -420,11 +386,11 @@ defaults read com.hegenberg.BetterTouchTool specialAppSwitcherInfoShown
 
 All should return `1`.
 
-BTT's action editor shows `Use Gesture Mode` enabled for the app switcher
-action. Its own description says the switcher advances with more taps or with
-scroll while fingers are still touching. In practice this means:
+BTT's action editor shows `Use Gesture Mode` enabled for the retained
+app-switcher action. Its own description says the switcher advances with more
+taps or with scroll while fingers are still touching. Historically this meant:
 
-- Three-finger swipe opens the app switcher.
+- Three-finger swipe opened the app switcher.
 - Two-finger scrolling can move through the app switcher.
 - Continuing to glide with the same three fingers does not appear to be a
   supported built-in BTT behavior.
@@ -438,15 +404,15 @@ defaults read com.hegenberg.BetterTouchTool BTTTpThreeFingerSwipeSensitivity
 
 Current value: `0.05`.
 
-Important: do not configure the app switcher gesture as a plain keyboard
+Important for rollback: do not configure the app switcher gesture as a plain keyboard
 shortcut like `Cmd+Tab` or `Shift+Cmd+Tab`. That only opens the macOS app
 switcher and can leave it waiting for release/confirmation. The working setup
 uses BTT's native Application Switcher action so the gesture behaves more like
 the MX Master gesture button.
 
 macOS's built-in 3-finger horizontal swipe is disabled in the matching
-trackpad preference domains so it does not fight BTT. Four-finger horizontal
-swipe remains enabled for Spaces/full-screen navigation.
+trackpad preference domains so it does not fight the current owner. Four-finger
+horizontal swipe remains enabled for Spaces/full-screen navigation.
 
 ## Magic Mouse Gestures
 
@@ -456,7 +422,6 @@ Current Magic Mouse gestures:
 | --- | --- | --- | --- |
 | 1-finger tap | `1` | `3` / Left Click at current mouse position | `73D46814-59D7-450D-8B99-FEB4FDE8CDF1` |
 | 1-finger tap right | `3` | `4` / Right Click at current mouse position | `042FC1A5-03DD-4C9D-9424-C5D6297DABBC` |
-| TipTap Left (1 Finger Fix) | `16` | `49` / launch `~/Applications/Spokenly Toggle.app` | `497F16E1-1725-4D6E-BD16-B8F88259EF2F` |
 | 2-finger swipe right | `6` | `46` / Application Switcher | `95B221B7-9EC1-4C8A-8D15-5542228FCF02` |
 | 3-finger tap | `9` | `1` / Middle Click at current mouse position | `CFBD7467-2660-467F-ABB4-D30CE1E9F021` |
 

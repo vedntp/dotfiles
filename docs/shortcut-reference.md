@@ -1,6 +1,6 @@
 # Custom Shortcut Reference
 
-Last audited against live settings: 2026-08-19
+Last audited against live settings: 2026-08-22
 
 ## Purpose
 
@@ -13,6 +13,7 @@ backup procedures, and troubleshooting:
 - [MX Master 3S reconstruction manifest](logitech-mx-master-3s-shortcuts.json)
 - [BetterTouchTool gesture setup](btt/README.md)
 - [Spokenly transcription profile](transcription/spokenly/README.md)
+- [Three Finger Switcher](three-finger-switcher.md)
 - [Ducky One 2 macOS setup](ducky-one-2-setup.md)
 
 Live application settings are authoritative when this file and a detailed guide
@@ -85,11 +86,26 @@ showing `allowedTerminal=true` and one `Fn tap triggered Ctrl+B` entry.
 
 | Physical input | Result |
 | --- | --- |
-| 3-finger swipe right | Open BTT's Application Switcher |
-| 3-finger swipe left | `Cmd+Delete`, delete to the beginning of the line |
+| 3-finger tap | Three Finger Switcher waits for release, then opens `Spokenly Toggle.app` |
+| 3-finger swipe right | Three Finger Switcher opens the macOS app switcher and supports two-finger scrubbing |
+| 3-finger swipe left | After 3.5 mm and 40 ms confirmation, sends one context-aware line-clear shortcut |
 | 4-finger tap | Return |
 
-The 3-finger click trigger is disabled and reserved for future use.
+Three Finger Switcher owns both three-finger tap and horizontal swipe
+classification. A tap must last 5 to 600 ms with no more than 2.0 mm of
+per-finger travel. Once the existing swipe threshold is crossed, swipe wins and
+Spokenly is not toggled. A left swipe uses the cached frontmost application:
+`Ctrl+U` in Ghostty, Alacritty, Terminal, cmux, Warp, and iTerm2, no shortcut
+in Three Finger Switcher, Finder, Mail, Messages, Notes, Reminders, Calendar,
+or Photos, and `Cmd+Delete` in every other, unknown, or missing-bundle app.
+The left action fires once per gesture and is re-armed after all fingers lift.
+The cache lookup adds negligible latency. All three-finger behaviors are
+controlled by **Enable Three-Finger Gestures**.
+
+Physical verification passed on 2026-08-22. The user confirmed that tap,
+right-swipe app switching with two-finger scrubbing, and context-aware
+left-swipe clearing work correctly in normal use. The superseded BTT trackpad
+triggers are absent from the live BTT data store.
 
 ### Global Magic Mouse gestures
 
@@ -121,7 +137,11 @@ Application-specific triggers override matching global gestures.
 
 The MX Master auxiliary/thumb button uses Logitech's `Spokenly Hands-Free`
 Smart Action to open `Spokenly Toggle.app`, which calls `spokenly://toggle`.
-No BetterTouchTool, trackpad, or Magic Mouse route activates Spokenly.
+The MacBook trackpad three-finger tap also reaches Spokenly through that helper,
+but only after Three Finger Switcher classifies and releases a valid tap. The
+unnamed Spokenly `threeFingerLight` mode was backed up and deleted so it cannot
+race the switcher. Magic Mouse activation remains governed by its current BTT
+configuration.
 
 The complete machine-readable profile inventory, including Logitech card
 payloads and thumb-wheel directions, is in the [MX Master 3S reconstruction
@@ -158,10 +178,12 @@ chords with `ReceiveChar`; the workspace shortcuts depend on Option-as-Alt.
 | Shortcut | Result |
 | --- | --- |
 | `Ctrl+B`, then `n` / `p` | Next / previous Herdr tab |
-| `Cmd+1` through `Cmd+9` | Switch to Herdr tabs 1 through 9 |
+| `Ctrl+PageDown` / `Ctrl+PageUp` | Next / previous Herdr workspace (translated by Alacritty to Herdr prefix + `Shift+N` / `Shift+P`) |
+| `Cmd+1` through `Cmd+9` | Switch to Herdr workspaces 1 through 9 |
 | `Ctrl+Option+1` through `Ctrl+Option+9` | Focus agents 1 through 9 |
-| `Ctrl+Tab` / `Ctrl+Shift+Tab` | Next / previous Herdr workspace; Ctrl+Tab is also the MX Master Forward-button mapping in Alacritty |
-| `Ctrl+1` through `Ctrl+9` | Switch directly to workspaces 1 through 9 |
+| `Option+Tab` / `Option+Shift+Tab` | Next / previous Herdr agent |
+| `Ctrl+Tab` / `Ctrl+Shift+Tab` | Next / previous Herdr tab; Ctrl+Tab is also the MX Master Forward-button mapping in Alacritty |
+| `Ctrl+1` through `Ctrl+9` | Switch directly to Herdr tabs 1 through 9 |
 | `Cmd+T` | Open a new Herdr tab immediately with a generated name |
 | `Cmd+Shift+T` | Rename the focused Herdr tab |
 | `Cmd+W` | Close the focused Herdr pane, not the tab |
