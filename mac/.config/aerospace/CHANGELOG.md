@@ -1,5 +1,8 @@
 # Aerospace Configuration Changelog
 
+## 2026-09-09
+- Assigned AmpCode (`com.ampcode.amp.macos`) to workspace `V` by default.
+
 ## 2026-08-21
 - Reassigned Option+Tab and Option+Shift+Tab from AeroSpace workspace cycling
   and monitor movement to Herdr next-agent and previous-agent navigation.

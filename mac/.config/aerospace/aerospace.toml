@@ -243,13 +243,17 @@ run = ['layout floating', 'move-node-to-workspace O']
 if.app-id = 'com.tinyspeck.slackmacgap'
 run = 'move-node-to-workspace S'
 
-# Workspace V - Claude AI
+# Workspace V - Claude AI / AmpCode
 [[on-window-detected]]
 if.app-name-regex-substring = 'Claude'
 run = 'move-node-to-workspace V'
 
 [[on-window-detected]]
 if.app-id = 'com.conductor.app'
+run = 'move-node-to-workspace V'
+
+[[on-window-detected]]
+if.app-id = 'com.ampcode.amp.macos'
 run = 'move-node-to-workspace V'
 
 # Workspace 10 - YouTube Music

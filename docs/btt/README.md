@@ -148,7 +148,9 @@ Its valid tap path waits for release, then launches `Spokenly Toggle.app`. A
 rightward horizontal movement that reaches the existing threshold opens the
 macOS app switcher, while a leftward movement emits one context-aware
 line-clear shortcut. See [the switcher guide](../three-finger-switcher.md) for
-the 5 to 600 ms tap window, 2.0 mm travel allowance, and application routing.
+the 5 to 600 ms tap window, 2.0 mm travel allowance, application routing, and
+the pending 2026-08-29 palm-filter calibration. Palm rejection belongs to
+Three Finger Switcher, not BTT.
 Current BTT UUIDs:
 
 | Gesture | UUID |

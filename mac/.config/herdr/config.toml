@@ -13,7 +13,7 @@ previous_workspace = "prefix+shift+p"
 next_workspace = "prefix+shift+n"
 previous_agent = "alt+shift+tab"
 next_agent = "alt+tab"
-switch_tab = ["prefix+1..9", "ctrl+1..9"]
+switch_tab = ["prefix+1..9", "cmd+1..9"]
 goto = ["prefix+g", "cmd+p"]
 focus_pane_left = ["prefix+h", "cmd+shift+h"]
 focus_pane_down = ["prefix+j", "cmd+shift+j"]
@@ -25,7 +25,7 @@ zoom = ["prefix+z", "cmd+z"]
 close_pane = ["prefix+x", "cmd+w"]
 split_vertical = ["prefix+v", "cmd+d"]
 split_horizontal = ["prefix+minus", "cmd+shift+d"]
-switch_workspace = "cmd+1..9"
+switch_workspace = "ctrl+1..9"
 
 [ui]
 agent_panel_sort = "spaces"

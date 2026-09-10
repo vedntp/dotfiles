@@ -1,6 +1,6 @@
 # Custom Shortcut Reference
 
-Last audited against live settings: 2026-08-22
+Last audited against live settings: 2026-09-03
 
 ## Purpose
 
@@ -40,8 +40,8 @@ The Logitech profile displayed as `ChatGPT` targets Codex bundle ID
 
 | Profile | Auxiliary/thumb `c195` | Wheel click `c82` | Back `c83` | Forward `c86` | Thumb wheel up / left | Thumb wheel down / right |
 | --- | --- | --- | --- | --- | --- | --- |
-| Desktop/default | Logitech Smart Action `Spokenly Hands-Free` | Middle click | Native Back | Native Forward | Native horizontal scroll | Native horizontal scroll |
-| Alacritty (`org.alacritty`) | Logitech Smart Action `Spokenly Hands-Free` | Return | `Ctrl+U` | `Ctrl+Tab`, next tab | `Ctrl+Option+Shift+Tab` (raw) | `Ctrl+Option+Tab` (raw) |
+| Desktop/default | Logitech Smart Action `Spokenly Hands-Free` | Middle click | `Cmd+Delete` | `Shift+Return` | Native horizontal scroll | Native horizontal scroll |
+| Alacritty (`org.alacritty`) | Logitech Smart Action `Spokenly Hands-Free` | Return | `Ctrl+U` | `Ctrl+PageDown`, next Herdr workspace | `Ctrl+Shift+Tab`, previous Herdr tab | `Ctrl+Tab`, next Herdr tab |
 | Codex, shown as ChatGPT (`com.openai.codex`) | Logitech Smart Action `Spokenly Hands-Free` | Return | `Cmd+Delete` | `Shift+Return` | `Ctrl+Tab` | `Cmd+K`, open search |
 | Conductor (`com.conductor.app`) | Logitech Smart Action `Spokenly Hands-Free` | Return | `Cmd+Delete` | `Shift+Return` | `Ctrl+Shift+Tab` | `Ctrl+Tab` |
 | Claude (`com.anthropic.claudefordesktop`) | Logitech Smart Action `Spokenly Hands-Free` | Enter | Native Back | Native Forward | `Ctrl+Shift+Tab` | `Ctrl+Tab` |
@@ -50,7 +50,8 @@ The Logitech profile displayed as `ChatGPT` targets Codex bundle ID
 | Google Chrome (`com.google.Chrome`) | Logitech Smart Action `Spokenly Hands-Free` | Middle click | Native Back | Native Forward | `Ctrl+Shift+Tab` | `Ctrl+Tab` |
 | Brave Browser (`com.brave.Browser`) | Logitech Smart Action `Spokenly Hands-Free` | Middle click | Native Back | Native Forward | `Ctrl+Shift+Tab` | `Ctrl+Tab` |
 | Firefox (`org.mozilla.firefox`) | Logitech Smart Action `Spokenly Hands-Free` | Middle click | Native Back | Native Forward | `Ctrl+Shift+Tab` | `Ctrl+Tab` |
-| Helium (`net.imput.helium`) | Logitech Smart Action `Spokenly Hands-Free` | Middle click | Native Back | Native Forward | `Ctrl+Tab` | `Ctrl+Shift+Tab` |
+| Helium (`net.imput.helium`) | Logitech Smart Action `Spokenly Hands-Free` | Middle click | Native Back | Native Forward | `Ctrl+Shift+Tab`, previous tab | `Ctrl+Tab`, next tab |
+| youtube Brave PWA (`com.brave.Browser.app.agimnkijcaahngcdmfeangaknmldooml`) | Logitech Smart Action `Spokenly Hands-Free` | Middle click | Native Back | Native Forward | System volume | System volume |
 | Sioyek (`info.sioyek.sioyek`) | Logitech Smart Action `Spokenly Hands-Free` | Middle click | Right Arrow | Left Arrow | `-`, zoom out | `=`, zoom in |
 
 ## BetterTouchTool
@@ -99,13 +100,20 @@ Spokenly is not toggled. A left swipe uses the cached frontmost application:
 in Three Finger Switcher, Finder, Mail, Messages, Notes, Reminders, Calendar,
 or Photos, and `Cmd+Delete` in every other, unknown, or missing-bundle app.
 The left action fires once per gesture and is re-armed after all fingers lift.
-The cache lookup adds negligible latency. All three-finger behaviors are
-controlled by **Enable Three-Finger Gestures**.
+The cache lookup adds negligible latency. All three-finger behaviors are owned
+by the background Three Finger Switcher process.
 
 Physical verification passed on 2026-08-22. The user confirmed that tap,
 right-swipe app switching with two-finger scrubbing, and context-aware
 left-swipe clearing work correctly in normal use. The superseded BTT trackpad
 triggers are absent from the live BTT data store.
+
+The stronger 2026-08-29 palm filter rejects a complete frame when two ordinary
+signals agree, using pressure, contact ellipse area, adaptive combined area,
+bottom-edge contact position, and contact-arrival timing. Invalid data and the hard
+contact limit reject immediately. It affects only Three Finger Switcher and is
+pending physical verification; exact values and rollback are in the
+[Three Finger Switcher guide](three-finger-switcher.md).
 
 ### Global Magic Mouse gestures
 
@@ -173,17 +181,17 @@ Right Command, while physical right GUI emits Right Option.
 The live sources are `mac/.config/herdr/config.toml` and
 `mac/.config/alacritty/alacritty.toml`. Herdr's prefix remains `Ctrl+B`, and
 the prefix alternatives remain available. Alacritty forwards the Command
-chords with `ReceiveChar`; the workspace shortcuts depend on Option-as-Alt.
+chords with `ReceiveChar`; the agent shortcuts depend on Option-as-Alt.
 
 | Shortcut | Result |
 | --- | --- |
 | `Ctrl+B`, then `n` / `p` | Next / previous Herdr tab |
 | `Ctrl+PageDown` / `Ctrl+PageUp` | Next / previous Herdr workspace (translated by Alacritty to Herdr prefix + `Shift+N` / `Shift+P`) |
-| `Cmd+1` through `Cmd+9` | Switch to Herdr workspaces 1 through 9 |
+| `Cmd+1` through `Cmd+9` | Switch directly to Herdr tabs 1 through 9 |
 | `Ctrl+Option+1` through `Ctrl+Option+9` | Focus agents 1 through 9 |
 | `Option+Tab` / `Option+Shift+Tab` | Next / previous Herdr agent |
-| `Ctrl+Tab` / `Ctrl+Shift+Tab` | Next / previous Herdr tab; Ctrl+Tab is also the MX Master Forward-button mapping in Alacritty |
-| `Ctrl+1` through `Ctrl+9` | Switch directly to Herdr tabs 1 through 9 |
+| `Ctrl+Tab` / `Ctrl+Shift+Tab` | Next / previous Herdr tab; MX Master thumb wheel down/right and up/left in Alacritty, MX Master Forward is now `Ctrl+PageDown` for next workspace |
+| `Ctrl+1` through `Ctrl+9` | Switch to Herdr workspaces 1 through 9 |
 | `Cmd+T` | Open a new Herdr tab immediately with a generated name |
 | `Cmd+Shift+T` | Rename the focused Herdr tab |
 | `Cmd+W` | Close the focused Herdr pane, not the tab |
@@ -192,9 +200,9 @@ chords with `ReceiveChar`; the workspace shortcuts depend on Option-as-Alt.
 | `Cmd+Shift+H` / `Cmd+Shift+J` / `Cmd+Shift+K` / `Cmd+Shift+L` | Focus the pane left / down / up / right |
 | `Cmd+P` | Open the Herdr Goto navigator |
 
-The MX Master thumb wheel still emits the raw Ctrl+Option+Shift+Tab and
-Ctrl+Option+Tab chords in Alacritty, but Herdr has no custom action for those
-thumb-wheel chords.
+The MX Master thumb wheel in Alacritty now sends `Ctrl+Shift+Tab` up/left
+for previous Herdr tab and `Ctrl+Tab` down/right for next Herdr tab. The old
+raw `Ctrl+Option+Tab` chords are gone.
 
 Stock Alacritty/winit retains the native `Hide Alacritty` Cmd+H menu action;
 Cmd+Shift+H is the Herdr pane-left shortcut. Cmd+K remains Alacritty's native

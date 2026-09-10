@@ -1,6 +1,6 @@
 # Logitech Options+ and Spokenly Setup
 
-Last audited: 2026-08-19
+Last audited: 2026-09-03
 
 ## Goal
 
@@ -58,22 +58,23 @@ application IDs, and both thumb-wheel directions.
 
 ### Full Profile Snapshot
 
-Generated from the live Logitech Options+ database and rechecked on 2026-08-19.
+Generated from the live Logitech Options+ database and rechecked on 2026-09-03.
 
 | App/profile | Bundle id | Thumb button `c195` | Wheel click `c82` | Back `c83` | Forward `c86` |
 | --- | --- | --- | --- | --- | --- |
-| Desktop/default | global fallback | Smart Action `Spokenly Hands-Free` | Real middle click: `MB3` | Native Back | Native Forward |
+| Desktop/default | global fallback | Smart Action `Spokenly Hands-Free` | Real middle click: `MB3` | `Cmd+Delete` | `Shift+Return` |
 | Codex | `com.openai.codex` | Smart Action `Spokenly Hands-Free` | `Enter` | `Cmd+Delete` | `Shift+Return` |
 | Conductor | `com.conductor.app` | Smart Action `Spokenly Hands-Free` | `Enter` | `Cmd+Delete` | `Shift+Return` |
 | Claude | `com.anthropic.claudefordesktop` | Smart Action `Spokenly Hands-Free` | `Enter` | Native Back | Native Forward |
 | Ghostty | `com.mitchellh.ghostty` | Smart Action `Spokenly Hands-Free` | `Enter` | Native Back | Native Forward |
-| Alacritty | `org.alacritty` | Smart Action `Spokenly Hands-Free` | `Enter` | `Ctrl+U` | `Ctrl+Tab` |
+| Alacritty | `org.alacritty` | Smart Action `Spokenly Hands-Free` | `Enter` | `Ctrl+U` | `Ctrl+PageDown` |
 | Safari | `com.apple.Safari` | Smart Action `Spokenly Hands-Free` | Real middle click: `MB3` | Native Back | Native Forward |
 | Google Chrome | `com.google.Chrome` | Smart Action `Spokenly Hands-Free` | Real middle click: `MB3` | Native Back | Native Forward |
 | Brave Browser | `com.brave.Browser` | Smart Action `Spokenly Hands-Free` | Real middle click: `MB3` | Native Back | Native Forward |
 | Firefox | `org.mozilla.firefox` | Smart Action `Spokenly Hands-Free` | Real middle click: `MB3` | Native Back | Native Forward |
 | Helium | `net.imput.helium` | Smart Action `Spokenly Hands-Free` | Real middle click: `MB3` | Native Back | Native Forward |
 | Sioyek | `info.sioyek.sioyek` | Smart Action `Spokenly Hands-Free` | Real middle click: `MB3` | Right Arrow | Left Arrow |
+| youtube | `com.brave.Browser.app.agimnkijcaahngcdmfeangaknmldooml` | Smart Action `Spokenly Hands-Free` | Real middle click: `MB3` | Native Back | Native Forward |
 
 ### Alacritty Herdr Navigation
 
@@ -83,13 +84,14 @@ explicit keyboard shortcuts:
 | Physical control | Assignment |
 | --- | --- |
 | Back button | `Ctrl+U` |
-| Forward button | `Ctrl+Tab`, next tab |
-| Thumb wheel up | `Ctrl+Option+Shift+Tab` (raw; no custom Herdr workspace action) |
-| Thumb wheel down | `Ctrl+Option+Tab` (raw; no custom Herdr workspace action) |
+| Forward button | `Ctrl+PageDown`, next Herdr workspace via Alacritty translation |
+| Thumb wheel up / left | `Ctrl+Shift+Tab`, previous Herdr tab |
+| Thumb wheel down / right | `Ctrl+Tab`, next Herdr tab |
 
-Herdr maps the Forward-button Ctrl+Tab chord to next tab while retaining
-the `Ctrl+B`, then `n`/`p` tab navigation sequences. The thumb-wheel chords have
-no custom Herdr workspace action.
+Herdr maps `Ctrl+Tab` / `Ctrl+Shift+Tab` to next / previous tab, and Alacritty
+translates the Forward-button `Ctrl+PageDown` chord to Herdr prefix +
+`Shift+N` for next workspace. The previous raw `Ctrl+Option+Tab` thumb-wheel
+chords are gone.
 
 ### Wheel Click
 
@@ -124,7 +126,6 @@ Known-good browser/default shape:
 
 Profiles currently matching that browser/default shape:
 
-- Desktop/default
 - Safari
 - Google Chrome
 - Brave Browser
@@ -132,6 +133,10 @@ Profiles currently matching that browser/default shape:
 - Helium
 - Claude
 - Ghostty
+- youtube Brave PWA
+
+Desktop/default no longer matches. It now uses `Cmd+Delete` and
+`Shift+Return`, the same as Codex and Conductor.
 
 Every restored MX Master profile assigns the thumb button (`c195`) to the
 Logitech Smart Action `Spokenly Hands-Free`, which opens
@@ -140,7 +145,7 @@ Logitech Smart Action `Spokenly Hands-Free`, which opens
 The Smart Action card identifier is
 `d18fe790-d754-4fbc-8e82-0e5df78bda9e`; its macro payload opens
 `/Users/vp/Applications/Spokenly Toggle.app` with the `OPEN_FILE_FOLDER`
-action. The twelve profile IDs, application IDs, application paths, HID key
+action. The thirteen profile IDs, application IDs, application paths, HID key
 codes, and modifier arrays are preserved in the [reconstruction manifest](logitech-mx-master-3s-shortcuts.json).
 
 Codex currently has a custom layout:
@@ -187,12 +192,15 @@ assignments:
 ~/Library/Application Support/LogiOptionsPlus/settings.db.backup-codex-20260728
 ```
 
-The current known-good recovery snapshot used for this audit is:
+The current known-good recovery snapshot used for the August audit is:
 
 ```text
 ~/Library/Application Support/LogiOptionsPlus/settings.db.recovered-full-with-global-20260819-144026
 SHA-256: a578b4ffd9a5e5cbcea24e4828eb582109ec835309b4acce5e965e4a3060ffe9
 ```
+
+The September audit is against the live database directly. The manifest
+`audit_timestamp` is `2026-09-03` and `expected_profile_count` is `13`.
 
 See the related BTT guide for trigger details and troubleshooting:
 
@@ -221,29 +229,38 @@ Codex first, so focus is not moved before the send action.
 Browser profiles keep wheel click as real `MB3`, preserving background-tab and
 other browser-native middle-click behavior.
 
-### YouTube PWA / Brave App Gotcha
+### YouTube PWA / Brave App
 
-YouTube installed from Brave can run as a separate app shim, for example:
+YouTube installed from Brave runs as a separate app shim:
 
 ```text
 /Users/vp/Applications/Brave Browser Apps.localized/YouTube.app
 com.brave.Browser.app.agimnkijcaahngcdmfeangaknmldooml
 ```
 
-That may not use the normal Brave Browser profile. It can fall back to the
-Desktop/default profile.
-
-If YouTube behaves differently from Brave:
-
-1. Check whether it is running as a Brave PWA/app shim.
-2. Check the Desktop/default Logi profile.
-3. If needed, create a dedicated Logi profile for the YouTube app bundle.
-
-In this setup, the default profile should keep:
+It now has a dedicated Logi profile named `youtube`, so it no longer falls
+back to Desktop/default:
 
 - Wheel click: `MB3`
-- Back: `OSX_GESTURE_BACK`
-- Forward: `OSX_GESTURE_FORWARD`
+- Back: Native Back
+- Forward: Native Forward
+- Thumb wheel: system volume control
+
+### Helium Thumb Wheel
+
+Helium thumb wheel was swapped to left equals previous and right equals next:
+
+- Thumb wheel up / left: `Ctrl+Shift+Tab`, previous tab
+- Thumb wheel down / right: `Ctrl+Tab`, next tab
+
+This matches the Alacritty Herdr tab direction and fixes the previous reversed
+mapping.
+
+In this setup, the default profile now keeps:
+
+- Wheel click: `MB3`
+- Back: `Cmd+Delete`
+- Forward: `Shift+Return`
 
 ## Audit Commands
 

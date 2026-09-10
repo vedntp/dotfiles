@@ -73,7 +73,7 @@ Rules are ordered. Specific rules must stay above broader rules, and the final c
 | `N` | Safari, Notion |
 | `O` | Books floating, Obsidian |
 | `S` | Slack |
-| `V` | Claude |
+| `V` | Claude, Amp |
 | `Y` | YouTube |
 | `Z` | Day One |
 

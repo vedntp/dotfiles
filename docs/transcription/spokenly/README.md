@@ -80,12 +80,18 @@ shortcut. The cached frontmost app selects `Ctrl+U` in Ghostty, Alacritty,
 Terminal, cmux, Warp, and iTerm2, suppresses the shortcut in Three Finger
 Switcher, Finder, Mail, Messages, Notes, Reminders, Calendar, and Photos, and
 uses `Cmd+Delete` in every other, unknown, or missing-bundle application. The
-cache lookup adds negligible latency. All behaviors are controlled by the
-switcher's **Enable Three-Finger Gestures** menu item.
+cache lookup adds negligible latency. All behaviors are owned by the background
+Three Finger Switcher process.
 
 The competing unnamed Spokenly mode with trigger `threeFingerLight` was backed
 up before being deleted. This prevents Spokenly's own light three-finger
 recognizer from firing before the switcher can classify the interaction.
+
+Three Finger Switcher applies whole-frame palm rejection before this tap path.
+Rejected contacts cannot toggle Spokenly or become an apparent release. The
+stronger 2026-08-29 calibration is pending physical verification; its exact
+thresholds and rollback procedure are maintained in the
+[Three Finger Switcher guide](../../three-finger-switcher.md).
 
 ## Current Device Compatibility
 
@@ -153,12 +159,14 @@ Spokenly, macOS, or switcher updates.
    the same mode.
 4. Make a deliberate three-finger tap and confirm the switcher toggles Spokenly
    once after release.
-5. Make a three-finger swipe right and confirm it opens the app switcher
+5. Reproduce a palm rest or broad accidental contact and confirm it produces no
+   Spokenly, app-switcher, or line-clear action.
+6. Make a three-finger swipe right and confirm it opens the app switcher
    without toggling Spokenly; keep two fingers down and confirm scrubbing.
-6. Make a three-finger swipe left in a terminal and confirm one `Ctrl+U`; test
+7. Make a three-finger swipe left in a terminal and confirm one `Ctrl+U`; test
    an ordinary text app for one `Cmd+Delete`, and confirm a denylisted app is
    suppressed.
-7. Press the MX Master auxiliary/thumb button and confirm it toggles Spokenly.
+8. Press the MX Master auxiliary/thumb button and confirm it toggles Spokenly.
 
 ## Rollback
 

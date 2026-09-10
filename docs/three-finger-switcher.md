@@ -4,7 +4,7 @@ Last updated: 2026-08-22
 
 ## Status
 
-Three Finger Switcher is a working local macOS menu-bar app that reproduces
+Three Finger Switcher is a working local background macOS app that reproduces
 the useful BetterTouchTool app-switching gesture without depending on
 BetterTouchTool for recognition or key emission. It now owns the MacBook
 trackpad's three-finger tap and horizontal swipe arbitration, so Spokenly and
@@ -33,8 +33,8 @@ The stable installed bundle that should actually be run is:
 The installed app automatically creates the per-user LaunchAgent
 `~/Library/LaunchAgents/com.local.ThreeFingerSwitcher.login.plist`. This is
 what brings the gesture back after logout, restart, or a Software Update
-reboot. The Launch at Login menu item controls this file. Running only the
-temporary build bundle does not provide reliable restart persistence.
+reboot. Running only the temporary build bundle does not provide reliable
+restart persistence.
 
 The app has bundle identifier `com.local.ThreeFingerSwitcher`. It has no
 networking, accounts, telemetry, or database. It stores its small set of menu
@@ -45,7 +45,8 @@ build. The user confirmed that the three-finger tap, right-swipe app switcher,
 two-finger scrubbing, and context-aware left-swipe line clear work correctly in
 normal use. The former BetterTouchTool trackpad triggers are absent from the
 live BTT data store, and Spokenly's competing `threeFingerLight` mode remains
-removed.
+removed. The stronger palm-rejection calibration added on 2026-08-29 remains
+pending physical verification on the installed build.
 
 ## Three-Finger Arbitration
 
@@ -67,8 +68,15 @@ One recognizer owns the complete three-finger contact:
   from toggling Spokenly.
 - A fourth finger, a stale contact stream, or another cancellation condition
   produces no Spokenly action and safely cancels any active switcher session.
+- Palm rejection examines the complete raw frame before gesture recognition.
+  Invalid or exceptionally large contacts reject immediately. Other frames
+  require two indicators from pressure, relative contact area, combined area,
+  a bottom-edge contact, or slow contact arrival. A rejected frame is never
+  converted into an apparent finger release.
+- Initial swipe classification requires all three fingers to move in the same
+  horizontal direction. Centroid motion by only one or two contacts is ignored.
 
-All three behaviors are controlled by the menu item **Enable Three-Finger Gestures**.
+All three behaviors are owned by the background switcher process.
 The line-clear action uses the cached frontmost application bundle ID, so the
 context check adds negligible latency to gesture handling.
 The old unnamed Spokenly `threeFingerLight` mode was backed up before removal;
@@ -121,8 +129,8 @@ Other supported behavior:
   automatically re-registers it after a device stop, system wake, or screen
   wake. This prevents the menu-bar process from remaining alive with a dead
   trackpad callback.
-- Two-finger scrubbing can be disabled from the menu-bar icon. Disabling it
-  restores the original three-finger-only behavior without rebuilding.
+- Two-finger scrubbing remains controlled by the persisted
+  `twoFingerScrubbing` preference.
 
 ## Current Calibration
 
@@ -152,6 +160,25 @@ Other recognizer calibration values are in
 | `endDebounceFrames` | 2 frames | Tolerates a momentary contact dropout before committing. |
 | `staleFrameGap` | 2 seconds | Cancels a gesture after the raw touch stream stalls. |
 
+Palm calibration is in `Sources/SwitcherCore/PalmRejectionFilter.swift`:
+
+| Variable | Value | Purpose |
+| --- | ---: | --- |
+| `pressureFloor` | `0.60` | Marks elevated contact pressure as one indicator. |
+| `relativeAreaMultiplier` | `2.0` | Marks one ellipse at least twice the frame median. |
+| `hardZTotalLimit` | `1.5` | Rejects an exceptionally large contact immediately. |
+| `combinedAreaMultiplier` | `2.2` | Compares total ellipse area with the adaptive normal baseline. |
+| `bottomEdgeFraction` | `0.12` | Marks a contact in the bottom 12 percent. |
+| `contactArrivalWindow` | `70 ms` | Marks three contacts arriving over a longer interval. |
+| `requiredIndicatorCount` | `2` | Requires two ordinary palm indicators to agree. |
+| `baselineSampleLimit` | `24` | Bounds the rolling normal-area calibration history. |
+| `palmRejectionQuarantine` | `250 ms` | Blocks the remainder of a rejected contact sequence. |
+| `swipeFingerDirectionMinimumMM` | `0.5 mm` | Requires each finger to agree with the initial swipe direction. |
+
+The combined-area baseline learns from one clean, indicator-free frame per
+contact sequence. It is runtime-only and resets when the gesture engine
+restarts. These are source constants, not menu settings.
+
 Keyboard event timing is in
 `Sources/ThreeFingerSwitcher/EventSynthesizer.swift`:
 
@@ -171,7 +198,7 @@ Keyboard event timing is in
 ```text
 MultitouchSupport.framework
   -> DeviceMonitor receives raw contact frames
-  -> SwitcherEngine filters contacts and palms
+  -> SwitcherEngine applies whole-frame PalmRejectionFilter
   -> SwipeRecognizer emits begin, step, commit, clear, or cancel
   -> FrontmostApplicationCache supplies the current bundle ID for left swipes
   -> AppSwitchKeyPlanner manages the held-Command lifecycle
@@ -188,17 +215,10 @@ the device as an opaque pointer. Retaining it as an Objective-C object, or
 borrowing a handle from a temporary device list, caused crashes during the
 macOS 27 investigation.
 
-## Menu-Bar Controls
+## Background Operation
 
-The arrow icon provides:
-
-- Enable Three-Finger Gestures
-- Swipe Sensitivity: High, Normal, or Low
-- Two-Finger Scrubbing After Opening
-- Launch at Login
-- Setup Instructions
-- Open Accessibility Settings
-- Quit Three Finger Switcher
+The app runs without a menu-bar or Dock icon. Its persisted gesture settings
+continue to apply, and the per-user LaunchAgent starts it after login.
 
 The relevant `UserDefaults` keys are:
 
@@ -251,16 +271,26 @@ To reject only the experimental two-finger interaction, turn off **Two-Finger
 Scrubbing After Opening** in the menu. The original working three-finger path
 remains intact.
 
-To disable the entire custom gesture, turn off **Enable Three-Finger Gestures**
-or quit the menu-bar app. BetterTouchTool can then own the gesture again if its
+To disable the entire custom gesture, stop the background app. BetterTouchTool
+can then own the gesture again if its
 corresponding triggers are enabled. The old BTT left-swipe trigger always sends
 `Cmd+Delete`; enable it only if that static rollback behavior is wanted. To
 restore Spokenly's original ownership of the three-finger tap, restore the
 backed-up unnamed `threeFingerLight` mode in Spokenly after disabling this app.
 
+To remove only custom palm rejection, delete its filter integration and restore
+the previous `zTotal > 2.0` contact guard before rebuilding. For an immediate
+rollback of all custom gestures, quit or disable Three Finger Switcher before
+restoring one alternate BTT or Spokenly owner. macOS palm rejection is separate
+and must not be changed.
+
+The 2026-08-29 palm calibration remains pending physical verification. Test a
+deliberate tap, right swipe, two-finger scrub, and left swipe, then reproduce
+the accidental palm contact and confirm that it produces no action.
+
 If the switcher ever appears stuck, lift all fingers. The recognizer commits on
 release, and the independent watchdog cancels a stalled session after 2
-seconds. Quitting the menu-bar app also sends a cancellation and releases
+seconds. Quitting the background app also sends a cancellation and releases
 Command.
 
 If a rebuild stops sending Command-Tab:
@@ -280,7 +310,7 @@ All paths below are relative to
 | File | Purpose |
 | --- | --- |
 | `.gitignore` | Excludes Swift and packaged build output. |
-| `App/Info.plist` | App identity, version, menu-bar-only mode, and minimum macOS version. |
+| `App/Info.plist` | App identity, background accessory mode, and minimum macOS version. |
 | `Package.swift` | Swift package targets, products, platform, and private-framework linker settings. |
 | `README.md` | Project-level behavior, build, setup, and architecture overview. |
 | `LICENSE` | Project license. |

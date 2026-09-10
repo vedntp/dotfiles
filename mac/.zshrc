@@ -157,6 +157,7 @@ export VISUAL='nvim'
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias szsh='source ~/.zshrc'
 alias hetzner='ssh myserver'
+alias ompg='omp --config "$HOME/.omp/agent/presets/opencode-go.yml"'
 
 # List project-scoped Codex skills from the project root.
 alias project-skills='find .agents/skills -name SKILL.md -print 2>/dev/null'
@@ -257,7 +258,9 @@ alias cldp="claude --dangerously-skip-permissions --model sonnet --effort medium
 
 # codex
 alias cx="codex --yolo"
+alias cxl="codex -p lean --dangerously-bypass-approvals-and-sandbox"
 alias oc="opencode --auto"
+alias oc2="opencode2 --auto"
 
 # Usage aliases with model breakdown
 alias ccu="ccusage --since \$(date +%Y%m%d) -b"
@@ -276,8 +279,6 @@ alias gfix="gcloud auth application-default login"
 # Source machine-specific local overrides (not version controlled)
 [[ -f ~/.config/zsh/.zshrc.local ]] && source ~/.config/zsh/.zshrc.local
 
-# OpenClaw Completion
-source "/Users/vp/.openclaw/completions/openclaw.zsh"
 export PATH="$HOME/.local/bin:$PATH"
 
 # omnara
@@ -288,3 +289,7 @@ path=("/Users/vp/.omnara/bin" $path)
 
 # Added by Devin
 export PATH="/Users/vp/.codeium/windsurf/bin:$PATH"
+
+
+# Added by Antigravity CLI installer
+export PATH="/Users/vp/.local/bin:$PATH"

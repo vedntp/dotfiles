@@ -49,10 +49,13 @@ latency. See the
 [Three Finger Switcher guide](../three-finger-switcher.md) for the live
 preference serialization, calibration, and verification steps.
 
+The switcher applies its own whole-frame palm filter before classifying the
+trackpad route. The stronger 2026-08-29 calibration remains pending physical
+verification and does not modify macOS palm rejection.
+
 The competing unnamed Spokenly `threeFingerLight` mode was backed up and
 deleted, so Spokenly's built-in recognizer cannot race the switcher. The
-switcher's **Enable Three-Finger Gestures** menu item controls both tap and
-swipe behavior.
+background switcher owns both tap and swipe behavior.
 
 ## Documentation Rules
 

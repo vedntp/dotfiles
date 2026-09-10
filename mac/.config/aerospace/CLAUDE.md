@@ -70,7 +70,7 @@ preserves the v1 behavior for all currently bound workspace keys.
 | O | Books (floating), Obsidian |
 | P | VS Code |
 | S | Slack |
-| V | Claude |
+| V | Claude, Amp |
 | Y | YouTube |
 | Z | Day One |
 
