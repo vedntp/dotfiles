@@ -1,0 +1,129 @@
+#!/bin/zsh
+# Keep custom icons on installed Chrome/Brave web apps (PWAs).
+#
+# Usage:
+#   webapp-icon set <App name> <icon-1024.png> [maskable-1024.png]
+#   webapp-icon sync        # reapply any icon in ~/.config/webapp-icons that drifted
+#
+#   icon      1024x1024 PNG, macOS style (rounded tile with transparent margin)
+#   maskable  1024x1024 PNG, full-bleed square with the logo inside the
+#             central ~60%. Defaults to <icon> when omitted.
+#
+# Icons live in ~/.config/webapp-icons/<App name>.png and
+# <App name>-maskable.png. Run manually; there is deliberately no background
+# job (see docs/web-apps.md). Reading browser data needs the terminal's own
+# macOS privacy access, so launchd agents cannot run this without Full Disk
+# Access.
+
+emulate -L zsh
+set -euo pipefail
+setopt null_glob extended_glob
+
+icons_dir="$HOME/.config/webapp-icons"
+state_dir="$HOME/Library/Application Support/webapp-icon"
+
+usage() { sed -n '4,11p' "$0" | sed 's/^# \{0,1\}//'; exit 1; }
+log() { print "$(date '+%F %T') $*"; }
+
+# Sets: shim app_id resources
+locate_app() {
+  local name="$1" dir plist browser_id data_root profile_prefs
+  local -a prefs
+  shim=""
+  for dir in "$HOME/Applications/Chrome Apps.localized" "$HOME/Applications/Brave Browser Apps.localized"; do
+    [[ -d "$dir/$name.app" ]] && { shim="$dir/$name.app"; break; }
+  done
+  [[ -n "$shim" ]] || { log "$name: app not installed, skipping"; return 1; }
+
+  plist="$shim/Contents/Info.plist"
+  app_id="$(plutil -extract CrAppModeShortcutID raw "$plist")"
+  browser_id="$(plutil -extract CrBundleIdentifier raw "$plist")"
+  case "$browser_id" in
+    com.google.Chrome) data_root="$HOME/Library/Application Support/Google/Chrome" ;;
+    com.brave.Browser) data_root="$HOME/Library/Application Support/BraveSoftware/Brave-Browser" ;;
+    *) log "$name: unsupported browser $browser_id"; return 1 ;;
+  esac
+
+  prefs=("$data_root"/*/Preferences)
+  profile_prefs="$(grep -l "$app_id" "${prefs[@]}" 2>/dev/null | head -1 || true)"
+  [[ -n "$profile_prefs" ]] || { log "$name: no profile owns $app_id"; return 1; }
+  resources="${profile_prefs:h}/Web Applications/Manifest Resources/$app_id"
+  [[ -d "$resources" ]] || { log "$name: missing $resources"; return 1; }
+}
+
+stored_pngs() {
+  local png size
+  for png in "$resources"/**/*.png; do
+    [[ "$png" == *Monochrome* ]] && continue
+    size="${png:t:r}"
+    [[ "$size" == <-> ]] && print -r -- "$png"
+  done
+}
+
+fingerprint() {
+  # Hash of every stored icon plus the source images, so edits to either
+  # trigger a reapply.
+  { stored_pngs | sort | while IFS= read -r png; do shasum "$png"; done
+    shasum "$1" "$2"; } | shasum | cut -d' ' -f1
+}
+
+apply() {
+  local name="$1" force="${2:-0}" icon maskable state png size src tmp iconset s
+  icon="$icons_dir/$name.png"
+  maskable="$icons_dir/$name-maskable.png"
+  [[ -f "$maskable" ]] || maskable="$icon"
+  [[ -f "$icon" ]] || { log "$name: missing $icon"; return 1; }
+  locate_app "$name" || return 0
+
+  mkdir -p "$state_dir"
+  state="$state_dir/$app_id.sha"
+  if [[ "$force" == 0 && -f "$state" && "$(fingerprint "$icon" "$maskable")" == "$(<"$state")" ]]; then
+    return 0
+  fi
+
+  mkdir -p "$state_dir/backups"
+  cp -R "$resources" "$state_dir/backups/$app_id-$(date +%Y%m%d-%H%M%S)"
+
+  stored_pngs | while IFS= read -r png; do
+    size="${png:t:r}"
+    src="$icon"
+    [[ "$png" == *Maskable* ]] && src="$maskable"
+    sips -z "$size" "$size" "$src" --out "$png" >/dev/null
+  done
+
+  tmp="$(mktemp -d)"
+  iconset="$tmp/app.iconset"
+  mkdir "$iconset"
+  for s in 16 32 128 256 512; do
+    sips -z $s $s "$icon" --out "$iconset/icon_${s}x${s}.png" >/dev/null
+    sips -z $((s * 2)) $((s * 2)) "$icon" --out "$iconset/icon_${s}x${s}@2x.png" >/dev/null
+  done
+  iconutil -c icns "$iconset" -o "$tmp/app.icns"
+  cp "$tmp/app.icns" "$shim/Contents/Resources/app.icns"
+  rm -rf "$tmp"
+  codesign --force --deep -s - "$shim" 2>/dev/null || true
+  touch "$shim"
+  /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$shim"
+
+  fingerprint "$icon" "$maskable" > "$state"
+  log "$name: icon applied ($app_id)"
+}
+
+case "${1:-}" in
+  set)
+    (( $# >= 3 )) || usage
+    name="$2"
+    mkdir -p "$icons_dir"
+    [[ "${3:A}" == "$icons_dir/$name.png" ]] || cp "$3" "$icons_dir/$name.png"
+    if (( $# >= 4 )); then
+      [[ "${4:A}" == "$icons_dir/$name-maskable.png" ]] || cp "$4" "$icons_dir/$name-maskable.png"
+    fi
+    apply "$name" 1
+    ;;
+  sync)
+    for icon in "$icons_dir"/*.png~*-maskable.png; do
+      apply "${icon:t:r}" 0 || true
+    done
+    ;;
+  *) usage ;;
+esac
