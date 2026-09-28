@@ -71,6 +71,7 @@ Each app has its own docs with keybindings, settings, and gotchas:
 - `mac/.config/ghostty/CLAUDE.md` - Current native/minimal Ghostty setup
 - `mac/.config/ghostty/AGENTS.md` - Agent notes for Ghostty edits
 - `docs/airpods-banner-dismiss.md` - AirPods system-banner investigation
+- `docs/web-apps.md` - Web app (PWA) preferences, inventory, `webapp-icon`
 
 ## Key Architecture
 
@@ -102,8 +103,7 @@ Meta bindings available for terminals that send Meta.
 - `~/.config/git/` -> `mac/.config/git/`
 
 **Claude Code**: `claude` is the default Claude Code command. The tracked
-`.zshrc` defines aliases such as `cl`, `cld`, `clds`, `cldr`, `cldc`, `cldp`,
-and `ccv*`. If `glm` is available, it comes from local shell config or another
+`.zshrc` defines aliases such as `cl`, `cld`, `cldr`, and `cldc`. If `glm` is available, it comes from local shell config or another
 installed command, not from the tracked `.zshrc`.
 
 **AirPods banners**: Suppression is still under investigation. The old

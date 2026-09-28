@@ -103,6 +103,7 @@ scripts/provision-server-terminal.sh
 - [Native Three Finger Switcher](docs/three-finger-switcher.md)
 - [Ducky One 2 macOS setup](docs/ducky-one-2-setup.md)
 - [AirPods smart-routing banner investigation](docs/airpods-banner-dismiss.md)
+- [Web apps: Chrome/Brave PWAs, per-app profiles, inventory, custom icons](docs/web-apps.md)
 
 ## Portable color defaults
 

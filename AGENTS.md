@@ -62,6 +62,7 @@ Important app docs:
 - `mac/.config/ghostty/AGENTS.md`
 - `docs/airpods-banner-dismiss.md`
 
+- `docs/web-apps.md`
 When editing inside a subdirectory with its own `AGENTS.md`, read that file
 first and treat it as more specific than this root guide.
 
@@ -148,8 +149,7 @@ Zsh:
 - Secrets load at the top from `~/.config/zsh/.zshenv.local`.
 - p10k instant prompt should stay near the top.
 - `EDITOR` and `VISUAL` are `nvim`; Bat selects `ansi` in its config.
-- Claude aliases in tracked config include `cl`, `cld`, `clds`, `cldr`, `cldc`,
-  `cldp`, `ccv`, `ccvcd`, and `ccvd`.
+- Claude aliases in tracked config include `cl`, `cld`, `cldr`, and `cldc`.
 
 Neovim:
 
@@ -228,8 +228,18 @@ AirPods banner investigation:
   iPhone behavior and confirm that Control Center does not log a later
   `show smart routing` event.
 - For Stow changes, run `stow -n -v mac` before `stow mac`.
+- When a web app (PWA) is created, removed, or re-iconed, update the inventory
+  in `docs/web-apps.md`. Never build web apps with `--user-data-dir` launchers.
 - For Ghostty edits, run `ghostty +validate-config --config-file ...`.
 - For AeroSpace edits, run `aerospace reload-config`.
 - For tmux edits, run `tmux source-file ~/.config/tmux/tmux.conf`.
 - For Doom `init.el` or `packages.el` edits, run `doom sync`.
 - For Neovim plugin edits, verify plugin specs load through lazy.nvim.
+
+## Herdr workspace keepers
+
+The protected workspace keeper plugin is tracked at
+`mac/.config/herdr/workspace-keepers/` and documented in
+`docs/herdr-workspace-keepers.md`. It protects `general`, `bte`, `stryde`, and
+`vqa` with event-driven keep-alive tabs. Runtime state and locks live outside
+the repository in `~/.local/state/herdr-workspace-keepers/`; do not commit them.

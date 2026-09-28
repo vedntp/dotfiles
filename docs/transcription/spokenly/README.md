@@ -1,6 +1,6 @@
 # Spokenly Input Profile
 
-Last audited against the installed app and live preferences: 2026-08-22
+Last audited against the installed app and live preferences: 2026-09-09
 
 ## Profile Summary
 
@@ -23,16 +23,17 @@ currently installed under `/usr/local/bin/`.
 
 ## Keyboard Activation Semantics
 
-Right Option is the only active keyboard shortcut:
+Right Option is handled by the local bridge so it shares Spokenly's toggle
+state with the MX Master and trackpad helpers:
 
 | Input | Result |
 | --- | --- |
-| MacBook physical Right Option | Activates Spokenly's Default Mode directly |
-| Ducky physical right GUI, immediately right of right Alt | Emits Right Option and activates the same Default Mode directly |
+| MacBook physical Right Option | Bridge toggles the `test` mode via its mode-specific deeplink |
+| Ducky physical right GUI, immediately right of right Alt | Emits Right Option, then the bridge toggles the `test` mode |
 
-The Ducky hardware Fn key is firmware-only and is not exposed to macOS. The MX
-Master thumb button remains a separate hands-free toggle route through the
-background helper.
+The Ducky hardware Fn key is firmware-only and is not exposed to macOS. The
+bridge uses a listen-only Core Graphics event tap and waits 120 ms to
+distinguish a bare modifier tap from a key chord.
 
 ## Live Preference Representation
 
@@ -63,9 +64,11 @@ The current profile is stored in `modes.v2` inside:
 }
 ```
 
-`rawFlags: 64` is the live serialization of the Right Option modifier trigger.
-Prefer Spokenly's settings UI when changing it instead of treating this private
-encoding as a stable public API.
+`rawFlags: 0` disables Spokenly's native Right Option trigger. The bridge owns
+the physical event and opens the documented toggle deeplink. The original
+`rawFlags: 64` value is preserved in
+`~/.dotfiles/backups/spokenly/modes.v2.before-native-shortcut-disable.json` for
+rollback.
 
 ## Trackpad Tap Ownership
 
@@ -97,8 +100,8 @@ thresholds and rollback procedure are maintained in the
 
 | Device | Physical input | Route |
 | --- | --- | --- |
-| MacBook keyboard | Right Option | Direct Spokenly Default Mode shortcut |
-| Ducky One 2 | Physical right GUI, immediately right of right Alt | Native macOS mapping to Right Option, then the same direct Spokenly shortcut |
+| MacBook keyboard | Right Option | Right Option bridge toggles the `test` mode |
+| Ducky One 2 | Physical right GUI, immediately right of right Alt | Native mapping to Right Option, then the bridge toggles the `test` mode |
 | MacBook trackpad | Three-finger tap, classified on release by Three Finger Switcher | Opens `Spokenly Toggle.app`, which calls `spokenly://toggle` |
 | MX Master 3S | Auxiliary/thumb button `c195` | Logitech Smart Action opens `Spokenly Toggle.app`, which calls `spokenly://toggle` |
 
@@ -144,6 +147,7 @@ activation.
 | Logitech Options+ profiles | `~/Library/Application Support/LogiOptionsPlus/settings.db` |
 | Logitech Smart Actions | `~/Library/Application Support/LogiOptionsPlus/macros.db` |
 | Spokenly toggle helper | `mac/.local/libexec/spokenly-toggle/` and `~/Applications/Spokenly Toggle.app` |
+| Right Option bridge | `mac/.local/bin/spokenly-right-option-listener.swift` and `com.vp.spokenly-right-option-listener` LaunchAgent |
 | Official activation styles | [Spokenly Modes](https://spokenly.app/docs/modes) |
 | Official automation hooks | [Spokenly Deeplinks](https://spokenly.app/docs/macos/deeplinks) |
 
@@ -154,9 +158,9 @@ verified by the user on 2026-08-22. The checklist remains useful after future
 Spokenly, macOS, or switcher updates.
 
 1. Confirm Spokenly is running and idle.
-2. Press MacBook Right Option and confirm Spokenly activates its Default Mode.
-3. Press the Ducky key immediately right of right Alt and confirm it activates
-   the same mode.
+2. Press MacBook Right Option and confirm the bridge toggles Spokenly.
+3. Press the Ducky key immediately right of right Alt and confirm the bridge
+   toggles the same recording.
 4. Make a deliberate three-finger tap and confirm the switcher toggles Spokenly
    once after release.
 5. Reproduce a palm rest or broad accidental contact and confirm it produces no
@@ -167,6 +171,8 @@ Spokenly, macOS, or switcher updates.
    an ordinary text app for one `Cmd+Delete`, and confirm a denylisted app is
    suppressed.
 8. Press the MX Master auxiliary/thumb button and confirm it toggles Spokenly.
+9. Start with either Right Option or the MX Master button, then stop with the
+   other input. Confirm that no second recording starts.
 
 ## Rollback
 
@@ -175,3 +181,19 @@ restore the backed-up `modes.v2` entry for the unnamed `threeFingerLight` mode
 through Spokenly's settings, and re-enable its three-finger gesture. Keep the
 switcher's former BetterTouchTool app-switcher triggers disabled until only one
 owner is selected for the trackpad gesture.
+
+## Known gap: Right Option bridge files are not tracked (2026-09-29)
+
+The docs above describe the `com.vp.spokenly-right-option-listener` LaunchAgent
+and `spokenly-right-option-listener.swift`. As of 2026-09-29 neither file
+exists in this repository or its git history. The Stow symlinks
+`~/.local/bin/spokenly-right-option-listener.swift` and
+`~/Library/LaunchAgents/com.vp.spokenly-right-option-listener.plist` are
+dangling, so the bridge is probably not running. Spokenly's native Right Option
+trigger is disabled (`rawFlags: 0`), which means Right Option may currently do
+nothing.
+
+To fix: either recreate the listener (listen-only CGEventTap, 120 ms bare-tap
+window, opens the `spokenly://toggle?mode_id=...` deeplink) and add both files
+under `mac/`, or restore `rawFlags: 64` from
+`backups/spokenly/modes.v2.before-native-shortcut-disable.json`.

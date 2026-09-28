@@ -140,11 +140,16 @@ Application-specific triggers override matching global gestures.
 
 | Input | Result |
 | --- | --- |
-| MacBook physical Right Option | Activates Spokenly's Default Mode directly |
-| Ducky physical right GUI, immediately right of right Alt | Emits Right Option and activates the same Default Mode directly |
+| MacBook physical Right Option | Right Option bridge toggles the MX Master `test` mode |
+| Ducky physical right GUI, immediately right of right Alt | Emits Right Option, then the bridge toggles the MX Master `test` mode |
 
 The MX Master auxiliary/thumb button uses Logitech's `Spokenly Hands-Free`
 Smart Action to open `Spokenly Toggle.app`, which calls `spokenly://toggle`.
+The `com.vp.spokenly-right-option-listener` LaunchAgent routes the physical
+Right Option event through `spokenly://toggle?mode_id=5D8361AD-F3FF-4A73-8D00-30D46B336947`,
+the mode-specific deeplink for the MX Master `test` mode. Spokenly's native
+Right Option trigger is disabled (`rawFlags: 0`) so the two paths cannot
+double-toggle.
 The MacBook trackpad three-finger tap also reaches Spokenly through that helper,
 but only after Three Finger Switcher classifies and releases a valid tap. The
 unnamed Spokenly `threeFingerLight` mode was backed up and deleted so it cannot
@@ -157,14 +162,15 @@ manifest](logitech-mx-master-3s-shortcuts.json).
 
 ## Spokenly
 
-Spokenly `2.27.16` (`538`) uses its direct Right Option shortcut with
-automatic activation. The live preference serializes it as `rawFlags: 64`,
-`activationMode: "automatic"`, and `modeMac: "autoInsert"`.
+Spokenly `2.27.16` (`538`) uses the Right Option bridge with toggle activation.
+The live preference leaves the native trigger disabled (`rawFlags: 0`), while
+the listener opens the `test` mode's toggle deeplink after a bare Right Option
+tap.
 
 | Input | Result | Origin |
 | --- | --- | --- |
-| MacBook physical Right Option | Activates the Default Mode | Direct Spokenly shortcut |
-| Ducky physical right GUI, immediately right of right Alt | Emits Right Option and activates the Default Mode | Native Ducky modifier mapping, then the direct Spokenly shortcut |
+| MacBook physical Right Option | Toggles the MX Master `test` mode recording | Right Option bridge |
+| Ducky physical right GUI, immediately right of right Alt | Emits Right Option and toggles the MX Master `test` mode recording | Native Ducky mapping, then the bridge |
 | MX Master auxiliary/thumb button | Opens the helper and toggles Spokenly | Logitech Smart Action |
 
 See the [Spokenly input profile](transcription/spokenly/README.md) for live

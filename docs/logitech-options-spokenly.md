@@ -142,6 +142,11 @@ Every restored MX Master profile assigns the thumb button (`c195`) to the
 Logitech Smart Action `Spokenly Hands-Free`, which opens
 `~/Applications/Spokenly Toggle.app`.
 
+The keyboard side of this toggle is handled by the companion
+`com.vp.spokenly-right-option-listener` LaunchAgent. It observes a bare Right
+Option tap and opens the same `spokenly://toggle` deeplink, leaving the MX
+Master Smart Action unchanged.
+
 The Smart Action card identifier is
 `d18fe790-d754-4fbc-8e82-0e5df78bda9e`; its macro payload opens
 `/Users/vp/Applications/Spokenly Toggle.app` with the `OPEN_FILE_FOLDER`
