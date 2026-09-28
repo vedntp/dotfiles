@@ -1,9 +1,5 @@
 onboarding = false
 
-[theme]
-name = "tokyo-night"
-
-auto_switch = false
 [keys]
 prefix = "ctrl+b"
 focus_agent = "ctrl+alt+1..9"
@@ -34,8 +30,28 @@ prompt_new_tab_name = false
 show_agent_labels_on_pane_borders = true
 
 [ui.toast]
-delivery = "system"
+# Herdr Focus Notify owns desktop notifications and click-to-focus behavior.
+# Keep Herdr's own toast available inside the app without duplicating desktop
+# notifications.
+delivery = "herdr"
 
 [ui.sound]
 enabled = true
 done_path = "/Users/vp/.config/opencode/sounds/conductor-chime.mp3"
+
+[ui.sidebar.agents]
+row_gap = 0
+rows = [
+  ["state_icon", { token = "$harness_logo", fg = "#A8ADB9", bold = true, rules = [{ contains = " fx", fg = "#D6D6D6" }] }],
+  ["workspace", "tab"],
+]
+
+[ui.sidebar.agents.rows_by_agent]
+amp = [["state_icon", { token = "$harness_logo", fg = "#DFDFC1", bold = true, dim = false }], ["workspace", "tab"]]
+claude = [["state_icon", { token = "$harness_logo", fg = "#E68A67", bold = true, dim = false }], ["workspace", "tab"]]
+codex = [["state_icon", { token = "$harness_logo", fg = "#A78BFA", bold = true, dim = false }], ["workspace", "tab"]]
+opencode = [["state_icon", { token = "$harness_logo", fg = "#A8ADB9", bold = true, dim = false }], ["workspace", "tab"]]
+pi = [["state_icon", { token = "$harness_logo", fg = "#FFFFFF", bold = true, dim = false }], ["workspace", "tab"]]
+
+[ui.sidebar.spaces]
+rows = [["state_icon", { token = "$bte_logo", fg = "#A8ADB9", bold = true, dim = false, rules = [{ contains = "bte", fg = "#00D2BE" }, { contains = "stryde", fg = "#3B82F6" }, { contains = "vqa", fg = "#00B8F2" }] }], ["branch", "git_status"]]

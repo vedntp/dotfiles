@@ -1,0 +1,39 @@
+id = "local.workspace-keepers"
+name = "Workspace Keepers"
+version = "1.0.0"
+min_herdr_version = "0.9.1"
+platforms = ["macos", "linux"]
+description = "Restore protected workspace containers without persistent keeper tabs."
+
+[[startup]]
+command = ["python3", "keepers.py"]
+
+[[events]]
+on = "pane.closed"
+command = ["python3", "keepers.py"]
+
+[[events]]
+on = "pane.exited"
+command = ["python3", "keepers.py"]
+
+[[events]]
+on = "tab.closed"
+command = ["python3", "keepers.py"]
+
+[[events]]
+on = "workspace.closed"
+command = ["python3", "keepers.py"]
+
+[[events]]
+on = "workspace.created"
+command = ["python3", "keepers.py"]
+
+[[events]]
+on = "workspace.renamed"
+command = ["python3", "keepers.py"]
+
+[[actions]]
+id = "reconcile"
+title = "Restore protected workspaces"
+contexts = ["global"]
+command = ["python3", "keepers.py"]

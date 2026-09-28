@@ -25,3 +25,6 @@ tmux.bak.*
 # Cache
 *.cache/
 mac/.config/tmux/plugins/
+mac/.config/herdr/plugins/herdr-focus-notify/
+mac/.config/alacritty/alacritty.toml.before-*
+mac/.config/herdr/initial-host-theme-replay.patch
