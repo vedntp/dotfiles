@@ -31,9 +31,10 @@ Run `aerospace reload-config` after changing `aerospace.toml`. For documentation
 
 ## Current Config Model
 
-- Launches the official `/Applications/AeroSpace.app` at login through
-  `start-at-login = true`.
-- Uses flattened container normalization and opposite-orientation normalization.
+- Launches the Homebrew-installed BSP fork at `/Applications/AeroSpace.app`
+  through `start-at-login = true`.
+- Uses flattened-container, opposite-orientation, and BSP-shape normalization.
+  The BSP key is fork-only and must be removed before launching vanilla.
 - Uses `config-version = 2`; keep `persistent-workspaces` aligned with the
   explicit workspace bindings when adding or removing one.
 - Default layout is `tiles`; root orientation is `auto`.
@@ -54,7 +55,7 @@ Rules are ordered. Specific rules must stay above broader rules, and the final c
 
 | Workspace | Current automatic assignments |
 | --- | --- |
-| `1` | Ghostty, Alacritty, cmux, Warp; all floating |
+| `1` | Persistent support workspace; terminals tile where they open |
 | `2` | Calendar |
 | `3` | Things, Linear |
 | `4` | TradingView |
@@ -73,7 +74,8 @@ Rules are ordered. Specific rules must stay above broader rules, and the final c
 | `N` | Safari, Notion |
 | `O` | Books floating, Obsidian |
 | `S` | Slack |
-| `V` | Claude, Amp |
+| `V` | Claude |
+| `X` | Amp, Conductor |
 | `Y` | YouTube |
 | `Z` | Day One |
 
@@ -110,8 +112,8 @@ Additional rules:
 - `alt-,`: toggle accordion horizontal/vertical.
 - `alt--` / `alt-=`: resize smart -50/+50.
 - `alt-1` through `alt-0`: switch to workspaces `1` through `10`.
-- Letter workspace bindings exist for `A B C D E F G I M N O P Q S T U V W Y Z`; `R` and `X` are commented out.
-- Move-to-workspace bindings mostly mirror switch bindings, but `alt-shift-e`, `alt-shift-r`, and `alt-shift-x` are commented out.
+- Letter workspace bindings exist for `A B C D E F G I M N O P Q S T U V W X Y Z`; `R` is commented out.
+- Move-to-workspace bindings mostly mirror switch bindings, but `alt-shift-e` and `alt-shift-r` are commented out.
 - `alt-tab` / `alt-shift-tab`: next / previous Herdr agent when Herdr is active.
 - `alt-backtick`: switch to the next empty workspace on the focused monitor.
 - `alt-shift-backtick`: move the focused window to the next empty workspace on the focused monitor.
@@ -135,13 +137,41 @@ Service mode starts with `alt-shift-;`:
 - Use `if.app-name-regex-substring` for flexible name matching, but beware broad matches.
 - Keep `YouTube Music` above `YouTube`.
 - If reintroducing a VS Code rule, prefer its bundle ID instead of matching `Code`, because broad name matching can catch unrelated apps.
-- Keep terminal apps that rely on native tabs/windows floating on workspace `1`: Ghostty, Alacritty, cmux, and Warp.
+- Keep Ghostty, Alacritty, cmux, and Warp tiled in the workspace where they
+  open so the BSP layout can arrange separate terminal windows. Native tabs
+  remain inside the terminal application and are not AeroSpace windows.
 - Add menu-bar/popover exclusions above the catch-all using `run = ['layout floating']`.
 - Keep the catch-all as the final `[[on-window-detected]]` block.
 - For significant behavior changes, update `CHANGELOG.md` and keep `CLAUDE.md`/`AGENTS.md` aligned with the real config.
-- Keep the main TOML compatible with released AeroSpace. Generic sticky
-  windows remain unsupported, but do not add a sticky workaround for the
-  Codex Pet because released AeroSpace handles it as an unmanaged popup.
+- The config currently targets the BSP fork and intentionally contains the
+  fork-only `enable-normalization-bsp-shape = true` key. Remove that key before
+  switching to vanilla. Generic sticky windows remain unsupported, and the
+  Codex Pet still does not need a sticky workaround.
+
+## BSP Fork Lifecycle
+
+- Active cask: `pszypowicz/tap/aerospace-bsp`.
+- The fork tracks upstream releases as `<upstream>-bsp.<release>` but publishes
+  on its own schedule. `brew upgrade --cask aerospace-bsp` installs only a BSP
+  release published by the fork maintainer.
+- The global config key is `enable-normalization-bsp-shape = true`. Unlike the
+  `enable-normalization --workspace ... bsp-shape on` command, it survives app
+  restarts and applies to every workspace.
+- To return to vanilla, first remove the fork-only config key, then run:
+
+```bash
+brew uninstall --cask aerospace-bsp
+brew install --cask nikitabobko/tap/aerospace
+open -a AeroSpace
+```
+
+- To switch back to BSP, restore the fork-only config key, then run:
+
+```bash
+brew uninstall --cask aerospace
+brew install --cask pszypowicz/tap/aerospace-bsp
+open -a AeroSpace
+```
 
 ## Known Doc Drift To Watch
 

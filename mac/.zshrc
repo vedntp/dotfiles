@@ -159,6 +159,34 @@ alias szsh='source ~/.zshrc'
 alias hetzner='ssh myserver'
 alias ompg='omp --config "$HOME/.omp/agent/presets/opencode-go.yml"'
 
+# Set the font size used by Ghostty and Alacritty.
+my_terminal_font() {
+	if (( $# != 1 )) || [[ ! "$1" =~ ^([1-9]|[1-9][0-9])([.][0-9]+)?$ ]]; then
+		print "Usage: my_terminal_font SIZE (for example: my_terminal_font 14)" >&2
+		return 2
+	fi
+
+	local size="$1"
+	local config
+	local ghostty_configs=(
+		"$HOME/.config/ghostty/config"
+		"$HOME/.dotfiles/mac/.config/ghostty/config"
+	)
+	local alacritty_configs=(
+		"$HOME/.config/alacritty/alacritty.toml"
+		"$HOME/.dotfiles/mac/.config/alacritty/alacritty.toml"
+	)
+
+	for config in $ghostty_configs; do
+		[[ -f "$config" ]] && sed -i '' -E "s/^font-size[[:space:]]*=.*/font-size = $size/" "$config"
+	done
+	for config in $alacritty_configs; do
+		[[ -f "$config" ]] && sed -i '' -E "s/^size[[:space:]]*=.*/size = $size/" "$config"
+	done
+
+	print "Terminal font size set to $size."
+}
+
 # List project-scoped Codex skills from the project root.
 alias project-skills='find .agents/skills -name SKILL.md -print 2>/dev/null'
 
@@ -248,16 +276,41 @@ bindkey -r '^T'
 
 # === CLAUDE CODE PROVIDER SWITCHER ===
 alias cl="claude"
-alias cld="claude --dangerously-skip-permissions --model 'claude-opus-4-8[1m]' --effort high"
-alias clds="claude --dangerously-skip-permissions --model sonnet --effort high"
+alias cld="claude --dangerously-skip-permissions"
 alias cldr="claude --resume --dangerously-skip-permissions"
 alias cldc="claude --continue --dangerously-skip-permissions"
 
-
-alias cldp="claude --dangerously-skip-permissions --model sonnet --effort medium -p"
+# Kick off the 5-hour usage window with the cheapest possible request
+# Optional arg: delay in minutes, e.g. `cc5 40` (keeps Mac awake while waiting).
+# The delayed run gets its own session so closing the pane or terminal won't kill it.
+cc5() {
+  if [[ -n "$1" ]]; then
+    [[ "$1" == <-> ]] || { echo "usage: cc5 [minutes]" >&2; return 1; }
+    local log=~/.cache/cc5.log
+    mkdir -p ${log:h}
+    nohup perl -MPOSIX -e 'fork and exit; POSIX::setsid(); exec @ARGV' \
+      zsh -c "$(functions cc5); caffeinate -i sleep $(( $1 * 60 )) && cc5" \
+      </dev/null >>$log 2>&1 &!
+    echo "cc5 scheduled for $(date -v+${1}M '+%H:%M') (log: $log)"
+    return
+  fi
+  if claude -p "hi" \
+      --model haiku \
+      --effort low \
+      --safe-mode \
+      --tools "" \
+      --system-prompt "Reply with exactly: ok" \
+      --no-session-persistence >/dev/null 2>&1; then
+    echo "claude window started $(date '+%H:%M'), ends ~$(date -v+5H '+%H:%M')"
+  else
+    echo "cc5: request failed (are you logged in? try: claude auth)" >&2
+    return 1
+  fi
+}
 
 # codex
-alias cx="codex --yolo"
+alias cx="$HOME/.local/bin/codex --yolo"
+alias cx-update='curl -fsSL https://chatgpt.com/codex/install.sh | sh'
 alias cxl="codex -p lean --dangerously-bypass-approvals-and-sandbox"
 alias oc="opencode --auto"
 alias oc2="opencode2 --auto"
@@ -267,9 +320,6 @@ alias ccu="ccusage --since \$(date +%Y%m%d) -b"
 alias ccuw="ccusage weekly -b"
 alias ccum="ccusage monthly -b"
 alias ccup="ccusage -i"
-alias ccv='claude --strict-mcp-config --mcp-config ~/.claude/mcp-none.json'
-alias ccvcd='claude --strict-mcp-config --mcp-config ~/.claude/mcp-none.json --continue --dangerously-skip-permissions'
-alias ccvd='claude --strict-mcp-config --mcp-config ~/.claude/mcp-none.json --dangerously-skip-permissions'
 
 # Remove oh-my-zsh git plugin alias that conflicts with gsd-pi CLI
 unalias gsd 2>/dev/null

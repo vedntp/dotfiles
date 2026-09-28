@@ -11,19 +11,19 @@ TERM = "xterm-256color"
 size = 14
 
 [font.normal]
-family = "JetBrainsMono Nerd Font Mono"
+family = "JetBrains Mono Herdr XL"
 style = "Light"
 
 [font.bold]
-family = "JetBrainsMono Nerd Font Mono"
+family = "JetBrains Mono Herdr XL"
 style = "Regular"
 
 [font.italic]
-family = "JetBrainsMono Nerd Font Mono"
+family = "JetBrains Mono Herdr XL"
 style = "Light Italic"
 
 [font.bold_italic]
-family = "JetBrainsMono Nerd Font Mono"
+family = "JetBrains Mono Herdr XL"
 style = "Italic"
 
 [window]

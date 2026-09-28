@@ -10,9 +10,11 @@ aerospace list-windows --all     # Debug window assignments
 aerospace list-workspaces        # See all workspaces
 ```
 
-The daily build is the official `/Applications/AeroSpace.app`, currently
-`0.21.3-Beta`. AeroSpace manages its own login item through
-`start-at-login = true`.
+The daily build is the `pszypowicz/tap/aerospace-bsp` fork installed as
+`/Applications/AeroSpace.app`, currently `0.21.3-bsp.2`. AeroSpace manages its
+own login item through `start-at-login = true`, and the global fork-only
+`enable-normalization-bsp-shape = true` setting makes BSP survive restarts and
+apply to every workspace.
 
 The config uses `config-version = 2`. `persistent-workspaces` explicitly
 preserves the v1 behavior for all currently bound workspace keys.
@@ -25,7 +27,7 @@ preserves the v1 behavior for all currently bound workspace keys.
 
 **Workspaces**:
 - `alt-[1-0]` - Switch to workspace 1-10
-- `alt-[a-z]` - Switch to letter workspace (except r, x reserved)
+- `alt-[a-z]` - Switch to letter workspace (except r reserved)
 - `alt-shift-[key]` - Move window to that workspace
 - `alt-tab` / `alt-shift-tab` - Herdr next / previous agent when Herdr is active
 - `alt-backtick` - Jump to next empty workspace
@@ -52,7 +54,7 @@ preserves the v1 behavior for all currently bound workspace keys.
 
 | Workspace | Apps |
 |-----------|------|
-| 1 | Ghostty (floating), Alacritty (floating), cmux (floating), Warp (floating) |
+| 1 | Persistent support workspace; Alacritty, cmux, and Warp tile where opened |
 | 2 | Calendar |
 | 3 | Things, Linear |
 | 4-6 | TradingView, IB Gateway, TWS |
@@ -70,13 +72,14 @@ preserves the v1 behavior for all currently bound workspace keys.
 | O | Books (floating), Obsidian |
 | P | VS Code |
 | S | Slack |
-| V | Claude, Amp |
+| V | Claude |
+| X | Amp, Conductor |
 | Y | YouTube |
 | Z | Day One |
 
 ## Floating Apps
 
-These apps launch floating instead of tiled: Ghostty, Alacritty, cmux, Warp, Finder, Books, mpv, CodexBar, Codex, CleanShot X, System Settings, Raycast.
+These apps launch floating instead of tiled: Ghostty, Finder, Books, mpv, CodexBar, Codex, CleanShot X, System Settings, and Raycast. Ghostty stays floating because macOS native tabs are exposed to AeroSpace as separate windows and can trigger unwanted BSP retiling. Alacritty, cmux, and Warp use tiled layout where they open so separate terminal windows can participate in BSP. Native tabs remain inside the terminal application.
 
 CleanShot X, System Settings, Raycast, CoreServices UI Agent system prompts, and
 Problem Reporter crash dialogs are floated in place so utility windows stay in
@@ -104,15 +107,23 @@ sticky-window rule or helper.
 
 ## Gotchas
 
+- **BSP config is fork-only**: Vanilla AeroSpace does not understand
+  `enable-normalization-bsp-shape`. Remove that key before launching vanilla.
+- **BSP updates follow the fork**: The version is anchored to an upstream
+  release, but the fork maintainer publishes its own `bsp.N` builds. Use
+  `brew upgrade --cask aerospace-bsp` to update.
 - **App matching**: Uses `app-name-regex-substring` (partial match) or `app-id` for specific bundle IDs
-- **Terminals float on workspace 1**: Ghostty, Alacritty, cmux, and Warp all use `layout floating` and pin to workspace 1, since they rely on native macOS tabs/windows rather than aerospace tiling. (Ghostty workspace switching historically went through tmux.)
+- **Ghostty stays floating**: macOS native tabs can appear to AeroSpace as
+  separate windows and trigger unwanted BSP retiling, so Ghostty uses
+  `layout floating`. Alacritty, cmux, and Warp use `layout tiling` where they
+  open. Native tabs remain inside the terminal application.
 - **YouTube PWA PiP can vanish**: The `YouTube` app is a Brave app-mode wrapper (`com.brave.Browser.app...`), but its PiP window is owned by the parent `Brave Browser` process. If PiP disappears, check whether `Brave Browser` is hidden while `YouTube` is visible. `aerospace-pip-guardian auto` usually recovers this; use `ctrl-alt-p` for manual recovery.
 - **Zero gaps**: `[gaps]` section has all values at 0
 - **Mouse follows monitor**: When focus changes monitors, mouse moves to center
 - **No generic sticky windows**: Feature not yet supported (issue #2). The
   Codex Pet does not require it because AeroSpace recognizes the Pet as an
   unmanaged popup.
-- **Reserved bindings**: `alt-r` and `alt-x` are commented out
+- **Reserved bindings**: `alt-r` is commented out
 
 ## Adding New App Assignment
 
@@ -129,3 +140,19 @@ if.app-id = 'com.company.appname'
 ```
 
 Find app bundle ID: `osascript -e 'id of app "AppName"'`
+
+## Switching Between BSP And Vanilla
+
+Return to vanilla:
+
+1. Remove `enable-normalization-bsp-shape = true` from `aerospace.toml`.
+2. Run `brew uninstall --cask aerospace-bsp`.
+3. Run `brew install --cask nikitabobko/tap/aerospace`.
+4. Run `open -a AeroSpace`.
+
+Switch back to BSP:
+
+1. Restore `enable-normalization-bsp-shape = true`.
+2. Run `brew uninstall --cask aerospace`.
+3. Run `brew install --cask pszypowicz/tap/aerospace-bsp`.
+4. Run `open -a AeroSpace`.

@@ -60,14 +60,9 @@ it comes from local shell config or another installed command.
 | Alias | Command | Purpose |
 |-------|---------|---------|
 | `cl` | `claude` | Launch Claude Code |
-| `cld` | `claude --dangerously-skip-permissions --model 'claude-opus-4-8[1m]' --effort high` | Opus/high effort |
-| `clds` | `claude --dangerously-skip-permissions --model sonnet --effort high` | Sonnet/high effort |
+| `cld` | `claude --dangerously-skip-permissions` | Skipped permissions, default model/effort |
 | `cldr` | `claude --resume --dangerously-skip-permissions` | Resume with skipped permissions |
 | `cldc` | `claude --continue --dangerously-skip-permissions` | Continue with skipped permissions |
-| `cldp` | `claude --dangerously-skip-permissions --model sonnet --effort medium -p` | Print-mode Sonnet |
-| `ccv` | `claude --strict-mcp-config --mcp-config ~/.claude/mcp-none.json` | Claude without MCP servers |
-| `ccvcd` | `ccv` + continue + skipped permissions | Continue without MCP servers |
-| `ccvd` | `ccv` + skipped permissions | Skipped permissions without MCP servers |
 
 ### Usage Aliases
 

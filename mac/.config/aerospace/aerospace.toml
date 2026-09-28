@@ -10,12 +10,14 @@ config-version = 2
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
 after-startup-command = []
 
-# Let the official AeroSpace app manage its login item.
+# Let the active AeroSpace app manage its login item.
 start-at-login = true
 
 # Normalizations. See: https://nikitabobko.github.io/AeroSpace/guide#normalization
 enable-normalization-flatten-containers = true
 enable-normalization-opposite-orientation-for-nested-containers = true
+# Fork-only global normalization. Remove this before launching vanilla AeroSpace.
+enable-normalization-bsp-shape = true
 
 # See: https://nikitabobko.github.io/AeroSpace/guide#layouts
 # The 'accordion-padding' specifies the size of accordion padding
@@ -50,7 +52,7 @@ automatically-unhide-macos-hidden-apps = false
 persistent-workspaces = [
     '1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'I', 'M', 'N', 'O', 'P', 'Q',
-    'S', 'T', 'U', 'V', 'W', 'Y', 'Z',
+    'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 ]
 
 # Workspace to monitor assignments
@@ -71,6 +73,7 @@ T = ['LG HDR 4K', 'main']
 U = ['LG HDR 4K', 'main']
 V = ['LG HDR 4K', 'main']  # Claude AI
 W = ['LG HDR 4K', 'main']
+X = ['LG HDR 4K', 'main']  # Amp/Conductor
 
 # Support / secondary workspace group
 1 = ['built-in', 'secondary', 'main']  # Terminal
@@ -95,25 +98,26 @@ Z = ['built-in', 'secondary', 'main']  # Journal/Knowledge
 # See: https://nikitabobko.github.io/AeroSpace/guide#assign-apps-to-workspaces
 # Organized by workspace: Numbers (2-9), then Letters (A-Z)
 
-# Workspace 1 - Terminal (Ghostty)
+# Ghostty uses native macOS tabs, which AeroSpace can see as separate windows.
+# Keep Ghostty floating so tab changes do not trigger BSP retiling.
 [[on-window-detected]]
 if.app-id = 'com.mitchellh.ghostty'
-run = ['layout floating', 'move-node-to-workspace 1']
+run = 'layout floating'
 
 # Workspace 1 - Terminal (Alacritty)
 [[on-window-detected]]
 if.app-id = 'org.alacritty'
-run = ['layout floating', 'move-node-to-workspace 1']
+run = 'layout tiling'
 
 # Workspace 1 - Terminal (cmux)
 [[on-window-detected]]
 if.app-id = 'com.cmuxterm.app'
-run = ['layout floating', 'move-node-to-workspace 1']
+run = 'layout tiling'
 
 # Workspace 1 - Terminal (Warp)
 [[on-window-detected]]
 if.app-id = 'dev.warp.Warp-Stable'
-run = ['layout floating', 'move-node-to-workspace 1']
+run = 'layout tiling'
 
 # Workspace 2 - Calendar
 [[on-window-detected]]
@@ -185,12 +189,17 @@ run = 'move-node-to-workspace B'
 
 [[on-window-detected]]
 if.app-id = 'net.imput.helium'
-run = 'move-node-to-workspace B'
+run = ['layout tiling', 'move-node-to-workspace B']
 
 # Workspace C - AI/Chat
 [[on-window-detected]]
 if.app-name-regex-substring = 'ChatGPT'
 run = 'move-node-to-workspace C'
+
+# Workspace M - Gmail installed Chrome web app
+[[on-window-detected]]
+if.app-id = 'com.google.Chrome.app.fmgjjmmmlfnkbppncabfkddbjimcfncm'
+run = 'move-node-to-workspace M'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'Chrome'
@@ -220,11 +229,6 @@ run = 'move-node-to-workspace G'
 if.app-id = 'com.brave.Browser.app.ggjocahimgaohmigbfhghnlfcnjemagj'
 run = 'move-node-to-workspace G'
 
-# Workspace M - Mail
-[[on-window-detected]]
-if.app-name-regex-substring = 'Gmail'
-run = 'move-node-to-workspace M'
-
 # Workspace N - Safari
 [[on-window-detected]]
 if.app-name-regex-substring = 'Safari'
@@ -243,18 +247,19 @@ run = ['layout floating', 'move-node-to-workspace O']
 if.app-id = 'com.tinyspeck.slackmacgap'
 run = 'move-node-to-workspace S'
 
-# Workspace V - Claude AI / AmpCode
+# Workspace V - Claude AI
 [[on-window-detected]]
 if.app-name-regex-substring = 'Claude'
 run = 'move-node-to-workspace V'
 
+# Workspace X - Amp / Conductor
 [[on-window-detected]]
 if.app-id = 'com.conductor.app'
-run = 'move-node-to-workspace V'
+run = 'move-node-to-workspace X'
 
 [[on-window-detected]]
 if.app-id = 'com.ampcode.amp.macos'
-run = 'move-node-to-workspace V'
+run = 'move-node-to-workspace X'
 
 # Workspace 10 - YouTube Music
 [[on-window-detected]]
@@ -447,7 +452,7 @@ run = ['exec-and-forget /bin/bash -c "aerospace list-workspaces --monitor focuse
     alt-u = 'workspace U'
     alt-v = 'workspace V'
     alt-w = 'workspace W'
-#    alt-x = 'workspace X'
+    alt-x = 'workspace X'
     alt-y = 'workspace Y'
     alt-z = 'workspace Z'
 
@@ -481,7 +486,7 @@ run = ['exec-and-forget /bin/bash -c "aerospace list-workspaces --monitor focuse
     alt-shift-u = 'move-node-to-workspace U'
     alt-shift-v = 'move-node-to-workspace V'
     alt-shift-w = 'move-node-to-workspace W'
-#    alt-shift-x = 'move-node-to-workspace X'
+    alt-shift-x = 'move-node-to-workspace X'
     alt-shift-y = 'move-node-to-workspace Y'
     alt-shift-z = 'move-node-to-workspace Z'
 

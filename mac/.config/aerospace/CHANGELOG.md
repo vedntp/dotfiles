@@ -1,5 +1,25 @@
 # Aerospace Configuration Changelog
 
+## 2026-09-25
+- Changed Ghostty to `layout floating` because macOS native tabs can appear as
+  separate AeroSpace windows and trigger unwanted BSP retiling.
+
+## 2026-09-14
+- Made `pszypowicz/tap/aerospace-bsp` the normal Homebrew-installed AeroSpace
+  build, enabled global persistent BSP normalization, and documented the
+  upgrade and vanilla rollback procedure in `AGENTS.md` and `CLAUDE.md`.
+- Changed Helium windows assigned to workspace `B` to use tiled layout so BSP
+  can arrange regular and incognito windows together.
+
+## 2026-09-13
+- Changed Ghostty, Alacritty, cmux, and Warp to stay in the workspace where
+  they open and use tiled layout, allowing the BSP fork to arrange terminal
+  windows instead of floating and moving them to workspace 1.
+
+## 2026-09-11
+- Enabled workspace `X` on the LG primary group: added to `persistent-workspaces`, monitor assignments, and `alt-x` / `alt-shift-x` bindings.
+- Moved AmpCode (`com.ampcode.amp.macos`) and Conductor (`com.conductor.app`) from workspace `V` to workspace `X`; Claude stays on `V`.
+
 ## 2026-09-09
 - Assigned AmpCode (`com.ampcode.amp.macos`) to workspace `V` by default.
 
