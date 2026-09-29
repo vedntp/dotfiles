@@ -64,7 +64,7 @@ preserves the v1 behavior for all currently bound workspace keys.
 | B | Arc, Firefox, Brave, Helium |
 | C | ChatGPT, Chrome |
 | D | Emacs |
-| E | Finder (floating), mpv (floating) |
+| E | Finder (floating) |
 | F | Drafts |
 | G | Gemini, Grok |
 | M | Gmail |
@@ -78,6 +78,14 @@ preserves the v1 behavior for all currently bound workspace keys.
 | Z | Day One |
 
 ## Floating Apps
+
+mpv floats and follows the focused workspace, including across monitors, through
+`~/.local/bin/aerospace-pip-guardian`. All managed `io.mpv` windows follow.
+`~/.config/mpv/mpv.conf` sets `ontop=yes` to keep video above ordinary windows.
+Restart existing mpv instances to load this setting. Workspace following can
+briefly reposition the window; it is a helper, not native sticky-window support.
+See [mpv workspace following](../../../docs/mpv-workspace-following.md) for
+configuration details, verification, limitations, and disable instructions.
 
 These apps launch floating instead of tiled: Ghostty, Finder, Books, mpv, CodexBar, Codex, CleanShot X, System Settings, and Raycast. Ghostty stays floating because macOS native tabs are exposed to AeroSpace as separate windows and can trigger unwanted BSP retiling. Alacritty, cmux, and Warp use tiled layout where they open so separate terminal windows can participate in BSP. Native tabs remain inside the terminal application.
 

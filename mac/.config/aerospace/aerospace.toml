@@ -39,7 +39,7 @@ default-root-container-orientation = 'auto'
 # Fallback value (if you omit the key): on-focused-monitor-changed = []
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
-# AeroSpace has no native sticky windows. Keep managed PiP windows visible and
+# AeroSpace has no native sticky windows. Keep mpv and managed PiP windows visible and
 # recover hidden Brave-owned PWA PiP windows when workspaces change.
 exec-on-workspace-change = ['/Users/vp/.local/bin/aerospace-pip-guardian', 'auto']
 

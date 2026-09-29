@@ -24,10 +24,12 @@ follow_managed_pip() {
 
   aerospace list-windows --all --format '%{window-id}%{tab}%{app-bundle-id}%{tab}%{workspace}%{tab}%{window-title}' |
   while IFS=$'\t' read -r window_id app_id current_workspace title; do
-    [[ "${title:l}" == 'picture-in-picture' ]] || continue
-
     case "$app_id" in
       net.imput.helium)
+        [[ "${title:l}" == 'picture-in-picture' ]] || continue
+        ;;
+      io.mpv)
+        # mpv supplies always-on-top; AeroSpace supplies workspace following.
         ;;
       *)
         continue

@@ -1,5 +1,11 @@
 # Aerospace Configuration Changelog
 
+## 2026-09-29
+- Made all managed mpv windows follow the focused workspace using the existing
+  PiP guardian, retaining floating layout and allowing cross-monitor following.
+- Added Stow-managed mpv configuration with `ontop=yes` so video remains above
+  ordinary windows. Corrected the outdated mpv workspace E documentation.
+
 ## 2026-09-25
 - Changed Ghostty to `layout floating` because macOS native tabs can appear as
   separate AeroSpace windows and trigger unwanted BSP retiling.

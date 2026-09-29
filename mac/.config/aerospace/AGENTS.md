@@ -82,6 +82,9 @@ Rules are ordered. Specific rules must stay above broader rules, and the final c
 Additional rules:
 
 - `mpv`, `CodexBar`, `Codex`, CleanShot X, System Settings, and Raycast are floating only and are not moved to fixed workspaces.
+- All managed `io.mpv` windows follow the focused workspace through
+  `aerospace-pip-guardian`, including across monitors. The Stow-managed
+  `mac/.config/mpv/mpv.conf` enables `ontop=yes` above ordinary windows.
 - ChatGPT stays assigned to workspace `C`. AeroSpace `0.21.0-Beta` and later
   classifies the always-on-top `com.openai.codex` Pet as an unmanaged popup,
   so no sticky-window rule or helper is required.
@@ -177,4 +180,5 @@ open -a AeroSpace
 
 - `CLAUDE.md` is closer to current state, but verify workspace tables against `aerospace.toml` before editing.
 - The live config currently has no automatic VS Code assignment even though some docs mention workspace `P`.
-- The live config floats `mpv` in place rather than moving it to workspace `E`.
+- The live config initially floats `mpv` in place; the PiP guardian then follows
+  workspace changes. It has no fixed workspace `E` assignment.
