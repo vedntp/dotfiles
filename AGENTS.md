@@ -212,7 +212,7 @@ AirPods banner investigation:
 - Update docs/changelogs when behavior changes, especially for Ghostty,
   AeroSpace, tmux, and keybindings.
 - Update `docs/shortcut-reference.md` whenever a Logitech Options+ profile,
-  BetterTouchTool trigger, or Spokenly shortcut changes. Keep it focused on
+  Three Finger Switcher gesture, or Spokenly shortcut changes. Keep it focused on
   current behavior and put implementation history in the specialized setup
   guides.
 - Update `docs/transcription/spokenly/README.md` whenever Spokenly defaults,

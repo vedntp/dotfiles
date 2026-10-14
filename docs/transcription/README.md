@@ -64,5 +64,5 @@ background switcher owns both tap and swipe behavior.
 - Keep stable trigger IDs, slot IDs, bundle IDs, and source-of-truth paths.
 - Update [the quick shortcut reference](../shortcut-reference.md) when current
   behavior changes.
-- Keep detailed Logitech and BetterTouchTool troubleshooting in their existing
-  setup guides.
+- Keep detailed Logitech and Three Finger Switcher troubleshooting in their
+  existing setup guides.

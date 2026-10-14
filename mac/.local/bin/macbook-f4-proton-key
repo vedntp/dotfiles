@@ -1,9 +1,9 @@
 #!/bin/sh
 
 # Map the built-in MacBook F4 Spotlight/Search key to a normal F4 key event.
-# BetterTouchTool recognizes three normal F4 presses as the global lock-screen
-# key sequence. The legacy filename is retained so the deployed LaunchAgent
-# does not need to change.
+# It originally fed BetterTouchTool's triple-F4 lock-screen sequence, which is
+# retired. The legacy filename is retained so the deployed LaunchAgent does not
+# need to change.
 # Keep this scoped to the internal Apple keyboard so it does not overwrite the
 # Ducky One 2's device-specific media key mapping.
 

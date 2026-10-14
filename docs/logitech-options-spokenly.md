@@ -187,9 +187,6 @@ The current known-good assignments are:
 | Thumb wheel left | `Ctrl+Tab` (`code: 43`, modifiers `[224]`) |
 | Thumb wheel right | `Cmd+K` (`code: 14`, modifiers `[227]`) |
 
-The Codex-specific BetterTouchTool `Ctrl+B` sidebar trigger remains available,
-but the restored Logitech profile does not assign `Ctrl+B` to a mouse control.
-
 The Logitech settings database was backed up before repairing these
 assignments:
 
@@ -207,16 +204,10 @@ SHA-256: a578b4ffd9a5e5cbcea24e4828eb582109ec835309b4acce5e965e4a3060ffe9
 The September audit is against the live database directly. The manifest
 `audit_timestamp` is `2026-09-03` and `expected_profile_count` is `13`.
 
-See the related BTT guide for trigger details and troubleshooting:
+## Related Gesture Docs
 
-[Codex sidebar organization shortcut](btt/README.md#codex-sidebar-organization-shortcut)
-
-## Related BetterTouchTool Docs
-
-BetterTouchTool trackpad gestures and future Magic Mouse experiments are
-documented separately:
-
-[BetterTouchTool gesture setup](btt/README.md)
+Trackpad and Magic Mouse gestures are owned by
+[Three Finger Switcher](three-finger-switcher.md).
 
 ## Input Ownership
 
@@ -224,7 +215,6 @@ documented separately:
 - Chat and terminal wheel click sends `Enter` directly from Logitech Options+.
 - The MX Master auxiliary/thumb button uses Logitech's `Spokenly Hands-Free`
   Smart Action.
-- BetterTouchTool does not own the MX Master Spokenly route.
 
 ### Codex And Browser Focus
 

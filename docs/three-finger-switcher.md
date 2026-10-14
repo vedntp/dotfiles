@@ -44,15 +44,13 @@ preferences in `UserDefaults`.
 Physical verification passed on 2026-08-22 after installing the directional
 build. The user confirmed that the three-finger tap, right-swipe app switcher,
 two-finger scrubbing, and context-aware left-swipe line clear work correctly in
-normal use. The former BetterTouchTool trackpad triggers are absent from the
-live BTT data store, and Spokenly's competing `threeFingerLight` mode remains
-removed. The stronger palm-rejection calibration added on 2026-08-29 remains
+normal use. Spokenly's competing `threeFingerLight` mode remains removed. The stronger palm-rejection calibration added on 2026-08-29 remains
 pending physical verification on the installed build.
 
 ## Magic Mouse support (2026-10-03)
 
 The installed app also recognizes Magic Mouse gestures independently of the
-trackpad. BTT is not required. On 2026-10-03 the user tried the installed
+trackpad. On 2026-10-03 the user tried the installed
 two-finger activation with one-finger browsing and confirmed it feels much
 better. This is the accepted interaction. Automated checks cover handoff with
 either finger, no selection jump, navigation in both directions, final-finger
@@ -106,9 +104,7 @@ provide a dependable public device ID, so suppression is session-scoped:
 scrolling from another device during an active mouse selection is also blocked.
 Mouse gestures remain disabled if the filter cannot be installed.
 
-Native Mouse two-finger desktop switching must remain off. The saved BTT
-Magic Mouse Application Switcher mapping is superseded; BTT was not running
-at installation. If BTT is re-enabled, disable that mapping to avoid overlap.
+Native Mouse two-finger desktop switching must remain off.
 
 `Sources/MouseBridge/` uses the proven C bridge to retain the device list and
 select the mouse using its IORegistry multitouch ID and mouse preferences.
@@ -129,7 +125,7 @@ checks replay the normal-use and continuous-swipe captures without posting keys.
 Mouse and trackpad support run in the same installed
 `/Applications/Three Finger Switcher.app`. The existing per-user LaunchAgent
 starts that app after login, including after a restart. No separate mouse
-helper, BTT process, diagnostic, terminal session, or manual launch is required.
+helper, diagnostic, terminal session, or manual launch is required.
 The app runs without a Dock or menu-bar icon. Mouse support defaults to enabled,
 so an absent `magicMouseEnabled` preference is normal.
 
@@ -141,15 +137,24 @@ The app polls for mouse reconnection and restarts its listeners on wake.
 
 The LaunchAgent starts the app at login; it does not continuously supervise
 crashes or restart an intentionally quit app. If gestures stop completely,
-open `/Applications/Three Finger Switcher.app` again. Keep its Accessibility
+open `/Applications/Three Finger Switcher.app` again.
+
+Known issue (2026-10-14): after a sleep/wake or Bluetooth reconnect the app
+can log `Mouse connected=true` yet receive no Magic Mouse frames, so mouse
+gestures silently stop while the trackpad keeps working. The log never shows
+`First Magic Mouse frame received` after the reconnect. Quitting and reopening
+the app restores frames. Check with:
+
+```sh
+/usr/bin/log show --last 1h --info --style compact \
+  --predicate 'subsystem == "com.local.ThreeFingerSwitcher" AND category == "MagicMouse"'
+``` Keep its Accessibility
 permission enabled. A major macOS update may require compatibility maintenance
 because raw touch access uses a private Apple framework.
 
 ## Trackpad four-finger Return tap (2026-10-03)
 
-Three Finger Switcher now owns four-finger tap for Return, replacing the saved
-BTT mapping. BTT is not required. Keep its saved four-finger Return trigger
-inactive if BTT is restarted, to avoid duplicate key presses.
+Three Finger Switcher owns four-finger tap for Return.
 
 A stationary four-finger tap sends one unmodified Return to the focused app
 only after all fingers lift. It needs 20–600 ms contact, at most 2 mm travel
@@ -384,28 +389,19 @@ First-run system setup:
    applications to four fingers. This avoids a collision with the custom
    three-finger gesture.
 
-The old equivalent BetterTouchTool three-finger app-switcher triggers must stay
-disabled while this app is running. Otherwise BTT can race the recognizer for
-the same trackpad contacts. This project does not automatically delete or
-modify any unrelated BetterTouchTool trigger.
-
 ## Rollback and Recovery
 
 To reject only the experimental two-finger interaction, turn off **Two-Finger
 Scrubbing After Opening** in the menu. The original working three-finger path
 remains intact.
 
-To disable the entire custom gesture, stop the background app. BetterTouchTool
-can then own the gesture again if its
-corresponding triggers are enabled. The old BTT left-swipe trigger always sends
-`Cmd+Delete`; enable it only if that static rollback behavior is wanted. To
-restore Spokenly's original ownership of the three-finger tap, restore the
+To disable the entire custom gesture, stop the background app. To restore Spokenly's original ownership of the three-finger tap, restore the
 backed-up unnamed `threeFingerLight` mode in Spokenly after disabling this app.
 
 To remove only custom palm rejection, delete its filter integration and restore
 the previous `zTotal > 2.0` contact guard before rebuilding. For an immediate
 rollback of all custom gestures, quit or disable Three Finger Switcher before
-restoring one alternate BTT or Spokenly owner. macOS palm rejection is separate
+restoring Spokenly as the owner. macOS palm rejection is separate
 and must not be changed.
 
 The 2026-08-29 palm calibration remains pending physical verification. Test a

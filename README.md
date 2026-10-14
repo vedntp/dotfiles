@@ -97,9 +97,8 @@ scripts/provision-server-terminal.sh
 ## Notes
 
 - [Spokenly transcription profile](docs/transcription/spokenly/README.md)
-- [Custom Logitech, BetterTouchTool, and transcription shortcut reference](docs/shortcut-reference.md)
+- [Custom Logitech, gesture, and transcription shortcut reference](docs/shortcut-reference.md)
 - [MX Master 3S, Logitech Options+, and Spokenly setup](docs/logitech-options-spokenly.md)
-- [BetterTouchTool gesture setup](docs/btt/README.md)
 - [Native Three Finger Switcher](docs/three-finger-switcher.md)
 - [Ducky One 2 macOS setup](docs/ducky-one-2-setup.md)
 - [AirPods smart-routing banner investigation](docs/airpods-banner-dismiss.md)

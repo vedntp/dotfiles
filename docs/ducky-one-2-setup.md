@@ -39,13 +39,13 @@ targeted to the Ducky vendor/product ID only. A LaunchAgent at
 `~/Library/LaunchAgents/com.vp.ducky-one2-media-keys.plist` reapplies the
 mapping on login and every 30 seconds so it survives keyboard replugging.
 
-- Triple F4 → BetterTouchTool's global key sequence locks the screen using its
-  native Lock Screen action. Single and double F4 presses have no custom
-  action. F4 passes through the F8 listener unchanged so BTT can recognize it.
+- F4 has no custom action and passes through the F8 listener unchanged.
 - MacBook built-in F4 → `~/.local/bin/macbook-f4-proton-key` remaps Apple's
   Spotlight/Search HID usage to normal F4, targeted only to the built-in Apple
-  keyboard so it does not overwrite the Ducky media mapping. The helper keeps
-  its legacy filename, but F4 no longer controls Proton VPN.
+  keyboard so it does not overwrite the Ducky media mapping. It originally fed
+  BetterTouchTool's retired triple-F4 lock-screen sequence, so it now has no
+  custom consumer. The helper keeps its legacy filename, but F4 no longer
+  controls Proton VPN.
 - F8 → the same listener calls `~/.local/bin/aerospace-toggle-enabled` to
   kill/relaunch the official `/Applications/AeroSpace.app` process.
   A LaunchAgent at
@@ -75,11 +75,6 @@ The raw input source is the built-in Apple keyboard's IOHID element, vendor
 down and up values. A separate listen-only event tap invalidates the tap if
 another key, modifier, or system-defined media event participates, including a
 modifier held before Fn is pressed.
-
-The former BetterTouchTool trigger, `Ghostty Fn to Ctrl+B - Herdr prefix`
-(`3D18BB81-90D9-4CD9-BED3-9B46FBB2F683`), is disabled but preserved as the
-immediate rollback path. It must remain disabled while the native listener is
-active so one Fn tap cannot emit two `Ctrl+B` prefixes.
 
 macOS **Press Globe key to** is set to **Do Nothing**
 (`com.apple.HIToolbox AppleFnUsageType = 0`) so the native Globe action does not
@@ -123,7 +118,5 @@ tail -f ~/Library/Logs/macbook-fn-herdr-listener.log
 defaults read com.apple.HIToolbox AppleFnUsageType
 ```
 
-For rollback, unload `com.vp.macbook-fn-herdr-listener`, restore
-`AppleFnUsageType` to `3`, and re-enable only preserved BTT trigger
-`3D18BB81-90D9-4CD9-BED3-9B46FBB2F683` after BTT is available. Do not change
-any unrelated BTT trigger.
+For rollback, unload `com.vp.macbook-fn-herdr-listener` and restore
+`AppleFnUsageType` to `3`.

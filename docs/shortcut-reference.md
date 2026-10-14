@@ -5,13 +5,12 @@ Last audited against live settings: 2026-09-03
 ## Purpose
 
 This is the quick reference for custom inputs managed through Logitech
-Options+, BetterTouchTool, and Spokenly. It records what a physical input does
+Options+, Three Finger Switcher, and Spokenly. It records what a physical input does
 now. Use the detailed setup guides for implementation history, database fields,
 backup procedures, and troubleshooting:
 
 - [Logitech Options+ and Spokenly setup](logitech-options-spokenly.md)
 - [MX Master 3S reconstruction manifest](logitech-mx-master-3s-shortcuts.json)
-- [BetterTouchTool gesture setup](btt/README.md)
 - [Spokenly transcription profile](transcription/spokenly/README.md)
 - [Three Finger Switcher](three-finger-switcher.md)
 - [Ducky One 2 macOS setup](ducky-one-2-setup.md)
@@ -54,13 +53,7 @@ The Logitech profile displayed as `ChatGPT` targets Codex bundle ID
 | youtube Brave PWA (`com.brave.Browser.app.agimnkijcaahngcdmfeangaknmldooml`) | Logitech Smart Action `Spokenly Hands-Free` | Middle click | Native Back | Native Forward | System volume | System volume |
 | Sioyek (`info.sioyek.sioyek`) | Logitech Smart Action `Spokenly Hands-Free` | Middle click | Right Arrow | Left Arrow | `-`, zoom out | `=`, zoom in |
 
-## BetterTouchTool
-
-### Global keyboard sequences
-
-| Physical input | Result |
-| --- | --- |
-| Triple F4, no more than 0.35 seconds between events | Lock the screen using BTT's native Lock Screen action |
+## Native input helpers
 
 ### Native MacBook keyboard listener
 
@@ -72,9 +65,7 @@ The listener reads explicit down/up values from the built-in keyboard's raw
 IOHID Fn element, then uses a listen-only event tap to detect other keys,
 modifiers, and media-key activity. It leaves all physical input unchanged and
 sends the prefix only when Ghostty or Alacritty is frontmost at press and
-release and no other input participates. The former BTT trigger
-`3D18BB81-90D9-4CD9-BED3-9B46FBB2F683` is disabled and preserved solely for
-rollback.
+release and no other input participates.
 
 The working deployment requires the compiled binary at
 `~/Library/Caches/dotfiles/macbook-fn-herdr-listener` to be enabled in both
@@ -96,9 +87,8 @@ Three Finger Switcher owns three-finger tap and horizontal swipe
 classification, plus the four-finger Return tap. The latter requires 20–600 ms
 of stationary contact, at most 2 mm travel per finger, and full release within
 150 ms of the first lift. Added during switching, the fourth finger only
-cancels. The saved BTT four-finger Return mapping is superseded and must stay
-inactive to avoid duplicate Enter presses. The user confirmed the installed
-four-finger Return tap works on 2026-10-03.
+cancels. The user confirmed the installed four-finger Return tap works on
+2026-10-03.
 
 The three-finger Spokenly tap must last 5 to 600 ms with no more than 2.0 mm of
 per-finger travel. Once the existing swipe threshold is crossed, swipe wins and
@@ -112,8 +102,7 @@ by the background Three Finger Switcher process.
 
 Physical verification passed on 2026-08-22. The user confirmed that tap,
 right-swipe app switching with two-finger scrubbing, and context-aware
-left-swipe clearing work correctly in normal use. The superseded BTT trackpad
-triggers are absent from the live BTT data store.
+left-swipe clearing work correctly in normal use.
 
 The stronger 2026-08-29 palm filter rejects a complete frame when two ordinary
 signals agree, using pressure, contact ellipse area, adaptive combined area,
@@ -126,34 +115,18 @@ pending physical verification; exact values and rollback are in the
 
 | Physical input | Result |
 | --- | --- |
-| 1-finger tap | Left click at the pointer |
-| 1-finger tap right | Right click at the pointer |
 | 2-finger swipe left | Three Finger Switcher clears text once using the trackpad’s app-aware route: Control-U in supported terminals, Command-Delete elsewhere, same app exclusions |
 | 2-finger swipe right | Three Finger Switcher opens native Command-Tab; lift one finger and slide the remaining finger left/right to browse, lift the final finger to select |
 | 2-finger tap | Three Finger Switcher toggles Spokenly on release through `Spokenly Toggle.app` |
 | 3-finger tap | Three Finger Switcher presses Return on release in the focused app |
 
-The Magic Mouse two-finger switcher is owned by Three Finger Switcher as of
-2026-10-03. It requires no BTT. The user confirmed the installed two-finger
-activation and one-finger browsing interaction feels better. It starts with
-the trackpad helper through the existing login LaunchAgent. The other BTT-owned mouse
-gestures require BTT to be running. See [the switcher guide](three-finger-switcher.md)
-for calibration and scrolling behavior. The custom two-finger Spokenly tap
-and three-finger Return tap were mapped on 2026-10-03 and await physical verification. Saved BTT three-finger
-middle-click and Codex Return mappings are superseded and must stay inactive
-while the custom tap is enabled.
-
-### Application-specific BTT shortcuts
-
-Application-specific triggers override matching global gestures.
-
-| Application | Input | Result |
-| --- | --- | --- |
-| Codex | Trackpad 2-finger swipe right | Open the Codex chat switcher, then select the hovered chat when the final finger lifts |
-| Codex | Magic Mouse 3-finger tap | Return instead of the global middle click |
-| Codex | `Ctrl+B` | Toggle the sidebar between `By project` and `In one list` through the debounced helper |
-| Codex | Normal-mouse horizontal scroll right | Toggle the sidebar between `By project` and `In one list` through the direct helper |
-| YouTube Brave app | `Cmd+Shift+C` | Open the application menu and run its native Copy URL command |
+All Magic Mouse gestures are owned by Three Finger Switcher (since
+2026-10-03). It starts with the trackpad helper through the existing login
+LaunchAgent. The user confirmed the two-finger activation and one-finger
+browsing interaction feels better. The two-finger Spokenly tap and three-finger
+Return tap await physical verification. One-finger taps use native macOS
+behavior. See [the switcher guide](three-finger-switcher.md) for calibration
+and scrolling behavior.
 
 ### Spokenly keyboard shortcut
 
@@ -235,12 +208,11 @@ Clear History action.
 
 ## Maintenance
 
-Update this file whenever a Logitech Options+ profile, BetterTouchTool trigger,
-or Spokenly shortcut changes. Record current behavior here, and keep
+Update this file whenever a Logitech Options+ profile, Three Finger Switcher
+gesture, or Spokenly shortcut changes. Record current behavior here, and keep
 implementation history and troubleshooting detail in the specialized guides.
 
 Audit the live sources before editing this reference:
 
 - Logitech Options+: `~/Library/Application Support/LogiOptionsPlus/settings.db`
-- BetterTouchTool: BTT's `get_triggers` AppleScript command
 - Spokenly: `~/Library/Preferences/app.spokenly.plist`
