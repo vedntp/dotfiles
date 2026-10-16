@@ -2,7 +2,8 @@
 
 Removed on 2026-10-03 at the user's request after disruptive behavior. The
 helper, deployed symlink, workspace-change hook, and Ctrl+Alt+P recovery binding
-are gone. No custom PiP recovery or workspace following is installed.
+are gone. A lightweight replacement was added on 2026-10-15: see
+[aerospace-pip-follow.md](aerospace-pip-follow.md).
 
 The remainder is historical documentation. Its commands are no longer available
 and should not be used as current setup instructions.

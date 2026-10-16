@@ -94,7 +94,7 @@ The final empty-workspace catch-all applies only to tiled windows. Windows
 AeroSpace recognizes as dialogs are floating by default, so they remain beside
 the application that opened them instead of being moved to another workspace.
 
-The custom PiP guardian, workspace-change hook, and `ctrl-alt-p` recovery binding were removed on 2026-10-03. No custom PiP following or recovery automation is installed.
+The old PiP guardian and `ctrl-alt-p` binding were removed on 2026-10-03. Since 2026-10-15, Helium PiP floats and follows the focused workspace via `~/.local/bin/aerospace-pip-follow` (aerospace CLI only, no osascript).
 
 The main ChatGPT window stays assigned to workspace `C`. AeroSpace
 `0.21.0-Beta` and later recognizes the always-on-top `com.openai.codex` Pet as

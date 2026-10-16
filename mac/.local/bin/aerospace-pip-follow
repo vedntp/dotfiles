@@ -1,0 +1,21 @@
+#!/bin/sh
+# Move Helium Picture-in-Picture windows to the newly focused workspace, but only
+# when the PiP's workspace is no longer visible on any monitor. With one display
+# PiP follows every switch; with two, a PiP on the other display stays put.
+# Runs from exec-on-workspace-change. Uses only the aerospace CLI: no osascript,
+# no app activation, and it exits after one query when no PiP is open.
+
+ws="${AEROSPACE_FOCUSED_WORKSPACE:-}"
+[ -n "$ws" ] || exit 0
+
+pips="$(aerospace list-windows --monitor all --app-bundle-id net.imput.helium \
+  --format '%{window-id}%{tab}%{workspace}%{tab}%{window-title}' 2>/dev/null |
+  awk -F '\t' 'tolower($3) == "picture-in-picture" { print $1 "\t" $2 }')"
+[ -n "$pips" ] || exit 0
+
+visible=" $(aerospace list-workspaces --monitor all --visible 2>/dev/null | tr '\n' ' ')"
+
+printf '%s\n' "$pips" | while IFS="$(printf '\t')" read -r id cur; do
+  case "$visible" in *" $cur "*) continue ;; esac
+  aerospace move-node-to-workspace --window-id "$id" "$ws" >/dev/null 2>&1
+done

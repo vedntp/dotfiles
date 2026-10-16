@@ -39,6 +39,10 @@ default-root-container-orientation = 'auto'
 # Fallback value (if you omit the key): on-focused-monitor-changed = []
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
+# AeroSpace has no sticky windows. Move Helium PiP to the focused workspace on
+# every switch. Lightweight: aerospace CLI only, no osascript or app activation.
+exec-on-workspace-change = ['/Users/vp/.local/bin/aerospace-pip-follow']
+
 # You can effectively turn off macOS "Hide application" (cmd-h) feature by toggling this flag
 # Useful if you don't use this macOS feature, but accidentally hit cmd-h or cmd-alt-h key
 # Also see: https://nikitabobko.github.io/AeroSpace/goodies#disable-hide-app
@@ -182,6 +186,13 @@ run = 'move-node-to-workspace B'
 [[on-window-detected]]
 if.app-id = 'com.brave.Browser'
 run = 'move-node-to-workspace B'
+
+# Helium Picture-in-Picture: float in place. Must precede the Helium rule below,
+# which would otherwise tile it into workspace B.
+[[on-window-detected]]
+if.app-id = 'net.imput.helium'
+if.window-title-regex-substring = '(?i)^picture-in-picture$'
+run = 'layout floating'
 
 [[on-window-detected]]
 if.app-id = 'net.imput.helium'

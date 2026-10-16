@@ -87,9 +87,9 @@ Additional rules:
 - ChatGPT stays assigned to workspace `C`. AeroSpace `0.21.0-Beta` and later
   classifies the always-on-top `com.openai.codex` Pet as an unmanaged popup,
   so no sticky-window rule or helper is required.
-- The custom PiP guardian, workspace-change hook, and `ctrl-alt-p` recovery
-  binding were removed on 2026-10-03 at the user's request. Do not restore them
-  without an explicit request.
+- The old PiP guardian and `ctrl-alt-p` recovery binding were removed on
+  2026-10-03. A lightweight replacement, `aerospace-pip-follow`, was added on
+  2026-10-15 at the user's request. Do not add osascript or app activation to it.
 - CleanShot X, System Settings, and Raycast are floated in place so utility windows stay in the workspace where they were invoked.
 - Cloudflare WARP, 1Password, `com.apple.LocalAuthentication.UIAgent`,
   `com.apple.coreservices.uiagent`, and `com.apple.ProblemReporter` are floating
@@ -101,8 +101,14 @@ Additional rules:
 
 ## PiP
 
-No custom PiP following or recovery automation is installed. Historical details
-are recorded in `docs/aerospace-pip-guardian.md` at the repository root.
+Helium PiP windows (title `Picture-in-Picture`, matched case-insensitively) are
+floated by a rule placed before the Helium tiling rule. `~/.local/bin/aerospace-pip-follow`
+runs from `exec-on-workspace-change` and moves them to the focused workspace
+only when their workspace is not visible on any monitor, so dual-monitor setups
+keep PiP on the other display.
+Full details: `docs/aerospace-pip-follow.md`.
+Keep it aerospace-CLI-only: the old guardian (see `docs/aerospace-pip-guardian.md`)
+was removed for running osascript and activating Brave on every switch.
 
 ## Keybindings
 

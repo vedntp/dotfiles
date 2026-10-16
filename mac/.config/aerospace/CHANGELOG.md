@@ -1,5 +1,13 @@
 # Aerospace Configuration Changelog
 
+## 2026-10-15
+- Added a lightweight Helium PiP follower, `aerospace-pip-follow`, run from
+  `exec-on-workspace-change`. It only uses the aerospace CLI (one query,
+  about 10 to 20ms), with no osascript, no Brave activation, and no recovery
+  mode. It only moves PiP when its workspace is hidden, so a PiP on the other
+  monitor stays put in dual-display use. Added a float rule for Helium `Picture-in-Picture` windows ahead of the
+  Helium tiling rule, which had been tiling PiP into workspace B.
+
 ## 2026-10-03
 - Removed the custom PiP guardian and its deployed symlink at the user's request
   after disruptive behavior. Removed the workspace-change hook and Ctrl+Alt+P
