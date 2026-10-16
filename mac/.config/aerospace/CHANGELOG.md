@@ -1,5 +1,8 @@
 # Aerospace Configuration Changelog
 
+## 2026-10-17
+- Routed the Grok Bot app (`com.anysphere.sand`) to workspace G.
+
 ## 2026-10-15
 - Added a lightweight Helium PiP follower, `aerospace-pip-follow`, run from
   `exec-on-workspace-change`. It only uses the aerospace CLI (one query,

@@ -66,7 +66,7 @@ preserves the v1 behavior for all currently bound workspace keys.
 | D | Emacs |
 | E | Finder (floating) |
 | F | Drafts |
-| G | Gemini, Grok |
+| G | Gemini, Grok, Grok Bot |
 | M | Gmail |
 | N | Safari, Notion |
 | O | Books (floating), Obsidian |

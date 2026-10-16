@@ -69,7 +69,7 @@ Rules are ordered. Specific rules must stay above broader rules, and the final c
 | `D` | Emacs |
 | `E` | Finder floating |
 | `F` | Drafts |
-| `G` | Gemini, Grok |
+| `G` | Gemini, Grok, Grok Bot |
 | `M` | Gmail |
 | `N` | Safari, Notion |
 | `O` | Books floating, Obsidian |

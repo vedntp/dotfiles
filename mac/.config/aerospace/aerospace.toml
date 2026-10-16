@@ -236,6 +236,10 @@ run = 'move-node-to-workspace G'
 if.app-id = 'com.brave.Browser.app.ggjocahimgaohmigbfhghnlfcnjemagj'
 run = 'move-node-to-workspace G'
 
+[[on-window-detected]]
+if.app-id = 'com.anysphere.sand'
+run = 'move-node-to-workspace G'
+
 # Workspace N - Safari
 [[on-window-detected]]
 if.app-name-regex-substring = 'Safari'
