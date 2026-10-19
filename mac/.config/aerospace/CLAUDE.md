@@ -27,7 +27,9 @@ preserves the v1 behavior for all currently bound workspace keys.
 
 **Workspaces**:
 - `alt-[1-0]` - Switch to workspace 1-10
-- `alt-[a-z]` - Switch to letter workspace (except r reserved)
+- `alt-[a-z]` - Switch to letter workspace (except r reserved, a launches Claude Code)
+- `alt-a` - Switch to the first empty workspace and open an Alacritty window (via `~/.local/bin/aerospace-claude-work`) in `~/Work` running `claude --dangerously-skip-permissions` (workspace A removed)
+- `alt-enter` - New Alacritty window in `~` on the current workspace (via `~/.local/bin/alacritty-new-window`). Overrides Option+Return in apps such as Excel.
 - `alt-shift-[key]` - Move window to that workspace
 - `alt-tab` / `alt-shift-tab` - Herdr next / previous agent when Herdr is active
 - `alt-backtick` - Jump to next empty workspace
@@ -59,8 +61,8 @@ preserves the v1 behavior for all currently bound workspace keys.
 | 3 | Things, Linear |
 | 4-6 | TradingView, IB Gateway, TWS |
 | 8 | Discord, Telegram, WhatsApp |
+| 9 | Slack |
 | 10 | Spotify, YouTube Music |
-| A | Excel, Word, sioyek |
 | B | Arc, Firefox, Brave, Helium |
 | C | ChatGPT, Chrome |
 | D | Emacs |
@@ -71,7 +73,7 @@ preserves the v1 behavior for all currently bound workspace keys.
 | N | Safari, Notion |
 | O | Books (floating), Obsidian |
 | P | VS Code |
-| S | Slack |
+| S | Excel, Word, sioyek |
 | V | Claude |
 | X | Amp, Conductor |
 | Y | YouTube |

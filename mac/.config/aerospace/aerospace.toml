@@ -51,7 +51,7 @@ automatically-unhide-macos-hidden-apps = false
 # Keep the same workspaces alive when empty as the former v1 binding inference.
 persistent-workspaces = [
     '1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'I', 'M', 'N', 'O', 'P', 'Q',
+    'B', 'C', 'D', 'E', 'F', 'G', 'I', 'M', 'N', 'O', 'P', 'Q',
     'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 ]
 
@@ -60,7 +60,6 @@ persistent-workspaces = [
 # fallback. Support workspaces prefer the built-in display, then secondary/main.
 [workspace-to-monitor-force-assignment]
 # Primary / default workspace group
-A = ['LG HDR 4K', 'main']  # Documents/Office
 B = ['LG HDR 4K', 'main']  # Browsers
 C = ['LG HDR 4K', 'main']  # AI/Chat
 D = ['LG HDR 4K', 'main']  # Development (Emacs)
@@ -68,7 +67,7 @@ I = ['LG HDR 4K', 'main']
 N = ['LG HDR 4K', 'main']  # Safari/Notion
 P = ['LG HDR 4K', 'main']
 Q = ['LG HDR 4K', 'main']
-S = ['LG HDR 4K', 'main']  # Social/Journal
+S = ['LG HDR 4K', 'main']  # Documents/Office
 T = ['LG HDR 4K', 'main']
 U = ['LG HDR 4K', 'main']
 V = ['LG HDR 4K', 'main']  # Claude AI
@@ -84,7 +83,7 @@ X = ['LG HDR 4K', 'main']  # Amp/Conductor
 6 = ['built-in', 'secondary', 'main']
 7 = ['built-in', 'secondary', 'main']
 8 = ['built-in', 'secondary', 'main']
-9 = ['built-in', 'secondary', 'main']
+9 = ['built-in', 'secondary', 'main']  # Slack
 10 = ['built-in', 'secondary', 'main']
 E = ['built-in', 'secondary', 'main']  # File Management (Finder)
 F = ['built-in', 'secondary', 'main']  # Writing/Notes
@@ -161,18 +160,18 @@ run = 'move-node-to-workspace 8'
 if.app-name-regex-substring = 'WhatsApp'
 run = 'move-node-to-workspace 8'
 
-# Workspace A - Documents/Office
+# Workspace S - Documents/Office (formerly A; alt-a now launches Claude Code)
 [[on-window-detected]]
 if.app-name-regex-substring = 'Microsoft Excel'
-run = 'move-node-to-workspace A'
+run = 'move-node-to-workspace S'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'Microsoft Word'
-run = 'move-node-to-workspace A'
+run = 'move-node-to-workspace S'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'sioyek'
-run = 'move-node-to-workspace A'
+run = 'move-node-to-workspace S'
 
 # Workspace B - Browsers
 [[on-window-detected]]
@@ -253,10 +252,10 @@ run = 'move-node-to-workspace N'
 if.app-id = 'com.apple.iBooksX'
 run = ['layout floating', 'move-node-to-workspace O']
 
-# Workspace S - Slack
+# Workspace 9 - Slack
 [[on-window-detected]]
 if.app-id = 'com.tinyspeck.slackmacgap'
-run = 'move-node-to-workspace S'
+run = 'move-node-to-workspace 9'
 
 # Workspace V - Claude AI
 [[on-window-detected]]
@@ -444,7 +443,9 @@ run = ['exec-and-forget /bin/bash -c "aerospace list-workspaces --monitor focuse
     alt-8 = 'workspace 8'
     alt-9 = 'workspace 9'
     alt-0 = 'workspace 10'
-    alt-a = 'workspace A' # In your config, you can drop workspace bindings that you don't need
+    # alt-a launches Claude Code in ~/Work (workspace A removed)
+    alt-a = 'exec-and-forget /bin/bash /Users/vp/.local/bin/aerospace-claude-work'
+    alt-enter = 'exec-and-forget /bin/bash /Users/vp/.local/bin/alacritty-new-window --working-directory /Users/vp'
     alt-b = 'workspace B'
     alt-c = 'workspace C'
     alt-d = 'workspace D'
@@ -478,7 +479,6 @@ run = ['exec-and-forget /bin/bash -c "aerospace list-workspaces --monitor focuse
     alt-shift-8 = 'move-node-to-workspace 8'
     alt-shift-9 = 'move-node-to-workspace 9'
     alt-shift-0 = 'move-node-to-workspace 10'
-    alt-shift-a = 'move-node-to-workspace A'
     alt-shift-b = 'move-node-to-workspace B'
     alt-shift-c = 'move-node-to-workspace C'
     alt-shift-d = 'move-node-to-workspace D'

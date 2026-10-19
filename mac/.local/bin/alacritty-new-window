@@ -1,0 +1,18 @@
+#!/bin/bash
+# Open a new Alacritty window, passing any args through (e.g. --working-directory, -e).
+# Reuses the running Alacritty via IPC so existing windows (Herdr) are untouched;
+# starts Alacritty if none is running. Used by alt-enter and aerospace-claude-work.
+
+alacritty=/Applications/Alacritty.app/Contents/MacOS/alacritty
+sock_dir="${TMPDIR:-$(getconf DARWIN_USER_TEMP_DIR)}"
+
+# Stale sockets from dead instances linger, so only use one whose pid is alive.
+for sock in "$sock_dir"/Alacritty-*.sock; do
+  pid="${sock##*-}"
+  pid="${pid%.sock}"
+  if kill -0 "$pid" 2>/dev/null && "$alacritty" msg -s "$sock" create-window "$@"; then
+    exit 0
+  fi
+done
+
+open -na Alacritty --args "$@"
