@@ -22,139 +22,72 @@ if [[ -n "$ALACRITTY_WINDOW_ID" ]]; then
     printf '\e[?1042l'
 fi
 
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
+# ===== SHELL BASICS =====
+# Plain zsh, no framework. These replace the parts of Oh My Zsh in use.
 
-# Complete direnv initialization (after instant prompt)
-(( ${+commands[direnv]} )) && eval "$(direnv hook zsh)"
+# History, shared across sessions
+HISTFILE=~/.zsh_history
+HISTSIZE=50000
+SAVEHIST=10000
+setopt extended_history hist_expire_dups_first hist_ignore_dups hist_ignore_space hist_verify share_history
 
+# Directories: type a folder name to cd into it; `-` goes back
+setopt auto_cd auto_pushd pushd_ignore_dups pushdminus interactive_comments
+alias -- -='cd -'
 
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
+# Keys: emacs mode; up/down search history for what is already typed
+bindkey -e
+autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey '^[[A' up-line-or-beginning-search
+bindkey '^[OA' up-line-or-beginning-search
+bindkey '^[[B' down-line-or-beginning-search
+bindkey '^[OB' down-line-or-beginning-search
+bindkey '^[[H' beginning-of-line
+bindkey '^[[F' end-of-line
+bindkey '^[[3~' delete-char
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;5D' backward-word
+bindkey '^[[1;3C' forward-word
+bindkey '^[[1;3D' backward-word
 
-# Path to your Oh My Zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
+# Colours and listings
+export CLICOLOR=1
+alias ls='ls -G'
+alias l='ls -lah'
+alias la='ls -lAh'
+alias ll='ls -lh'
+alias grep='grep --color=auto'
 
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time Oh My Zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="powerlevel10k/powerlevel10k"
+# Completion: case-insensitive, menu via fzf-tab (loaded at the end)
+typeset -U fpath
+$IS_MAC && [[ -d /opt/homebrew/share/zsh/site-functions ]] && fpath+=(/opt/homebrew/share/zsh/site-functions)
+autoload -Uz compinit
+compinit -d "${XDG_CACHE_HOME:-$HOME/.cache}/zcompdump-$ZSH_VERSION"
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' special-dirs true
+setopt complete_in_word always_to_end
 
-# Set list of themes to pick from when loading at random
-# Setting this variable when ZSH_THEME=random will cause zsh to load
-# a theme from this variable instead of looking in $ZSH/themes/
-# If set to an empty array, this variable will have no effect.
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
+# Window title: user@host:dir at the prompt, the command while it runs
+_title_precmd() { print -Pn "\e]0;%n@%m:%~\a" }
+_title_preexec() { print -Pn "\e]0;%n@%m:" && print -rn -- "${1[(w)1]}" && print -n "\a" }
+precmd_functions+=(_title_precmd)
+preexec_functions+=(_title_preexec)
 
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion.
-# Case-sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Uncomment one of the following lines to change the auto-update behavior
-# zstyle ':omz:update' mode disabled  # disable automatic updates
-# zstyle ':omz:update' mode auto      # update automatically without asking
-# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
-
-# Uncomment the following line to change how often to auto-update (in days).
-# zstyle ':omz:update' frequency 13
-
-# Uncomment the following line if pasting URLs and other text is messed up.
-# DISABLE_MAGIC_FUNCTIONS="true"
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# You can also set it to another string to have that shown instead of the default red dots.
-# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
-# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 ZSH_AUTOSUGGEST_USE_ASYNC=1
 
-plugins=(
-	git zsh-autosuggestions
-	fzf
-	fzf-tab
-	z
-	colored-man-pages
-	zsh-syntax-highlighting
-)
-# Mac-only plugins
-$IS_MAC && plugins+=(macos brew)
-
-# Keep completion search paths stable so Oh My Zsh can reuse .zcompdump.
-typeset -U fpath
-[[ -d "$HOME/.oh-my-zsh/custom/plugins/fzf-tab/lib" ]] && fpath+=("$HOME/.oh-my-zsh/custom/plugins/fzf-tab/lib")
-$IS_MAC && [[ -d /opt/homebrew/share/zsh/site-functions ]] && fpath+=(/opt/homebrew/share/zsh/site-functions)
-
-source $ZSH/oh-my-zsh.sh
-
-
-# User configuration
+# ===== USER CONFIGURATION =====
 
 # Keep Puppeteer/fast-cli cache out of ~/.cache to avoid cleanup.
 export PUPPETEER_CACHE_DIR="$HOME/.local/share/puppeteer"
-
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
 export EDITOR='nvim'
 export VISUAL='nvim'
 
-# Compilation flags
-# export ARCHFLAGS="-arch $(uname -m)"
-
-# Set personal aliases, overriding those provided by Oh My Zsh libs,
-# plugins, and themes. Aliases can be placed here, though Oh My Zsh
-# users are encouraged to define aliases within a top-level file in
-# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
-# - $ZSH_CUSTOM/aliases.zsh
-# - $ZSH_CUSTOM/macos.zsh
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
 alias szsh='source ~/.zshrc'
 alias hetzner='ssh myserver'
 
@@ -189,11 +122,10 @@ my_terminal_font() {
 # List project-scoped Codex skills from the project root.
 alias project-skills='find .agents/skills -name SKILL.md -print 2>/dev/null'
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 export TERM="xterm-256color"
 
-(( ${plugins[(Ie)fzf]} )) || [[ ! -f ~/.fzf.zsh ]] || source ~/.fzf.zsh
+# fzf key bindings (Ctrl+R history search)
+[[ ! -f ~/.fzf.zsh ]] || source ~/.fzf.zsh
 
 alias theta="~/thetadata/theta.bash"
 export PATH="$PATH:$HOME/.config/emacs/bin"
@@ -324,8 +256,6 @@ alias ccuw="ccusage weekly -b"
 alias ccum="ccusage monthly -b"
 alias ccup="ccusage -i"
 
-# Remove oh-my-zsh git plugin alias that conflicts with gsd-pi CLI
-unalias gsd 2>/dev/null
 alias gsdc="gsd -c"
 alias gfix="gcloud auth application-default login"
 
@@ -337,12 +267,19 @@ export PATH="$HOME/.local/bin:$PATH"
 # omnara
 path=("/Users/vp/.omnara/bin" $path)
 
-# To customize prompt, run `p10k configure` or edit ~/.dotfiles/mac/.p10k.zsh.
-[[ ! -f ~/.dotfiles/mac/.p10k.zsh ]] || source ~/.dotfiles/mac/.p10k.zsh
-
 # Added by Devin
 export PATH="/Users/vp/.codeium/windsurf/bin:$PATH"
 
 
 # Added by Antigravity CLI installer
 export PATH="/Users/vp/.local/bin:$PATH"
+
+# Drop duplicate PATH entries added above
+typeset -U path
+
+# ===== PLUGINS AND PROMPT =====
+# Order matters: fzf-tab after compinit, syntax highlighting last.
+source ~/.local/share/zsh/plugins/fzf-tab/fzf-tab.zsh
+source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+eval "$(starship init zsh)"
