@@ -29,6 +29,12 @@ prompt_new_tab_name = false
 
 show_agent_labels_on_pane_borders = true
 
+# CPU and memory of the machine the focused space runs on. Herdr runs the
+# command on that machine's server, so omarchy spaces show omarchy's load.
+tab_bar_right = [
+  { type = "command", command = "$HOME/.dotfiles/mac/.config/herdr/load-status", interval_seconds = 5, timeout_seconds = 5 },
+]
+
 [ui.toast]
 # Herdr Focus Notify owns desktop notifications and click-to-focus behavior.
 # Keep Herdr's own toast available inside the app without duplicating desktop
@@ -47,16 +53,16 @@ done_path = "/Users/vp/.config/opencode/sounds/conductor-chime.mp3"
 row_gap = 0
 rows = [
   ["state_icon", { token = "$harness_logo", fg = "#A8ADB9", bold = true, rules = [{ contains = " fx", fg = "#D6D6D6" }] }],
-  ["workspace", "tab"],
+  [{ token = "$host_logo", fg = "#6B7089", dim = false, rules = [{ contains = "\uF303", fg = "#1793D1" }] }, "workspace", "tab"],
 ]
 
 # Same row for every agent; only the logo colour differs.
 [ui.sidebar.agents.rows_by_agent]
-amp = [["state_icon", { token = "$harness_logo", fg = "#DFDFC1", bold = true, dim = false }], ["workspace", "tab"]]
-claude = [["state_icon", { token = "$harness_logo", fg = "#E68A67", bold = true, dim = false }], ["workspace", "tab"]]
-codex = [["state_icon", { token = "$harness_logo", fg = "#A78BFA", bold = true, dim = false }], ["workspace", "tab"]]
-opencode = [["state_icon", { token = "$harness_logo", fg = "#A8ADB9", bold = true, dim = false }], ["workspace", "tab"]]
-pi = [["state_icon", { token = "$harness_logo", fg = "#FFFFFF", bold = true, dim = false }], ["workspace", "tab"]]
+amp = [["state_icon", { token = "$harness_logo", fg = "#DFDFC1", bold = true, dim = false }], [{ token = "$host_logo", fg = "#6B7089", dim = false, rules = [{ contains = "\uF303", fg = "#1793D1" }] }, "workspace", "tab"]]
+claude = [["state_icon", { token = "$harness_logo", fg = "#E68A67", bold = true, dim = false }], [{ token = "$host_logo", fg = "#6B7089", dim = false, rules = [{ contains = "\uF303", fg = "#1793D1" }] }, "workspace", "tab"]]
+codex = [["state_icon", { token = "$harness_logo", fg = "#A78BFA", bold = true, dim = false }], [{ token = "$host_logo", fg = "#6B7089", dim = false, rules = [{ contains = "\uF303", fg = "#1793D1" }] }, "workspace", "tab"]]
+opencode = [["state_icon", { token = "$harness_logo", fg = "#A8ADB9", bold = true, dim = false }], [{ token = "$host_logo", fg = "#6B7089", dim = false, rules = [{ contains = "\uF303", fg = "#1793D1" }] }, "workspace", "tab"]]
+pi = [["state_icon", { token = "$harness_logo", fg = "#FFFFFF", bold = true, dim = false }], [{ token = "$host_logo", fg = "#6B7089", dim = false, rules = [{ contains = "\uF303", fg = "#1793D1" }] }, "workspace", "tab"]]
 
 # $bte_logo is "<glyph> <label>" for every space, not only bte (the name is
 # historical). The workspace-keepers plugin sets it from its config.json; the

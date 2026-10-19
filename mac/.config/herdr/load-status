@@ -1,0 +1,37 @@
+#!/bin/sh
+# CPU, GPU and memory use for the Herdr tab bar (ui.tab_bar_right in config.toml).
+# Herdr runs it on the server, so it reports the machine the panes run on.
+# Prints CPU, GPU (when the machine reports it) and memory use, each after a
+# Nerd Font icon: nf-oct-cpu, nf-md-expansion_card, nf-fa-memory.
+
+case "$(uname -s)" in
+Darwin)
+    cpu=$(top -l 2 -n 0 -s 1 | awk '/CPU usage/ { idle = $7 } END { sub("%", "", idle); printf "%d", 100 - idle + 0.5 }')
+    gpu=$(ioreg -r -d 1 -c IOAccelerator | sed -n 's/.*"Device Utilization %"=\([0-9]*\).*/\1/p' | head -n 1)
+    mem=$(vm_stat | awk -v total="$(sysctl -n hw.memsize)" '
+        /page size of/ { size = $8 }
+        /Pages active/ { used += $3 }
+        /Pages wired down/ { used += $4 }
+        /occupied by compressor/ { used += $5 }
+        END { printf "%d", used * size * 100 / total + 0.5 }')
+    ;;
+*)
+    read -r _ a1 b1 c1 idle1 w1 x1 y1 z1 _ </proc/stat
+    sleep 1
+    read -r _ a2 b2 c2 idle2 w2 x2 y2 z2 _ </proc/stat
+    busy=$(( (a2 + b2 + c2 + x2 + y2 + z2) - (a1 + b1 + c1 + x1 + y1 + z1) ))
+    all=$(( busy + (idle2 + w2) - (idle1 + w1) ))
+    cpu=$(( all > 0 ? (busy * 100 + all / 2) / all : 0 ))
+    if command -v nvidia-smi >/dev/null 2>&1; then
+        gpu=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | head -n 1 | tr -d ' ')
+    else
+        gpu=$(cat /sys/class/drm/card*/device/gpu_busy_percent 2>/dev/null | head -n 1)
+    fi
+    mem=$(awk '/^MemTotal/ { t = $2 } /^MemAvailable/ { a = $2 } END { printf "%d", (t - a) * 100 / t + 0.5 }' /proc/meminfo)
+    ;;
+esac
+
+# GPU is left out on machines that do not report it.
+printf '\357\222\274 %s%%  ' "$cpu"
+[ -n "$gpu" ] && printf '\363\260\242\256 %s%%  ' "$gpu"
+printf '\356\277\205 %s%%\n' "$mem"

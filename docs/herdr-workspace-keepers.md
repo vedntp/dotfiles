@@ -50,3 +50,19 @@ herdr plugin enable local.workspace-keepers
 
 Disabling the plugin stops automatic resurrection. It does not close existing
 workspaces or tabs.
+
+## Per-machine lists
+
+`keepers.py` reads `config.json` from the machine's own plugin config dir,
+`~/.config/herdr/plugins/config/local.workspace-keepers/config.json`, when it
+exists, and falls back to the shared `workspace-keepers/config.json` otherwise.
+
+As of 2026-10-19:
+
+| Machine | List used | Protected spaces |
+|---|---|---|
+| Mac | local override | `general` |
+| omarchy | shared file | `general`, `bte`, `stryde`, `vqa` |
+
+The project spaces live only on omarchy. Their project files are not there yet;
+the spaces open in `~`.

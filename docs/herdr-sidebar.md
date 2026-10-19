@@ -102,6 +102,26 @@ To pick up upstream changes, diff upstream against this copy by hand and keep
 the three edits above. Do not `herdr plugin install` it from GitHub again while
 the local link exists.
 
+## Host logos
+
+Row 2 of every agent row starts with `$host_logo`, which shows the machine
+the agent runs on. The same `agent-icons` plugin sets it on each pane. Plugins
+run on the server that owns the pane, so each machine reports its own glyph.
+These are stock Nerd Font glyphs, already in both Herdr fonts.
+
+| Machine | Glyph | Codepoint | Colour |
+|---|---|---|---|
+| macOS (this Mac) | Apple | `U+F179` | `#6B7089` (dim, the default) |
+| Arch-based Linux (omarchy) | Arch | `U+F303` | `#1793D1` (via a `contains` rule) |
+| Ubuntu | Ubuntu | `U+F31B` | `#6B7089` |
+| other Linux | Tux | `U+F17C` | `#6B7089` |
+| Windows | Windows | `U+F17A` | `#6B7089` |
+
+omarchy (`vp@omarchy`) is a saved Herdr machine (`herdr machine list`). It
+keeps its own live `~/.config/herdr/config.toml` with Linux keybindings, not a
+symlink to this repo, so sidebar row changes must be applied there separately.
+Its plugin is linked from its own `~/.dotfiles` checkout.
+
 ## Space logos
 
 `mac/.config/herdr/workspace-keepers/config.json` maps a space label to the

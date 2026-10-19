@@ -20,7 +20,10 @@ def cli(*args):
 def main():
     if os.environ.get("HERDR_ENV") != "1":
         raise RuntimeError("Run inside Herdr or as a Herdr plugin.")
-    configured = json.loads((ROOT / "config.json").read_text())
+    # A config.json in this machine's plugin config dir replaces the shared one,
+    # so each machine can protect a different set of spaces.
+    override = Path(os.environ.get("HERDR_PLUGIN_CONFIG_DIR", "/nonexistent")) / "config.json"
+    configured = json.loads((override if override.is_file() else ROOT / "config.json").read_text())
     state_dir = Path(os.environ.get("HERDR_PLUGIN_STATE_DIR", str(Path.home() / ".local/state/herdr-workspace-keepers")))
     state_dir.mkdir(parents=True, exist_ok=True)
     with (state_dir / "lock").open("w") as lock:

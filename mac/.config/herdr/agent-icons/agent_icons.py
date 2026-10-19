@@ -45,6 +45,15 @@ TEXT_LOGOS = {
     "fx": "\ue1aa",
 }
 VARIANTS = ("auto", "font", "text", "none")
+# Nerd Font glyphs, already present in the JetBrains Mono Herdr fonts.
+HOST_TOKEN_NAME = "host_logo"
+HOST_LOGOS = {
+    "macos": "",  # nf-fa-apple
+    "arch": "",  # nf-linux-archlinux
+    "ubuntu": "",  # nf-linux-ubuntu
+    "linux": "",  # nf-fa-linux
+    "windows": "",  # nf-fa-windows
+}
 
 
 def run_herdr(herdr: str, *args: str) -> dict[str, Any]:
@@ -117,6 +126,27 @@ def logo_for(agent: str, variant: str) -> str | None:
     return PUA_LOGOS[agent] if variant == "font" else TEXT_LOGOS[agent]
 
 
+def host_logo() -> str:
+    # Plugins run on the server that owns the pane, so this is the machine the
+    # agent itself runs on, even when the sidebar shows it from another one.
+    if sys.platform == "darwin":
+        return HOST_LOGOS["macos"]
+    if sys.platform == "win32":
+        return HOST_LOGOS["windows"]
+    distros: set[str] = set()
+    try:
+        for line in Path("/etc/os-release").read_text().splitlines():
+            key, _, value = line.partition("=")
+            if key in {"ID", "ID_LIKE"}:
+                distros.update(value.strip('"').split())
+    except OSError:
+        pass
+    for distro in ("arch", "ubuntu"):
+        if distro in distros:
+            return HOST_LOGOS[distro]
+    return HOST_LOGOS["linux"]
+
+
 def report_logo(herdr: str, source: str, pane_id: str, agent: str | None, variant: str) -> bool:
     logo = logo_for(agent, variant) if agent is not None else None
     arguments = [
@@ -131,6 +161,10 @@ def report_logo(herdr: str, source: str, pane_id: str, agent: str | None, varian
     else:
         label = logo + "  " if agent == "amp" else f"{logo} {agent}"
         arguments.extend(("--token", f"{TOKEN_NAME}={label}"))
+    if variant == "none":
+        arguments.extend(("--clear-token", HOST_TOKEN_NAME))
+    else:
+        arguments.extend(("--token", f"{HOST_TOKEN_NAME}={host_logo()}"))
     run_herdr(herdr, *arguments)
     return logo is not None
 
