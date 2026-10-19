@@ -19,6 +19,7 @@ __init__.py
 
 # Backups
 backups/
+*.bak
 *.bak.*
 tmux.bak.*
 
