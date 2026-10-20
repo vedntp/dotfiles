@@ -22,6 +22,30 @@ if [[ -n "$ALACRITTY_WINDOW_ID" ]]; then
     printf '\e[?1042l'
 fi
 
+# Cache the output of `tool init zsh` so startup does not spawn the tool every
+# time. Regenerated whenever the tool's binary is newer than the cache.
+_cached_init() {
+  local name=$1 bin=${commands[$1]}; shift
+  [[ -n $bin ]] || return
+  local file=~/.cache/zsh/$name-init.zsh
+  if [[ ! -s $file || $bin -nt $file ]]; then
+    mkdir -p ${file:h}
+    "$@" >| $file
+  fi
+  source $file
+}
+
+# Starship's init, with two per-shell costs baked in at cache time: the
+# continuation prompt (otherwise one starship run per new shell) and the
+# right prompt (otherwise one extra starship run per prompt; this config has
+# no right_format).
+_starship_init_static() {
+  local cont; cont=$(STARSHIP_SHELL=zsh starship prompt --continuation)
+  starship init zsh | grep -v '^PROMPT2=\|^RPROMPT='
+  print -r -- "PROMPT2=${(q)cont}"
+  print -r -- "RPROMPT=''"
+}
+
 # ===== SHELL BASICS =====
 # Plain zsh, no framework. These replace the parts of Oh My Zsh in use.
 
@@ -54,17 +78,35 @@ bindkey '^[[1;3D' backward-word
 
 # Colours and listings
 export CLICOLOR=1
-alias ls='ls -G'
-alias l='ls -lah'
-alias la='ls -lAh'
-alias ll='ls -lh'
 alias grep='grep --color=auto'
+# eza, with the same aliases as Omarchy, only for a person at a terminal.
+# Agents keep plain ls: Claude Code copies these aliases into its shell, which
+# has no terminal, and there eza waits for file names on stdin and hangs.
+if (( $+commands[eza] )) && [[ -t 0 && -z $CLAUDECODE ]]; then
+    alias ls='eza -lh --group-directories-first --icons=auto'
+    alias lsa='ls -a'
+    alias lt='eza --tree --level=2 --long --icons --git'
+    alias lta='lt -a'
+else
+    alias ls='ls -G'
+    alias lsa='ls -lah'
+fi
 
-# Completion: case-insensitive, menu via fzf-tab (loaded at the end)
+# Completion: case-insensitive, menu via fzf-tab (loaded at the end).
+# The full security check runs once a day; other starts reuse the dump (-C).
 typeset -U fpath
 $IS_MAC && [[ -d /opt/homebrew/share/zsh/site-functions ]] && fpath+=(/opt/homebrew/share/zsh/site-functions)
 autoload -Uz compinit
-compinit -d "${XDG_CACHE_HOME:-$HOME/.cache}/zcompdump-$ZSH_VERSION"
+_zcompdump="${XDG_CACHE_HOME:-$HOME/.cache}/zcompdump-$ZSH_VERSION"
+_zcompdump_stale=( $_zcompdump(N.mh+24) )
+if [[ ! -s $_zcompdump || -n $_zcompdump_stale ]]; then
+  compinit -d $_zcompdump
+else
+  compinit -C -d $_zcompdump
+fi
+# A compiled dump loads faster than the plain text one.
+[[ $_zcompdump.zwc -nt $_zcompdump ]] || zcompile $_zcompdump
+unset _zcompdump _zcompdump_stale
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' special-dirs true
@@ -124,8 +166,8 @@ alias project-skills='find .agents/skills -name SKILL.md -print 2>/dev/null'
 
 export TERM="xterm-256color"
 
-# fzf key bindings (Ctrl+R history search)
-[[ ! -f ~/.fzf.zsh ]] || source ~/.fzf.zsh
+# fzf key bindings (Ctrl+R history search), cached instead of `source ~/.fzf.zsh`
+_cached_init fzf fzf --zsh
 
 alias theta="~/thetadata/theta.bash"
 export PATH="$PATH:$HOME/.config/emacs/bin"
@@ -282,4 +324,4 @@ typeset -U path
 source ~/.local/share/zsh/plugins/fzf-tab/fzf-tab.zsh
 source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-eval "$(starship init zsh)"
+_cached_init starship _starship_init_static
