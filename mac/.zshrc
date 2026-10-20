@@ -166,7 +166,7 @@ alias project-skills='find .agents/skills -name SKILL.md -print 2>/dev/null'
 
 export TERM="xterm-256color"
 
-# fzf key bindings (Ctrl+R history search), cached instead of `source ~/.fzf.zsh`
+# fzf key bindings (Ctrl+R history search)
 _cached_init fzf fzf --zsh
 
 alias theta="~/tools/thetadata/theta.bash"

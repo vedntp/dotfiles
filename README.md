@@ -54,7 +54,6 @@ scripts/provision-server-terminal.sh
 |-- mac/                    # Active Stow package
 |   |-- .zshrc              # Shell config
 |   |-- .gitconfig          # Git config
-|   |-- .fzf.zsh            # FZF shell integration
 |   |-- .taskrc             # Taskwarrior config
 |   |-- .local/bin/         # Helper scripts and background watchers
 |   |-- Library/LaunchAgents/ # Per-user background services

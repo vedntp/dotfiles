@@ -23,7 +23,6 @@ Codex-facing guide for working in `/Users/vp/.dotfiles`.
 |-- mac/                    # Active macOS Stow package
 |   |-- .zshrc
 |   |-- .gitconfig
-|   |-- .fzf.zsh
 |   |-- .local/bin/
 |   |-- Library/LaunchAgents/
 |   `-- .config/
@@ -100,7 +99,6 @@ Stow creates symlinks from `$HOME` and `$HOME/.config` into `mac/`. Examples:
 
 - `~/.zshrc` points at the `.zshrc` in the deployed package.
 - `~/.gitconfig` points at `mac/.gitconfig`.
-- `~/.fzf.zsh` points at `mac/.fzf.zsh`.
 - `~/.config/nvim/` points at `mac/.config/nvim/`.
 - `~/.config/tmux/` points at `mac/.config/tmux/`.
 - `~/.config/doom/` points at `mac/.config/doom/`.

@@ -36,7 +36,6 @@ tmux source-file ~/.config/tmux/tmux.conf
 |-- mac/                    # Active Stow package
 |   |-- .zshrc              # Shell config
 |   |-- .gitconfig          # Git config
-|   |-- .fzf.zsh            # FZF shell integration
 |   |-- .local/bin/         # Helper scripts
 |   |-- Library/LaunchAgents/ # Per-user background services
 |   `-- .config/
@@ -98,7 +97,6 @@ Meta bindings available for terminals that send Meta.
 
 - `~/.zshrc` -> `mac/.zshrc`
 - `~/.gitconfig` -> `mac/.gitconfig`
-- `~/.fzf.zsh` -> `mac/.fzf.zsh`
 - `~/.config/nvim/` -> `mac/.config/nvim/`
 - `~/.config/tmux/` -> `mac/.config/tmux/`
 - `~/.config/doom/` -> `mac/.config/doom/`
