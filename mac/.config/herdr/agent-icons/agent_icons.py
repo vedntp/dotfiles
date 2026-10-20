@@ -51,6 +51,13 @@ TEXT_LOGOS = {
     "fx": "\ue1aa",
 }
 VARIANTS = ("auto", "font", "text", "none")
+# Agent state, shown in front of the logo. Loud for what needs you.
+STATE_EMOJIS = {
+    "blocked": "🚨",
+    "done": "✅",
+    "working": "⚡",
+    "idle": "💤",
+}
 # Nerd Font glyphs, already present in the JetBrains Mono Herdr fonts.
 HOST_TOKEN_NAME = "host_logo"
 HOST_LOGOS = {
@@ -160,7 +167,9 @@ def host_logo() -> str:
     return HOST_LOGOS["linux"]
 
 
-def report_logo(herdr: str, source: str, pane_id: str, agent: str | None, variant: str) -> bool:
+def report_logo(
+    herdr: str, source: str, pane_id: str, agent: str | None, variant: str, status: str | None = None
+) -> bool:
     logo = logo_for(agent, variant) if agent is not None else None
     arguments = [
         "pane",
@@ -173,6 +182,8 @@ def report_logo(herdr: str, source: str, pane_id: str, agent: str | None, varian
         arguments.extend(("--clear-token", TOKEN_NAME))
     else:
         label = logo + "  " if agent == "amp" else f"{logo} {agent}"
+        # One token, so Herdr draws no " · " between the state and the logo.
+        label = STATE_EMOJIS.get(status or "", "") + label
         arguments.extend(("--token", f"{TOKEN_NAME}={label}"))
     if variant == "none":
         arguments.extend(("--clear-token", HOST_TOKEN_NAME))
@@ -208,18 +219,18 @@ def event_pane(raw_event: str) -> str | None:
     return pane_id
 
 
-def current_target(herdr: str, pane_id: str) -> tuple[str, str | None]:
+def current_target(herdr: str, pane_id: str) -> tuple[str, str | None, str | None]:
     response = run_herdr(herdr, "pane", "get", pane_id)
     pane = response.get("result", {}).get("pane", {})
     agent = pane.get("agent")
-    return pane_id, agent if isinstance(agent, str) else None
+    return pane_id, agent if isinstance(agent, str) else None, pane.get("agent_status")
 
 
-def startup_targets(herdr: str) -> list[tuple[str, str | None]]:
+def startup_targets(herdr: str) -> list[tuple[str, str | None, str | None]]:
     response = run_herdr(herdr, "pane", "list")
     panes = response.get("result", {}).get("panes", [])
     return [
-        (pane["pane_id"], pane.get("agent"))
+        (pane["pane_id"], pane.get("agent"), pane.get("agent_status"))
         for pane in panes
         if isinstance(pane, dict)
         and isinstance(pane.get("pane_id"), str)
@@ -245,7 +256,7 @@ def main() -> int:
 
     try:
         if args.pane and args.agent:
-            targets = [(args.pane, args.agent)]
+            targets = [(args.pane, args.agent, None)]
         elif os.environ.get("HERDR_PLUGIN_EVENT_JSON"):
             pane_id = event_pane(os.environ["HERDR_PLUGIN_EVENT_JSON"])
             targets = [] if pane_id is None else [current_target(herdr, pane_id)]
@@ -256,9 +267,9 @@ def main() -> int:
         return 1
 
     failures = []
-    for pane_id, agent in targets:
+    for pane_id, agent, status in targets:
         try:
-            report_logo(herdr, source, pane_id, agent, variant)
+            report_logo(herdr, source, pane_id, agent, variant, status)
         except (RuntimeError, json.JSONDecodeError) as error:
             failures.append(f"{pane_id}: {error}")
 

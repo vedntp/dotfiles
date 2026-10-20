@@ -124,17 +124,19 @@ Its plugin is linked from its own `~/.dotfiles` checkout.
 
 ## State emoji
 
-Agent rows start with `$state_emoji` instead of Herdr's dot, because the
-dots for done and idle were both green. `agent-icons/state_emoji.py` reports
-it on startup, `pane.agent_status_changed`, and `pane.focused` (which turns
-done into idle), under its own metadata source.
+The agent-icons plugin puts a state emoji in front of the logo inside
+`$harness_logo`, replacing Herdr's dot (done and idle were both green). It is
+one token so Herdr draws no ` · ` between them. It reruns on
+`pane.agent_status_changed` and `pane.focused` (which turns done into idle).
 
 | State | Emoji |
 |---|---|
 | blocked | 🚨 |
 | done | ✅ |
-| working | ⏳ |
+| working | ⚡ |
 | idle | 💤 |
+
+After editing `config.toml`, run `herdr server reload-config`.
 
 ## Space logos
 

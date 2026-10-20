@@ -27,14 +27,11 @@ width = 72
 height = 18
 command = ["python3", "preview.py", "--pick"]
 
-[[startup]]
-command = ["python3", "state_emoji.py"]
-
 [[events]]
 on = "pane.agent_status_changed"
-command = ["python3", "state_emoji.py"]
+command = ["python3", "agent_icons.py"]
 
 # Focusing a finished pane turns done into idle.
 [[events]]
 on = "pane.focused"
-command = ["python3", "state_emoji.py"]
+command = ["python3", "agent_icons.py"]
