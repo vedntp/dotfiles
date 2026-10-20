@@ -135,7 +135,7 @@ and idle were both green. It reruns on `pane.agent_status_changed` and
 |---|---|
 | blocked | 🚨 |
 | done | ✅ |
-| working | 🟨 |
+| working | yellow square `#F7C948`, font glyph `U+E1B8`, smaller than 🟨 |
 | idle | 🔘 |
 
 After editing `config.toml`, run `herdr server reload-config`.

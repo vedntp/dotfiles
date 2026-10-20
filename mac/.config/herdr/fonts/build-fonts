@@ -14,7 +14,6 @@ installs as its own family. See docs/herdr-sidebar.md.
     build-fonts --check         # compare a fresh build with ~/Library/Fonts
 """
 import argparse
-import math
 import sys
 import tempfile
 from pathlib import Path
@@ -32,7 +31,7 @@ FAMILIES = {
     "JetBrainsMonoHerdr": ("JetBrains Mono Herdr", "logos.ttf"),
     "JetBrainsMonoHerdrXL": ("JetBrains Mono Herdr XL", "logos-xl.ttf"),
 }
-FIRST, LAST = 0xE1A0, 0xE1BF  # logos, host logos, pulse dots
+FIRST, LAST = 0xE1A0, 0xE1BF  # logos, host logos, working square
 # Host logos, copied from the base Nerd Font glyphs and scaled to fill the
 # Claude logo's box (U+E1A0), so they look the same size in the sidebar.
 HOST_LOGOS = {
@@ -42,9 +41,9 @@ HOST_LOGOS = {
     0xE1B3: 0xF17C,  # linux
     0xE1B4: 0xF17A,  # windows
 }
-# Eight identical filled dots for the working pulse. Herdr colours them through
-# `rules` in config.toml, one shade per codepoint, so the pulse can fade.
-PULSE_DOTS = tuple(range(0xE1B8, 0xE1C0))
+# A filled square for the working state, smaller than the 🟨 emoji. Herdr
+# colours it through a `rules` entry in config.toml.
+WORKING_SQUARE = 0xE1B8
 
 
 def logo_glyphs(font):
@@ -76,30 +75,26 @@ def add_host_logos(font, donor, order):
                 table.cmap[code] = name
 
 
-def add_pulse_dots(font, donor, order):
+def add_working_square(font, donor, order):
     ref = donor["glyf"][donor.getBestCmap()[FIRST]]
-    # Emoji fill two cells, so the dot is drawn across its own cell and the
-    # blank (U+2800) that follows it in the token, at about emoji size.
+    # Emoji fill two cells, so the square is centred across its own cell and
+    # the blank (U+2800) that follows it in the token.
     advance = font["hmtx"]["space"][0]
-    radius = 0.42 * 2 * advance
-    cx, cy = advance, (ref.yMin + ref.yMax) / 2
-    # A circle as eight quadratic segments, every point off-curve (clockwise).
-    reach = radius / math.cos(math.pi / 8)
-    points = [
-        (round(cx + reach * math.cos(-k * math.pi / 4)), round(cy + reach * math.sin(-k * math.pi / 4)))
-        for k in range(8)
-    ]
-    for code in PULSE_DOTS:
-        pen = TTGlyphPen(None)
-        pen.qCurveTo(*points, None)
-        pen.closePath()
-        name = f"herdrpulse{code:04X}"
-        order.append(name)
-        font["glyf"][name] = pen.glyph()
-        font["hmtx"][name] = (advance, 0)
-        for table in font["cmap"].tables:
-            if table.isUnicode():
-                table.cmap[code] = name
+    half = round(0.3 * 2 * advance)
+    cx, cy = advance, round((ref.yMin + ref.yMax) / 2)
+    pen = TTGlyphPen(None)
+    pen.moveTo((cx - half, cy - half))
+    pen.lineTo((cx - half, cy + half))
+    pen.lineTo((cx + half, cy + half))
+    pen.lineTo((cx + half, cy - half))
+    pen.closePath()
+    name = f"herdrworking{WORKING_SQUARE:04X}"
+    order.append(name)
+    font["glyf"][name] = pen.glyph()
+    font["hmtx"][name] = (advance, 0)
+    for table in font["cmap"].tables:
+        if table.isUnicode():
+            table.cmap[WORKING_SQUARE] = name
 
 
 def build(stem, style, base_dir):
@@ -124,7 +119,7 @@ def build(stem, style, base_dir):
             if table.isUnicode():
                 table.cmap[code] = name
     add_host_logos(font, donor, order)
-    add_pulse_dots(font, donor, order)
+    add_working_square(font, donor, order)
     font.setGlyphOrder(order)
 
     names = {
