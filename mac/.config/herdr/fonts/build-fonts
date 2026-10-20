@@ -81,7 +81,9 @@ def add_working_square(font, donor, order):
     # the blank (U+2800) that follows it in the token.
     advance = font["hmtx"]["space"][0]
     half = round(0.3 * 2 * advance)
-    cx, cy = advance, round((ref.yMin + ref.yMax) / 2)
+    # Measured on screen: emoji sit about a quarter cell right of the
+    # two-cell midpoint, so the square does too.
+    cx, cy = round(1.23 * advance), round((ref.yMin + ref.yMax) / 2)
     pen = TTGlyphPen(None)
     pen.moveTo((cx - half, cy - half))
     pen.lineTo((cx - half, cy + half))
