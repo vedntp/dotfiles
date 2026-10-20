@@ -9,10 +9,16 @@ import os
 import shutil
 import subprocess
 import sys
-import tomllib
 import unicodedata
 from pathlib import Path
 from typing import Any
+
+try:
+    import tomllib
+except ModuleNotFoundError:
+    # A Herdr server started at login gets macOS's Python 3.9, which has no
+    # tomllib. The config is one `variant = "..."` line, so read it directly.
+    tomllib = None
 
 FONT_FAMILY = "Herdr Harness Logos"
 TOKEN_NAME = "harness_logo"
@@ -111,8 +117,15 @@ def configured_variant(explicit: str | None = None) -> str:
     config_path = Path(config_dir) / "config.toml"
     if not config_path.is_file():
         return "auto"
-    with config_path.open("rb") as config_file:
-        variant = tomllib.load(config_file).get("variant", "auto")
+    if tomllib is not None:
+        with config_path.open("rb") as config_file:
+            variant = tomllib.load(config_file).get("variant", "auto")
+    else:
+        variant = "auto"
+        for line in config_path.read_text().splitlines():
+            key, _, value = line.partition("=")
+            if key.strip() == "variant":
+                variant = value.split("#")[0].strip().strip('"')
     if variant not in VARIANTS:
         raise RuntimeError(f"invalid variant {variant!r} in {config_path}")
     return variant
