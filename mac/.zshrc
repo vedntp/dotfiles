@@ -197,8 +197,6 @@ alias tw="task"
 if $IS_MAC; then
     # opencode
     export PATH="$HOME/.opencode/bin:$PATH"
-    # gsd-browser
-    export PATH="$HOME/.gsd-browser/bin:$PATH"
     # MacPorts
     export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
 
@@ -295,7 +293,6 @@ alias ccuw="ccusage weekly -b"
 alias ccum="ccusage monthly -b"
 alias ccup="ccusage -i"
 
-alias gsdc="gsd -c"
 alias gfix="gcloud auth application-default login"
 
 # Source machine-specific local overrides (not version controlled)
@@ -303,8 +300,6 @@ alias gfix="gcloud auth application-default login"
 
 export PATH="$HOME/.local/bin:$PATH"
 
-# omnara
-path=("/Users/vp/.omnara/bin" $path)
 
 
 

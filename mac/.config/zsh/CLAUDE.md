@@ -64,7 +64,6 @@ it comes from local shell config or another installed command.
 | `tw` | `task` | Taskwarrior |
 | `caff`/`uncaff` | caffeinate control | Keep-awake scripts |
 | `mynet`/`offmynet` | network scripts | Fast network toggle |
-| `gsdc` | `gsd -c` | GSD CLI shortcut |
 | `gfix` | `gcloud auth application-default login` | Refresh ADC auth |
 | `cxl` | `codex -p lean --dangerously-bypass-approvals-and-sandbox` | Codex lean profile with approvals and sandbox disabled |
 
