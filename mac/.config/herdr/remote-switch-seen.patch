@@ -1,0 +1,131 @@
+diff --git a/src/server/headless.rs b/src/server/headless.rs
+index cb2c619..2a84a26 100644
+--- a/src/server/headless.rs
++++ b/src/server/headless.rs
+@@ -803,7 +803,7 @@ impl HeadlessServer {
+         });
+         let Some(client_id) = self.foreground_client_id else {
+             self.effective_size = self.headless_size;
+-            self.app.state.outer_terminal_focus = None;
++            self.app.state.outer_terminal_focus = self.unviewed_outer_terminal_focus();
+             self.app.state.host_cell_size = crate::kitty_graphics::HostCellSize::default();
+             self.sync_runtime_view_geometry();
+             let server_keybindings = self.server_keybindings.clone();
+@@ -814,7 +814,7 @@ impl HeadlessServer {
+         let Some(client) = self.clients.get(&client_id) else {
+             self.foreground_client_id = None;
+             self.effective_size = self.headless_size;
+-            self.app.state.outer_terminal_focus = None;
++            self.app.state.outer_terminal_focus = self.unviewed_outer_terminal_focus();
+             self.app.state.host_cell_size = crate::kitty_graphics::HostCellSize::default();
+             self.sync_runtime_view_geometry();
+             let server_keybindings = self.server_keybindings.clone();
+@@ -882,8 +882,24 @@ impl HeadlessServer {
+     }
+ 
+     fn foreground_client_outer_focus(&self) -> Option<bool> {
+-        let client_id = self.foreground_client_id?;
+-        self.clients.get(&client_id)?.outer_terminal_focus
++        let Some(client) = self
++            .foreground_client_id
++            .and_then(|client_id| self.clients.get(&client_id))
++        else {
++            return self.unviewed_outer_terminal_focus();
++        };
++        client.outer_terminal_focus
++    }
++
++    /// Focus to assume when no client shell surface is in the foreground. A client shell that
++    /// is still connected but has released its surface is viewing another endpoint, so nothing
++    /// here is visible to it: completions in the active tab must stay unseen until it returns.
++    /// With no client shell at all, keep the historical unknown-focus behaviour.
++    fn unviewed_outer_terminal_focus(&self) -> Option<bool> {
++        self.clients
++            .values()
++            .any(|client| client.is_shell_client() && !client.shell_surface_active)
++            .then_some(false)
+     }
+ 
+     fn active_tab_suppresses_notifications(&self, is_active_tab: bool) -> bool {
+diff --git a/src/server/headless/tests/mod.rs b/src/server/headless/tests/mod.rs
+index 3ab7ec0..9614a8a 100644
+--- a/src/server/headless/tests/mod.rs
++++ b/src/server/headless/tests/mod.rs
+@@ -8333,3 +8333,77 @@ fn no_handle_internal_event_bypass_in_module() {
+         bypass_lines.join("\n  ")
+     );
+ }
++
++#[test]
++fn active_tab_completion_stays_unseen_while_client_views_another_endpoint() {
++    use api::schema::{Method, PaneAgentState, PaneReportAgentParams};
++
++    fn complete(server: &mut HeadlessServer, pane_id: crate::layout::PaneId, seq: u64) -> bool {
++        let public_pane_id = server.app.public_pane_id(0, pane_id).unwrap();
++        for (offset, state) in [PaneAgentState::Working, PaneAgentState::Idle]
++            .into_iter()
++            .enumerate()
++        {
++            completion_guard_api_report(
++                server,
++                Method::PaneReportAgent(PaneReportAgentParams {
++                    pane_id: public_pane_id.clone(),
++                    source: "custom:pi".into(),
++                    agent: "pi".into(),
++                    state,
++                    message: None,
++                    seq: Some(seq + offset as u64),
++                    agent_session_id: None,
++                    agent_session_path: None,
++                    resume_argv: None,
++                }),
++            );
++        }
++        server.app.state.workspaces[0].panes[&pane_id].seen
++    }
++
++    let mut server = test_headless_server();
++    server.app.state.workspaces = vec![crate::workspace::Workspace::test_new("active")];
++    server.app.state.ensure_test_terminals();
++    server.app.state.active = Some(0);
++    server.app.state.toast_config.delay_seconds = 0;
++    let pane_id = server.app.state.workspaces[0].tabs[0].root_pane;
++    server.handle_internal_event_with_forwarding(AppEvent::AgentProcessDetected {
++        pane_id,
++        agent: crate::detect::Agent::Pi,
++        observed_at: Instant::now(),
++    });
++
++    // No client shell at all keeps the historical unknown-focus behaviour.
++    server.sync_foreground_client_state();
++    assert_eq!(server.app.state.outer_terminal_focus, None);
++    assert!(complete(&mut server, pane_id, 1));
++
++    // A client shell that released its surface is viewing another endpoint.
++    let (writer, _control_rx, _render_rx) = test_client_writer();
++    let mut connection = ClientConnection::new_with_mode(
++        ClientConnectionMode::ClientShell,
++        (80, 24),
++        Default::default(),
++        1,
++        RenderEncoding::SemanticFrame,
++        Some(writer),
++    );
++    connection.shell_surface_active = false;
++    connection.outer_terminal_focus = Some(false);
++    server.clients.insert(1, connection);
++    server.sync_foreground_client_state();
++    assert_eq!(server.foreground_client_id, None);
++    assert_eq!(server.app.state.outer_terminal_focus, Some(false));
++    assert!(!server.active_tab_suppresses_notifications(true));
++    assert!(
++        !complete(&mut server, pane_id, 10),
++        "completion must be done"
++    );
++
++    // Switching back and focusing the endpoint marks its active tab seen.
++    server.clients.get_mut(&1).unwrap().shell_surface_active = true;
++    server.clients.get_mut(&1).unwrap().outer_terminal_focus = Some(true);
++    assert!(server.promote_client_to_foreground(1));
++    assert!(server.app.state.workspaces[0].panes[&pane_id].seen);
++}

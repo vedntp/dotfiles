@@ -53,6 +53,7 @@ TEXT_LOGOS = {
 VARIANTS = ("auto", "font", "text", "none")
 # Agent state, the first item on each row. Loud for what needs you.
 STATE_TOKEN_NAME = "state_emoji"
+CLUSTER_TOKEN_NAME = "agent_cluster"
 STATE_EMOJIS = {
     "blocked": "🚨",
     "done": "✅",
@@ -190,9 +191,11 @@ def report_logo(
         arguments.extend(("--token", f"{HOST_TOKEN_NAME}={host_logo()}"))
     emoji = STATE_EMOJIS.get(status or "") if logo is not None else None
     if emoji is None:
-        arguments.extend(("--clear-token", STATE_TOKEN_NAME))
+        arguments.extend(("--clear-token", STATE_TOKEN_NAME, "--clear-token", CLUSTER_TOKEN_NAME))
     else:
         arguments.extend(("--token", f"{STATE_TOKEN_NAME}={emoji}"))
+        # State, host and agent in one token, so Herdr draws no " · " between them.
+        arguments.extend(("--token", f"{CLUSTER_TOKEN_NAME}={emoji} {host_logo()} {logo}"))
     run_herdr(herdr, *arguments)
     return logo is not None
 

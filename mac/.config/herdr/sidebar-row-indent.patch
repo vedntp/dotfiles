@@ -1,0 +1,15 @@
+diff --git a/src/client/shell/agent_sidebar.rs b/src/client/shell/agent_sidebar.rs
+index e43ab8c..89ae329 100644
+--- a/src/client/shell/agent_sidebar.rs
++++ b/src/client/shell/agent_sidebar.rs
+@@ -354,7 +354,9 @@ pub(super) fn render_agent_row(
+         row.rows.clone()
+     };
+     for (index, tokens) in rows.iter().take(rect.height as usize).enumerate() {
+-        let indent = if index == 0 { 1 } else { 3 };
++        // Every row starts in the same column, so a second-row title lines up
++        // under the first row's state mark.
++        let indent = 1;
+         let mut spans = vec![ratatui::text::Span::raw(" ".repeat(indent))];
+         spans.extend(crate::ui::resolved_token_spans(
+             tokens,
