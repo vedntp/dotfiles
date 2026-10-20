@@ -29,6 +29,7 @@ Last checked: 2026-10-07. Read this before updating or troubleshooting this user
   - `sidebar-row-indent.patch`: agent sidebar rows after the first start in the same column as the first. Client side.
   - `seen-status-event.patch`: emits `pane.agent_status_changed` when only `seen` flips (done to idle on viewing), which Herdr never did. Server side.
 - Rollback: `mv ~/.local/bin/herdr.0.9.5-pre-seen-fix ~/.local/bin/herdr`, then reattach.
+- omarchy (2026-10-20): same patched 0.9.5 built in `~/.cache/herdr-build` (rustup and zig in user space) and installed over the pacman file `/usr/bin/herdr`, so a pacman update of `herdr` will replace it. Swapped in with `herdr server live-handoff --import-exe /usr/bin/herdr --expected-protocol 22`; panes and agents survived. Rollback: `sudo install -m755 ~/.local/bin/herdr.0.9.1-pacman /usr/bin/herdr`, then hand off again. Its state loop runs as the systemd user service `herdr-pulse`.
 
 ## Earlier state (2026-10-07, historical)
 
