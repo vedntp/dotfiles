@@ -135,7 +135,7 @@ and idle were both green. It reruns on `pane.agent_status_changed` and
 |---|---|
 | blocked | 🚨 |
 | done | ✅ |
-| working | pulsing dot, font glyphs `U+E1B8`/`U+E1B9` coloured `#FFD43B`/`#FFF3B0` |
+| working | dot fading yellow `#FFD43B` to white and back, 8 font glyphs `U+E1B8`-`U+E1BF` coloured by config rules, driven by `agent-icons/pulse.py` |
 | idle | 🔘 |
 
 After editing `config.toml`, run `herdr server reload-config`.

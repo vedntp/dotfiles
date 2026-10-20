@@ -3,62 +3,76 @@
 
 Herdr sends no event when done turns into idle, so the plugin alone leaves a
 stale done mark. This loop rereads every pane each tick, sets the emoji for
-its state, and alternates the working emoji so it looks lit. It writes only
-when a value changes. Run by a LaunchAgent (com.vp.herdr-pulse).
+its state, and fades the working dot from yellow to white and back. It talks
+to Herdr's API socket directly, since launching the CLI for every
+frame cost about 10 ms of CPU. Run by a LaunchAgent (com.vp.herdr-pulse).
 """
 
 from __future__ import annotations
 
 import json
 import os
-import subprocess
+import socket
 import time
 
 from agent_icons import STATE_EMOJIS, STATE_TOKEN_NAME
 
-HERDR = os.environ.get("HERDR_BIN_PATH", os.path.expanduser("~/.local/bin/herdr"))
+SOCKET = os.path.expanduser("~/.config/herdr/herdr.sock")
 SOURCE = "plugin:moneycaringcoder.agent-icons"
-# Font dots (fonts/build-fonts) coloured yellow and pale yellow by config.toml
-# rules. Herdr trims trailing spaces, so a blank braille cell (U+2800) makes
-# them two cells wide like the emoji.
-WORKING_FRAMES = ("\ue1b8\u2800", "\ue1b9\u2800")
-TICK_SECONDS = 0.6
+# Font dots U+E1B8..U+E1BF (fonts/build-fonts), coloured yellow to white by
+# config.toml rules. A blank braille cell (U+2800) makes each two cells wide
+# like the emoji, since Herdr trims trailing spaces.
+SHADES = [chr(code) + "⠀" for code in range(0xE1B8, 0xE1C0)]
+WORKING_FRAMES = SHADES + SHADES[-2:0:-1]  # yellow to white and back
+TICK_SECONDS = 0.1
 
 
-def herdr(*args: str) -> dict:
-    result = subprocess.run([HERDR, *args], check=False, capture_output=True, text=True)
-    if result.returncode != 0:
-        raise RuntimeError(result.stderr.strip())
-    return json.loads(result.stdout or "{}")
+class Herdr:
+    """Herdr's API socket answers one request per connection."""
+
+    def __init__(self) -> None:
+        self.next_id = 0
+
+    def call(self, method: str, params: dict) -> dict:
+        self.next_id += 1
+        request = {"id": f"pulse:{self.next_id}", "method": method, "params": params}
+        with socket.socket(socket.AF_UNIX) as sock:
+            sock.connect(SOCKET)
+            sock.sendall(json.dumps(request).encode() + b"\n")
+            with sock.makefile("rb") as reader:
+                line = reader.readline()
+        if not line:
+            raise ConnectionError("herdr closed the socket")
+        response = json.loads(line)
+        if "error" in response:
+            raise RuntimeError(response["error"])
+        return response["result"]
 
 
 def main() -> None:
+    herdr = None
     frame = 0
     while True:
-        frame ^= 1
         try:
-            panes = herdr("pane", "list")["result"]["panes"]
-        except (RuntimeError, json.JSONDecodeError, KeyError):
-            time.sleep(2)  # server restarting or not up yet
+            if herdr is None:
+                herdr = Herdr()
+            frame = (frame + 1) % len(WORKING_FRAMES)
+            for pane in herdr.call("pane.list", {})["panes"]:
+                status = pane.get("agent_status")
+                emoji = None
+                if pane.get("agent"):
+                    emoji = WORKING_FRAMES[frame] if status == "working" else STATE_EMOJIS.get(status)
+                if emoji == pane.get("tokens", {}).get(STATE_TOKEN_NAME):
+                    continue
+                herdr.call(
+                    "pane.report_metadata",
+                    {"pane_id": pane["pane_id"], "source": SOURCE, "tokens": {STATE_TOKEN_NAME: emoji}},
+                )
+        except (OSError, ValueError, RuntimeError, KeyError):
+            # Server restarting or not up yet: reconnect after a pause.
+            herdr = None
+            time.sleep(2)
             continue
-        for pane in panes:
-            status = pane.get("agent_status")
-            emoji = None
-            if pane.get("agent"):
-                emoji = WORKING_FRAMES[frame] if status == "working" else STATE_EMOJIS.get(status)
-            pane_id = pane["pane_id"]
-            current = pane.get("tokens", {}).get(STATE_TOKEN_NAME)
-            if emoji == current:
-                continue
-            arguments = ["pane", "report-metadata", pane_id, "--source", SOURCE]
-            if emoji is None:
-                arguments += ["--clear-token", STATE_TOKEN_NAME]
-            else:
-                arguments += ["--token", f"{STATE_TOKEN_NAME}={emoji}"]
-            try:
-                herdr(*arguments)
-            except (RuntimeError, json.JSONDecodeError):
-                pass
         time.sleep(TICK_SECONDS)
 
 

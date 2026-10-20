@@ -32,7 +32,7 @@ FAMILIES = {
     "JetBrainsMonoHerdr": ("JetBrains Mono Herdr", "logos.ttf"),
     "JetBrainsMonoHerdrXL": ("JetBrains Mono Herdr XL", "logos-xl.ttf"),
 }
-FIRST, LAST = 0xE1A0, 0xE1BF
+FIRST, LAST = 0xE1A0, 0xE1BF  # logos, host logos, pulse dots
 # Host logos, copied from the base Nerd Font glyphs and scaled to fill the
 # Claude logo's box (U+E1A0), so they look the same size in the sidebar.
 HOST_LOGOS = {
@@ -42,9 +42,9 @@ HOST_LOGOS = {
     0xE1B3: 0xF17C,  # linux
     0xE1B4: 0xF17A,  # windows
 }
-# Two identical filled dots for the working pulse. Herdr colours them through
+# Eight identical filled dots for the working pulse. Herdr colours them through
 # `rules` in config.toml, one shade per codepoint, so the pulse can fade.
-PULSE_DOTS = (0xE1B8, 0xE1B9)
+PULSE_DOTS = tuple(range(0xE1B8, 0xE1C0))
 
 
 def logo_glyphs(font):
