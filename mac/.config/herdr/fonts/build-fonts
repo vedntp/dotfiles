@@ -83,7 +83,7 @@ def add_working_square(font, donor, order):
     half = round(0.3 * 2 * advance)
     # Measured on screen: this lines the square up with the emoji in the
     # rows below it.
-    cx, cy = round(0.78 * advance), round((ref.yMin + ref.yMax) / 2)
+    cx, cy = round(0.86 * advance), round((ref.yMin + ref.yMax) / 2) + 30
     pen = TTGlyphPen(None)
     pen.moveTo((cx - half, cy - half))
     pen.lineTo((cx - half, cy + half))
