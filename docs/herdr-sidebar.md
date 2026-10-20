@@ -107,15 +107,16 @@ the local link exists.
 Row 2 of every agent row starts with `$host_logo`, which shows the machine
 the agent runs on. The same `agent-icons` plugin sets it on each pane. Plugins
 run on the server that owns the pane, so each machine reports its own glyph.
-These are stock Nerd Font glyphs, already in both Herdr fonts.
+`fonts/build-fonts` copies the stock Nerd Font glyphs to `U+E1B0` and up, scaled
+to the Claude logo's box so both logos look the same size.
 
 | Machine | Glyph | Codepoint | Colour |
 |---|---|---|---|
-| macOS (this Mac) | Apple | `U+F179` | `#6B7089` (dim, the default) |
-| Arch-based Linux (omarchy) | Arch | `U+F303` | `#1793D1` (via a `contains` rule) |
-| Ubuntu | Ubuntu | `U+F31B` | `#6B7089` |
-| other Linux | Tux | `U+F17C` | `#6B7089` |
-| Windows | Windows | `U+F17A` | `#6B7089` |
+| macOS (this Mac) | Apple | `U+E1B0` (from `U+F179`) | `#6B7089` (dim, the default) |
+| Arch-based Linux (omarchy) | Arch | `U+E1B1` (from `U+F303`) | `#1793D1` (via a `contains` rule) |
+| Ubuntu | Ubuntu | `U+E1B2` (from `U+F31B`) | `#6B7089` |
+| other Linux | Tux | `U+E1B3` (from `U+F17C`) | `#6B7089` |
+| Windows | Windows | `U+E1B4` (from `U+F17A`) | `#6B7089` |
 
 omarchy (`vp@omarchy`) is a saved Herdr machine (`herdr machine list`). It
 keeps its own live `~/.config/herdr/config.toml` with Linux keybindings, not a

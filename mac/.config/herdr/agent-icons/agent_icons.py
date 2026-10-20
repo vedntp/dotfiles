@@ -60,14 +60,14 @@ STATE_EMOJIS = {
     "working": "🟡",
     "idle": "💤",
 }
-# Nerd Font glyphs, already present in the JetBrains Mono Herdr fonts.
+# Enlarged copies of the Nerd Font host glyphs, added by fonts/build-fonts.
 HOST_TOKEN_NAME = "host_logo"
 HOST_LOGOS = {
-    "macos": "",  # nf-fa-apple
-    "arch": "",  # nf-linux-archlinux
-    "ubuntu": "",  # nf-linux-ubuntu
-    "linux": "",  # nf-fa-linux
-    "windows": "",  # nf-fa-windows
+    "macos": "\ue1b0",  # nf-fa-apple
+    "arch": "\ue1b1",  # nf-linux-archlinux
+    "ubuntu": "\ue1b2",  # nf-linux-ubuntu
+    "linux": "\ue1b3",  # nf-fa-linux
+    "windows": "\ue1b4",  # nf-fa-windows
 }
 
 

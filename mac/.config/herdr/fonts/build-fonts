@@ -19,6 +19,8 @@ import tempfile
 from pathlib import Path
 
 from fontTools.pens.recordingPen import RecordingPen
+from fontTools.pens.transformPen import TransformPen
+from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 
 HERE = Path(__file__).resolve().parent
@@ -30,11 +32,44 @@ FAMILIES = {
     "JetBrainsMonoHerdrXL": ("JetBrains Mono Herdr XL", "logos-xl.ttf"),
 }
 FIRST, LAST = 0xE1A0, 0xE1BF
+# Host logos, copied from the base Nerd Font glyphs and scaled to fill the
+# Claude logo's box (U+E1A0), so they look the same size in the sidebar.
+HOST_LOGOS = {
+    0xE1B0: 0xF179,  # apple
+    0xE1B1: 0xF303,  # arch
+    0xE1B2: 0xF31B,  # ubuntu
+    0xE1B3: 0xF17C,  # linux
+    0xE1B4: 0xF17A,  # windows
+}
 
 
 def logo_glyphs(font):
     cmap = font.getBestCmap()
     return {code: cmap[code] for code in sorted(cmap) if FIRST <= code <= LAST}
+
+
+def add_host_logos(font, donor, order):
+    glyf = font["glyf"]
+    ref = donor["glyf"][donor.getBestCmap()[FIRST]]
+    size = max(ref.xMax - ref.xMin, ref.yMax - ref.yMin)
+    centre = ((ref.xMin + ref.xMax) / 2, (ref.yMin + ref.yMax) / 2)
+    cmap = font.getBestCmap()
+    glyphs = font.getGlyphSet()
+    for code, source in HOST_LOGOS.items():
+        src = glyf[cmap[source]]
+        src.recalcBounds(glyf)
+        scale = size / max(src.xMax - src.xMin, src.yMax - src.yMin)
+        dx = centre[0] - scale * (src.xMin + src.xMax) / 2
+        dy = centre[1] - scale * (src.yMin + src.yMax) / 2
+        pen = TTGlyphPen(glyphs)
+        glyphs[cmap[source]].draw(TransformPen(pen, (scale, 0, 0, scale, dx, dy)))
+        name = f"herdrhost{code:04X}"
+        order.append(name)
+        glyf[name] = pen.glyph()
+        font["hmtx"][name] = font["hmtx"][cmap[source]]
+        for table in font["cmap"].tables:
+            if table.isUnicode():
+                table.cmap[code] = name
 
 
 def build(stem, style, base_dir):
@@ -58,6 +93,7 @@ def build(stem, style, base_dir):
         for table in font["cmap"].tables:
             if table.isUnicode():
                 table.cmap[code] = name
+    add_host_logos(font, donor, order)
     font.setGlyphOrder(order)
 
     names = {
