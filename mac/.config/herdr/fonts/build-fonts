@@ -14,6 +14,7 @@ installs as its own family. See docs/herdr-sidebar.md.
     build-fonts --check         # compare a fresh build with ~/Library/Fonts
 """
 import argparse
+import math
 import sys
 import tempfile
 from pathlib import Path
@@ -41,6 +42,9 @@ HOST_LOGOS = {
     0xE1B3: 0xF17C,  # linux
     0xE1B4: 0xF17A,  # windows
 }
+# Two identical filled dots for the working pulse. Herdr colours them through
+# `rules` in config.toml, one shade per codepoint, so the pulse can fade.
+PULSE_DOTS = (0xE1B8, 0xE1B9)
 
 
 def logo_glyphs(font):
@@ -72,6 +76,29 @@ def add_host_logos(font, donor, order):
                 table.cmap[code] = name
 
 
+def add_pulse_dots(font, donor, order):
+    ref = donor["glyf"][donor.getBestCmap()[FIRST]]
+    radius = 0.4 * max(ref.xMax - ref.xMin, ref.yMax - ref.yMin)
+    cx, cy = (ref.xMin + ref.xMax) / 2, (ref.yMin + ref.yMax) / 2
+    # A circle as eight quadratic segments, every point off-curve (clockwise).
+    reach = radius / math.cos(math.pi / 8)
+    points = [
+        (round(cx + reach * math.cos(-k * math.pi / 4)), round(cy + reach * math.sin(-k * math.pi / 4)))
+        for k in range(8)
+    ]
+    for code in PULSE_DOTS:
+        pen = TTGlyphPen(None)
+        pen.qCurveTo(*points, None)
+        pen.closePath()
+        name = f"herdrpulse{code:04X}"
+        order.append(name)
+        font["glyf"][name] = pen.glyph()
+        font["hmtx"][name] = (font["hmtx"]["space"][0] if "space" in font["hmtx"].metrics else 600, 0)
+        for table in font["cmap"].tables:
+            if table.isUnicode():
+                table.cmap[code] = name
+
+
 def build(stem, style, base_dir):
     family, donor_name = FAMILIES[stem]
     base_path = base_dir / f"JetBrainsMonoNerdFontMono-{style}.ttf"
@@ -94,6 +121,7 @@ def build(stem, style, base_dir):
             if table.isUnicode():
                 table.cmap[code] = name
     add_host_logos(font, donor, order)
+    add_pulse_dots(font, donor, order)
     font.setGlyphOrder(order)
 
     names = {
