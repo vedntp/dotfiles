@@ -78,8 +78,11 @@ def add_host_logos(font, donor, order):
 
 def add_pulse_dots(font, donor, order):
     ref = donor["glyf"][donor.getBestCmap()[FIRST]]
-    radius = 0.4 * max(ref.xMax - ref.xMin, ref.yMax - ref.yMin)
-    cx, cy = (ref.xMin + ref.xMax) / 2, (ref.yMin + ref.yMax) / 2
+    # Emoji fill two cells, so the dot is drawn across its own cell and the
+    # blank (U+2800) that follows it in the token, at about emoji size.
+    advance = font["hmtx"]["space"][0]
+    radius = 0.42 * 2 * advance
+    cx, cy = advance, (ref.yMin + ref.yMax) / 2
     # A circle as eight quadratic segments, every point off-curve (clockwise).
     reach = radius / math.cos(math.pi / 8)
     points = [
@@ -93,7 +96,7 @@ def add_pulse_dots(font, donor, order):
         name = f"herdrpulse{code:04X}"
         order.append(name)
         font["glyf"][name] = pen.glyph()
-        font["hmtx"][name] = (font["hmtx"]["space"][0] if "space" in font["hmtx"].metrics else 600, 0)
+        font["hmtx"][name] = (advance, 0)
         for table in font["cmap"].tables:
             if table.isUnicode():
                 table.cmap[code] = name

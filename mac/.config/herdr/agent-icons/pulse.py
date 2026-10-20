@@ -19,8 +19,9 @@ from agent_icons import STATE_EMOJIS, STATE_TOKEN_NAME
 HERDR = os.environ.get("HERDR_BIN_PATH", os.path.expanduser("~/.local/bin/herdr"))
 SOURCE = "plugin:moneycaringcoder.agent-icons"
 # Font dots (fonts/build-fonts) coloured yellow and pale yellow by config.toml
-# rules. Herdr trims trailing spaces, so they stay one cell wide.
-WORKING_FRAMES = ("\ue1b8", "\ue1b9")
+# rules. Herdr trims trailing spaces, so a blank braille cell (U+2800) makes
+# them two cells wide like the emoji.
+WORKING_FRAMES = ("\ue1b8\u2800", "\ue1b9\u2800")
 TICK_SECONDS = 0.6
 
 
