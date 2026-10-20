@@ -46,22 +46,22 @@ enabled = true
 done_path = "/Users/vp/.config/opencode/sounds/conductor-chime.mp3"
 
 # Sidebar rows, logos, and colours are documented in docs/herdr-sidebar.md.
-# One row per agent: $host_logo ("<state emoji> <host glyph>"), then $harness_logo, from the agent-icons
+# One row per agent: $state_emoji, $host_logo, then $harness_logo, all from the agent-icons
 # plugin (mac/.config/herdr/agent-icons). The glyphs need the JetBrains Mono
 # Herdr XL font built by mac/.config/herdr/fonts/build-fonts.
 [ui.sidebar.agents]
 row_gap = 0
 rows = [
-  [{ token = "$host_logo", fg = "#6B7089", dim = false, rules = [{ contains = "\uF303", fg = "#1793D1" }] }, { token = "$harness_logo", fg = "#A8ADB9", bold = true, rules = [{ contains = " fx", fg = "#D6D6D6" }] }, "workspace", "tab"],
+  ["$state_emoji", { token = "$host_logo", fg = "#6B7089", dim = false, rules = [{ contains = "\uF303", fg = "#1793D1" }] }, { token = "$harness_logo", fg = "#A8ADB9", bold = true, rules = [{ contains = " fx", fg = "#D6D6D6" }] }, "workspace", "tab"],
 ]
 
 # Same row for every agent; only the logo colour differs.
 [ui.sidebar.agents.rows_by_agent]
-amp = [[{ token = "$host_logo", fg = "#6B7089", dim = false, rules = [{ contains = "\uF303", fg = "#1793D1" }] }, { token = "$harness_logo", fg = "#DFDFC1", bold = true, dim = false }, "workspace", "tab"]]
-claude = [[{ token = "$host_logo", fg = "#6B7089", dim = false, rules = [{ contains = "\uF303", fg = "#1793D1" }] }, { token = "$harness_logo", fg = "#E68A67", bold = true, dim = false }, "workspace", "tab"]]
-codex = [[{ token = "$host_logo", fg = "#6B7089", dim = false, rules = [{ contains = "\uF303", fg = "#1793D1" }] }, { token = "$harness_logo", fg = "#A78BFA", bold = true, dim = false }, "workspace", "tab"]]
-opencode = [[{ token = "$host_logo", fg = "#6B7089", dim = false, rules = [{ contains = "\uF303", fg = "#1793D1" }] }, { token = "$harness_logo", fg = "#A8ADB9", bold = true, dim = false }, "workspace", "tab"]]
-pi = [[{ token = "$host_logo", fg = "#6B7089", dim = false, rules = [{ contains = "\uF303", fg = "#1793D1" }] }, { token = "$harness_logo", fg = "#FFFFFF", bold = true, dim = false }, "workspace", "tab"]]
+amp = [["$state_emoji", { token = "$host_logo", fg = "#6B7089", dim = false, rules = [{ contains = "\uF303", fg = "#1793D1" }] }, { token = "$harness_logo", fg = "#DFDFC1", bold = true, dim = false }, "workspace", "tab"]]
+claude = [["$state_emoji", { token = "$host_logo", fg = "#6B7089", dim = false, rules = [{ contains = "\uF303", fg = "#1793D1" }] }, { token = "$harness_logo", fg = "#E68A67", bold = true, dim = false }, "workspace", "tab"]]
+codex = [["$state_emoji", { token = "$host_logo", fg = "#6B7089", dim = false, rules = [{ contains = "\uF303", fg = "#1793D1" }] }, { token = "$harness_logo", fg = "#A78BFA", bold = true, dim = false }, "workspace", "tab"]]
+opencode = [["$state_emoji", { token = "$host_logo", fg = "#6B7089", dim = false, rules = [{ contains = "\uF303", fg = "#1793D1" }] }, { token = "$harness_logo", fg = "#A8ADB9", bold = true, dim = false }, "workspace", "tab"]]
+pi = [["$state_emoji", { token = "$host_logo", fg = "#6B7089", dim = false, rules = [{ contains = "\uF303", fg = "#1793D1" }] }, { token = "$harness_logo", fg = "#FFFFFF", bold = true, dim = false }, "workspace", "tab"]]
 
 # $bte_logo is "<glyph> <label>" for every space, not only bte (the name is
 # historical). The workspace-keepers plugin sets it from its config.json; the

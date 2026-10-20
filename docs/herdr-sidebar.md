@@ -124,10 +124,11 @@ Its plugin is linked from its own `~/.dotfiles` checkout.
 
 ## State emoji
 
-The agent-icons plugin puts a state emoji in front of the logo inside
-`$harness_logo`, replacing Herdr's dot (done and idle were both green). It is
-one token so Herdr draws no ` · ` between them. It reruns on
-`pane.agent_status_changed` and `pane.focused` (which turns done into idle).
+Each agent row is one line: state emoji, host logo, agent logo, space, tab.
+The agent-icons plugin reports `$state_emoji` alongside `$host_logo` and
+`$harness_logo` (logo only, no agent name), replacing Herdr's dot, since done
+and idle were both green. It reruns on `pane.agent_status_changed` and
+`pane.focused` (which turns done into idle).
 
 | State | Emoji |
 |---|---|
