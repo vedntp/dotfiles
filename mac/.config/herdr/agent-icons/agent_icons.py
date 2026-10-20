@@ -57,7 +57,7 @@ CLUSTER_TOKEN_NAME = "agent_cluster"
 STATE_EMOJIS = {
     "blocked": "🚨",
     "done": "✅",
-    "working": "\ue1b8\u2800",  # first pulse shade, see pulse.py
+    "working": "🟨",
     "idle": "🔘",  # not ⚪: the terminal font draws that as a small text circle
 }
 # Enlarged copies of the Nerd Font host glyphs, added by fonts/build-fonts.

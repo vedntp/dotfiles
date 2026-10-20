@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""Keep each agent's $state_emoji current, pulsing it while the agent works.
+"""Keep each agent's $state_emoji current.
 
 Herdr sends no event when done turns into idle, so the plugin alone leaves a
-stale done mark. This loop rereads every pane each tick, sets the emoji for
-its state, and fades the working dot from yellow to white and back. It talks
-to Herdr's API socket directly, since launching the CLI for every
-frame cost about 10 ms of CPU. Run by a LaunchAgent (com.vp.herdr-pulse).
+stale done mark. This loop rereads every pane each tick and sets the emoji for
+its state. It talks to Herdr's API socket directly, since launching the
+CLI every tick cost about 10 ms of CPU. Run by a LaunchAgent (com.vp.herdr-pulse).
 """
 
 from __future__ import annotations
@@ -19,12 +18,7 @@ from agent_icons import STATE_EMOJIS, STATE_TOKEN_NAME
 
 SOCKET = os.path.expanduser("~/.config/herdr/herdr.sock")
 SOURCE = "plugin:moneycaringcoder.agent-icons"
-# Font dots U+E1B8..U+E1BF (fonts/build-fonts), coloured yellow to white by
-# config.toml rules. A blank braille cell (U+2800) makes each two cells wide
-# like the emoji, since Herdr trims trailing spaces.
-SHADES = [chr(code) + "⠀" for code in range(0xE1B8, 0xE1C0)]
-WORKING_FRAMES = SHADES + SHADES[-2:0:-1]  # yellow to white and back
-TICK_SECONDS = 0.1
+TICK_SECONDS = 0.5
 
 
 class Herdr:
@@ -51,17 +45,15 @@ class Herdr:
 
 def main() -> None:
     herdr = None
-    frame = 0
     while True:
         try:
             if herdr is None:
                 herdr = Herdr()
-            frame = (frame + 1) % len(WORKING_FRAMES)
             for pane in herdr.call("pane.list", {})["panes"]:
                 status = pane.get("agent_status")
                 emoji = None
                 if pane.get("agent"):
-                    emoji = WORKING_FRAMES[frame] if status == "working" else STATE_EMOJIS.get(status)
+                    emoji = STATE_EMOJIS.get(status)
                 if emoji == pane.get("tokens", {}).get(STATE_TOKEN_NAME):
                     continue
                 herdr.call(
