@@ -77,13 +77,13 @@ def add_host_logos(font, donor, order):
 
 def add_working_square(font, donor, order):
     ref = donor["glyf"][donor.getBestCmap()[FIRST]]
-    # Emoji fill two cells, so the square is centred across its own cell and
-    # the blank (U+2800) that follows it in the token.
+    # Emoji fill two cells; the blank (U+2800) after the square in the token
+    # keeps it two cells wide.
     advance = font["hmtx"]["space"][0]
     half = round(0.3 * 2 * advance)
-    # Measured on screen: emoji sit about a quarter cell right of the
-    # two-cell midpoint, so the square does too.
-    cx, cy = round(1.23 * advance), round((ref.yMin + ref.yMax) / 2)
+    # Measured on screen: this lines the square up with the emoji in the
+    # rows below it.
+    cx, cy = round(0.78 * advance), round((ref.yMin + ref.yMax) / 2)
     pen = TTGlyphPen(None)
     pen.moveTo((cx - half, cy - half))
     pen.lineTo((cx - half, cy + half))
@@ -93,7 +93,9 @@ def add_working_square(font, donor, order):
     name = f"herdrworking{WORKING_SQUARE:04X}"
     order.append(name)
     font["glyf"][name] = pen.glyph()
-    font["hmtx"][name] = (advance, 0)
+    # macOS places a glyph by its left side bearing, not its outline, so it
+    # must match the outline's left edge or the square never moves.
+    font["hmtx"][name] = (advance, cx - half)
     for table in font["cmap"].tables:
         if table.isUnicode():
             table.cmap[WORKING_SQUARE] = name
