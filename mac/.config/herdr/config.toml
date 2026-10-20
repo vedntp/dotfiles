@@ -46,7 +46,7 @@ enabled = true
 done_path = "/Users/vp/.config/opencode/sounds/conductor-chime.mp3"
 
 # Sidebar rows, logos, and colours are documented in docs/herdr-sidebar.md.
-# One row per agent: host logo, then $harness_logo ("<state emoji> <glyph>") from the agent-icons
+# One row per agent: $host_logo ("<state emoji> <host glyph>"), then $harness_logo, from the agent-icons
 # plugin (mac/.config/herdr/agent-icons). The glyphs need the JetBrains Mono
 # Herdr XL font built by mac/.config/herdr/fonts/build-fonts.
 [ui.sidebar.agents]

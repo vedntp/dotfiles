@@ -182,16 +182,15 @@ def report_logo(
         arguments.extend(("--clear-token", TOKEN_NAME))
     else:
         # The logo alone identifies the agent; the name made rows too busy.
-        label = logo
-        # One token, so Herdr draws no " · " between the state and the logo.
-        emoji = STATE_EMOJIS.get(status or "")
-        if emoji:
-            label = f"{emoji} {label}"
-        arguments.extend(("--token", f"{TOKEN_NAME}={label}"))
+        arguments.extend(("--token", f"{TOKEN_NAME}={logo}"))
     if variant == "none":
         arguments.extend(("--clear-token", HOST_TOKEN_NAME))
     else:
-        arguments.extend(("--token", f"{HOST_TOKEN_NAME}={host_logo()}"))
+        # The state leads the host glyph in one token, so Herdr draws no " · "
+        # between them and the row reads state, host, agent.
+        emoji = STATE_EMOJIS.get(status or "") if logo is not None else None
+        host = f"{emoji} {host_logo()}" if emoji else host_logo()
+        arguments.extend(("--token", f"{HOST_TOKEN_NAME}={host}"))
     run_herdr(herdr, *arguments)
     return logo is not None
 
