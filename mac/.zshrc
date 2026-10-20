@@ -290,7 +290,6 @@ alias cxa="$HOME/.local/bin/codex --yolo agents"
 alias cx-update='curl -fsSL https://chatgpt.com/codex/install.sh | sh'
 alias cxl="codex -p lean --dangerously-bypass-approvals-and-sandbox"
 alias oc="opencode --auto"
-alias oc2="opencode2 --auto"
 
 # Usage aliases with model breakdown
 alias ccu="ccusage --since \$(date +%Y%m%d) -b"
