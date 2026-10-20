@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.vp.herdr-pulse</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/python3</string>
+    <string>/Users/vp/.dotfiles/mac/.config/herdr/agent-icons/pulse.py</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Users/vp/.dotfiles/mac/.config/herdr/agent-icons</string>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>ThrottleInterval</key>
+  <integer>10</integer>
+  <key>StandardErrorPath</key>
+  <string>/tmp/herdr-pulse.log</string>
+</dict>
+</plist>

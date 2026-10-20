@@ -1,0 +1,182 @@
+--- a/src/app/api.rs
++++ b/src/app/api.rs
+@@ -717,6 +717,8 @@
+             .and_then(|ws| ws.pane_state(update.pane_id))
+             .map(|pane| pane_agent_status(update.state, pane.seen))
+             .unwrap_or_else(|| pane_agent_status(update.state, update.seen));
++        self.reported_agent_status
++            .insert(update.pane_id, (update.state, agent_status));
+ 
+         if previous_agent_status != agent_status
+             || update.previous_presentation != update.presentation
+@@ -737,6 +739,61 @@
+         }
+     }
+ 
++    /// Emits `pane.agent_status_changed` for panes whose derived status changed because only
++    /// `seen` flipped, e.g. done becoming idle once the user views the pane. Agent state
++    /// transitions are reported by `emit_pane_state_update`, which keeps the tracker current.
++    pub(crate) fn sync_seen_agent_status_events(&mut self) {
++        let mut changed = Vec::new();
++        for (ws_idx, ws) in self.state.workspaces.iter().enumerate() {
++            for (&pane_id, pane) in ws.tabs.iter().flat_map(|tab| tab.panes.iter()) {
++                let Some(terminal) = self.state.terminals.get(&pane.attached_terminal_id) else {
++                    continue;
++                };
++                let status = pane_agent_status(terminal.state, pane.seen);
++                let previous = self
++                    .reported_agent_status
++                    .insert(pane_id, (terminal.state, status));
++                if previous.is_some_and(|(state, previous_status)| {
++                    state == terminal.state && previous_status != status
++                }) {
++                    changed.push((ws_idx, pane_id, status));
++                }
++            }
++        }
++        let workspaces = &self.state.workspaces;
++        self.reported_agent_status.retain(|pane_id, _| {
++            workspaces
++                .iter()
++                .any(|ws| ws.pane_state(*pane_id).is_some())
++        });
++
++        for (ws_idx, pane_id, agent_status) in changed {
++            let Some(public_pane_id) = self.public_pane_id(ws_idx, pane_id) else {
++                continue;
++            };
++            let Some(terminal) = self.state.workspaces[ws_idx]
++                .pane_state(pane_id)
++                .and_then(|pane| self.state.terminals.get(&pane.attached_terminal_id))
++            else {
++                continue;
++            };
++            let agent = terminal.effective_agent_label().map(str::to_string);
++            let presentation = terminal.effective_presentation();
++            self.emit_event(crate::api::schema::EventEnvelope {
++                event: crate::api::schema::EventKind::PaneAgentStatusChanged,
++                data: crate::api::schema::EventData::PaneAgentStatusChanged {
++                    pane_id: public_pane_id,
++                    workspace_id: self.public_workspace_id(ws_idx),
++                    agent_status,
++                    agent,
++                    title: presentation.title,
++                    display_agent: presentation.display_agent,
++                    state_labels: presentation.state_labels,
++                },
++            });
++        }
++    }
++
+     pub(crate) fn sync_toast_deadline(
+         &mut self,
+         previous_toast: Option<crate::app::state::ToastNotification>,
+--- a/src/app/mod.rs
++++ b/src/app/mod.rs
+@@ -111,6 +111,11 @@
+     pub(crate) api_rx: tokio::sync::mpsc::UnboundedReceiver<crate::api::ApiRequestMessage>,
+     pub(crate) event_hub: crate::api::EventHub,
+     pub(crate) last_focus: Option<(usize, crate::layout::PaneId)>,
++    /// Agent state and derived status last reported per pane via `pane.agent_status_changed`.
++    pub(crate) reported_agent_status: HashMap<
++        crate::layout::PaneId,
++        (crate::detect::AgentState, crate::api::schema::AgentStatus),
++    >,
+     pub(crate) policy: AppPolicy,
+     pub(crate) config_diagnostic_deadline: Option<Instant>,
+     pub(crate) toast_deadline: Option<Instant>,
+@@ -671,6 +676,7 @@
+             api_rx,
+             event_hub,
+             last_focus,
++            reported_agent_status: HashMap::new(),
+             policy,
+             render_notify,
+             render_dirty,
+--- a/src/server/headless.rs
++++ b/src/server/headless.rs
+@@ -540,6 +540,9 @@
+             self.stream_host_mouse_capture_mode();
+             self.stream_direct_terminal_keyboard_mode();
+ 
++            // Report done/idle flips caused only by panes becoming seen (or unseen).
++            self.app.sync_seen_agent_status_events();
++
+             // 7. Render virtually and stream frames. Hidden-only PTY work keeps a
+             // bounded classification cadence without delaying presentation work
+             // that joins the same coalesced request.
+--- a/src/server/headless/tests/mod.rs
++++ b/src/server/headless/tests/mod.rs
+@@ -8407,3 +8407,72 @@
+     assert!(server.promote_client_to_foreground(1));
+     assert!(server.app.state.workspaces[0].panes[&pane_id].seen);
+ }
++
++#[test]
++fn viewing_done_agent_emits_single_idle_status_event() {
++    use crate::api::schema::{AgentStatus, EventData, EventKind};
++
++    fn statuses(server: &HeadlessServer, after: u64) -> Vec<(AgentStatus, Option<String>)> {
++        server
++            .app
++            .event_hub
++            .events_after(after)
++            .into_iter()
++            .filter_map(|(_, event)| match event.data {
++                EventData::PaneAgentStatusChanged {
++                    agent_status,
++                    agent,
++                    ..
++                } if event.event == EventKind::PaneAgentStatusChanged => {
++                    Some((agent_status, agent))
++                }
++                _ => None,
++            })
++            .collect()
++    }
++
++    let mut server = test_headless_server();
++    server.app.state.workspaces = vec![
++        crate::workspace::Workspace::test_new("active"),
++        crate::workspace::Workspace::test_new("background"),
++    ];
++    server.app.state.ensure_test_terminals();
++    server.app.state.active = Some(0);
++    let pane_id = server.app.state.workspaces[1].tabs[0].root_pane;
++    server.app.sync_seen_agent_status_events();
++
++    for state in [
++        crate::detect::AgentState::Working,
++        crate::detect::AgentState::Idle,
++    ] {
++        server.handle_internal_event_with_forwarding(AppEvent::HookStateReported {
++            pane_id,
++            source: "custom:pi".into(),
++            agent_label: "pi".into(),
++            state,
++            message: None,
++            seq: None,
++            session_ref: None,
++        });
++        server.app.sync_seen_agent_status_events();
++    }
++    assert!(!server.app.state.workspaces[1].panes[&pane_id].seen);
++    let reported = statuses(&server, 0);
++    assert_eq!(
++        reported.last(),
++        Some(&(AgentStatus::Done, Some("pi".into())))
++    );
++    let before_view = server.app.event_hub.current_sequence();
++
++    // Viewing the pane flips `seen` outside the agent state path.
++    server.app.state.focus_pane_in_workspace(1, pane_id);
++    server.app.state.mark_active_tab_seen();
++    assert!(server.app.state.workspaces[1].panes[&pane_id].seen);
++    server.app.sync_seen_agent_status_events();
++    server.app.sync_seen_agent_status_events();
++
++    assert_eq!(
++        statuses(&server, before_view),
++        vec![(AgentStatus::Idle, Some("pi".into()))]
++    );
++}

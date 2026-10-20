@@ -23,10 +23,11 @@ Last checked: 2026-10-07. Read this before updating or troubleshooting this user
 
 ## Current state (2026-10-20)
 
-- Installed: **0.9.5** from tag `v0.9.5` (commit `2ecf19a`) plus three patches saved here, SHA-256 `4364748e9108a55f...`:
+- Installed: **0.9.5** from tag `v0.9.5` (commit `2ecf19a`) plus four patches saved here, SHA-256 `a877fcc3d16225a5...`:
   - `initial-host-theme-replay.patch`: the theme patch below, rebased onto 0.9.5 (the 0.9.3 file no longer applied). Client side.
   - `remote-switch-seen.patch`: the server treated "client viewing another machine" as unknown focus, which counted as seen, so agents finishing there went idle instead of done. Server side, so it only takes effect after a server restart. omarchy (0.9.1) needs the same patch for the reverse direction.
   - `sidebar-row-indent.patch`: agent sidebar rows after the first start in the same column as the first. Client side.
+  - `seen-status-event.patch`: emits `pane.agent_status_changed` when only `seen` flips (done to idle on viewing), which Herdr never did. Server side.
 - Rollback: `mv ~/.local/bin/herdr.0.9.5-pre-seen-fix ~/.local/bin/herdr`, then reattach.
 
 ## Earlier state (2026-10-07, historical)
