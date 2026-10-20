@@ -58,7 +58,7 @@ STATE_EMOJIS = {
     "blocked": "🚨",
     "done": "✅",
     "working": "🟡",
-    "idle": "\u26aa\ufe0f",  # full-size emoji style, same size as 🟡
+    "idle": "🔘",  # not ⚪: the terminal font draws that as a small text circle
 }
 # Enlarged copies of the Nerd Font host glyphs, added by fonts/build-fonts.
 HOST_TOKEN_NAME = "host_logo"
