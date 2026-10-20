@@ -169,7 +169,7 @@ export TERM="xterm-256color"
 # fzf key bindings (Ctrl+R history search), cached instead of `source ~/.fzf.zsh`
 _cached_init fzf fzf --zsh
 
-alias theta="~/thetadata/theta.bash"
+alias theta="~/tools/thetadata/theta.bash"
 export PATH="$PATH:$HOME/.config/emacs/bin"
 alias py=".venv/bin/python3"
 alias fim="vim \$(fzf)"
