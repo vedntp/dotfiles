@@ -133,7 +133,7 @@ one token so Herdr draws no ` · ` between them. It reruns on
 |---|---|
 | blocked | 🚨 |
 | done | ✅ |
-| working | ⚡ |
+| working | 🟡 |
 | idle | 💤 |
 
 After editing `config.toml`, run `herdr server reload-config`.

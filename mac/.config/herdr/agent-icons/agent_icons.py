@@ -55,7 +55,7 @@ VARIANTS = ("auto", "font", "text", "none")
 STATE_EMOJIS = {
     "blocked": "🚨",
     "done": "✅",
-    "working": "⚡",
+    "working": "🟡",
     "idle": "💤",
 }
 # Nerd Font glyphs, already present in the JetBrains Mono Herdr fonts.
@@ -183,7 +183,9 @@ def report_logo(
     else:
         label = logo + "  " if agent == "amp" else f"{logo} {agent}"
         # One token, so Herdr draws no " · " between the state and the logo.
-        label = STATE_EMOJIS.get(status or "", "") + label
+        emoji = STATE_EMOJIS.get(status or "")
+        if emoji:
+            label = f"{emoji} {label}"
         arguments.extend(("--token", f"{TOKEN_NAME}={label}"))
     if variant == "none":
         arguments.extend(("--clear-token", HOST_TOKEN_NAME))
