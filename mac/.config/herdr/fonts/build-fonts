@@ -124,6 +124,14 @@ def build(stem, style, base_dir):
                 table.cmap[code] = name
     add_host_logos(font, donor, order)
     add_working_square(font, donor, order)
+    # Claude Code marks its messages with U+23FA, which the base font lacks.
+    # Without this, Linux falls back to a colour emoji font and draws an
+    # orange square; map it to the font's own black circle instead.
+    cmap = font.getBestCmap()
+    if 0x23FA not in cmap:
+        for table in font["cmap"].tables:
+            if table.isUnicode():
+                table.cmap[0x23FA] = cmap[0x25CF]
     font.setGlyphOrder(order)
 
     names = {
