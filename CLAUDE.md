@@ -35,7 +35,6 @@ tmux source-file ~/.config/tmux/tmux.conf
 ~/.dotfiles/
 |-- mac/                    # Active Stow package
 |   |-- .zshrc              # Shell config
-|   |-- .p10k.zsh           # Powerlevel10k prompt
 |   |-- .gitconfig          # Git config
 |   |-- .fzf.zsh            # FZF shell integration
 |   |-- .local/bin/         # Helper scripts
@@ -98,7 +97,6 @@ Meta bindings available for terminals that send Meta.
 `mac/`, including:
 
 - `~/.zshrc` -> `mac/.zshrc`
-- `~/.p10k.zsh` -> `mac/.p10k.zsh`
 - `~/.gitconfig` -> `mac/.gitconfig`
 - `~/.fzf.zsh` -> `mac/.fzf.zsh`
 - `~/.config/nvim/` -> `mac/.config/nvim/`
@@ -118,7 +116,7 @@ user to confirm both routing directions before calling a candidate solved.
 
 ## Color defaults
 
-Ghostty and Alacritty use their terminal palettes. macOS Powerlevel10k uses a
-compact one-line Lean prompt, while the server keeps the upstream rainbow
-layout. tmux inherits terminal colors, Ranger uses its bundled default, Bat
+Ghostty and Alacritty use their terminal palettes. macOS uses a Starship
+prompt with a green chevron, while the server keeps Powerlevel10k's upstream
+rainbow layout. tmux inherits terminal colors, Ranger uses its bundled default, Bat
 uses `ansi`, Neovim uses Kanagawa Wave, and Doom Org faces inherit Doom One.

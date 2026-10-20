@@ -39,7 +39,7 @@ scripts/provision-server-terminal.sh
 | [nvim](mac/.config/nvim/) | `mac` | Neovim with lazy.nvim | [CLAUDE.md](mac/.config/nvim/CLAUDE.md) |
 | [doom](mac/.config/doom/) | `mac` | Doom Emacs, GTD, org-roam, gptel | [CLAUDE.md](mac/.config/doom/CLAUDE.md) |
 | [tmux](mac/.config/tmux/) | `mac` | Terminal multiplexer | [CLAUDE.md](mac/.config/tmux/CLAUDE.md) |
-| [zsh](mac/.config/zsh/) | `mac` | Shell, Oh My Zsh, p10k | [CLAUDE.md](mac/.config/zsh/CLAUDE.md) |
+| [zsh](mac/.config/zsh/) | `mac` | Shell (plain zsh, Starship) | [CLAUDE.md](mac/.config/zsh/CLAUDE.md) |
 | [ghostty](mac/.config/ghostty/) | `mac` | Terminal emulator | [CLAUDE.md](mac/.config/ghostty/CLAUDE.md) |
 | [herdr](mac/.config/herdr/) | `mac` | Agent terminal workspace manager | - |
 | [ranger](mac/.config/ranger/) | `mac` | File manager | - |
@@ -53,7 +53,6 @@ scripts/provision-server-terminal.sh
 ~/.dotfiles/
 |-- mac/                    # Active Stow package
 |   |-- .zshrc              # Shell config
-|   |-- .p10k.zsh           # Powerlevel10k prompt
 |   |-- .gitconfig          # Git config
 |   |-- .fzf.zsh            # FZF shell integration
 |   |-- .taskrc             # Taskwarrior config
@@ -106,9 +105,9 @@ scripts/provision-server-terminal.sh
 
 ## Portable color defaults
 
-Terminal emulators use their default palettes. macOS Powerlevel10k uses a
-compact one-line Lean prompt, while the server keeps the upstream rainbow
-layout. tmux inherits terminal colors, Ranger uses its bundled default, Bat
+Terminal emulators use their default palettes. macOS uses a Starship
+prompt with a green chevron, while the server keeps Powerlevel10k's upstream
+rainbow layout. tmux inherits terminal colors, Ranger uses its bundled default, Bat
 uses `ansi`, Neovim uses Kanagawa Wave, and Doom Emacs inherits Doom One.
 
 ---

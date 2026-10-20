@@ -22,7 +22,6 @@ Codex-facing guide for working in `/Users/vp/.dotfiles`.
 ~/.dotfiles/
 |-- mac/                    # Active macOS Stow package
 |   |-- .zshrc
-|   |-- .p10k.zsh
 |   |-- .gitconfig
 |   |-- .fzf.zsh
 |   |-- .local/bin/
@@ -100,7 +99,6 @@ tmux source-file ~/.config/tmux/tmux.conf
 Stow creates symlinks from `$HOME` and `$HOME/.config` into `mac/`. Examples:
 
 - `~/.zshrc` points at the `.zshrc` in the deployed package.
-- `~/.p10k.zsh` points at `mac/.p10k.zsh`.
 - `~/.gitconfig` points at `mac/.gitconfig`.
 - `~/.fzf.zsh` points at `mac/.fzf.zsh`.
 - `~/.config/nvim/` points at `mac/.config/nvim/`.
@@ -145,9 +143,9 @@ Machine-specific files are intentionally gitignored:
 
 Zsh:
 
-- Main files: `mac/.zshrc`, `mac/.config/zsh/CLAUDE.md`, `mac/.p10k.zsh`.
+- Main files: `mac/.zshrc`, `mac/.config/zsh/CLAUDE.md`, `mac/.config/starship.toml`.
 - Secrets load at the top from `~/.config/zsh/.zshenv.local`.
-- p10k instant prompt should stay near the top.
+- Plain zsh with Starship; no Oh My Zsh, p10k or direnv. Plugin order at the end of `.zshrc` matters.
 - `EDITOR` and `VISUAL` are `nvim`; Bat selects `ansi` in its config.
 - Claude aliases in tracked config include `cl`, `cld`, `cldr`, and `cldc`.
 

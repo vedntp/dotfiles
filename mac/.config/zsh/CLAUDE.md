@@ -2,25 +2,38 @@
 
 ## Overview
 
-Zsh configuration using Oh My Zsh with the Powerlevel10k theme. The tracked
-shell config is `mac/.zshrc`, stowed to `~/.zshrc`.
+Plain zsh, no framework, with a Starship prompt. The tracked shell config is
+`mac/.zshrc`, stowed to `~/.zshrc`. Oh My Zsh, Powerlevel10k and direnv were
+removed on 2026-10-19; the "SHELL BASICS" block in `.zshrc` replaces the parts
+of Oh My Zsh that were in use (history, auto_cd, key bindings, completion,
+window title).
 
 ## Plugins
 
-```text
-git zsh-autosuggestions fzf fzf-tab z colored-man-pages zsh-syntax-highlighting
-```
+Loaded at the end of `.zshrc`, in this order: fzf-tab (cloned to
+`~/.local/share/zsh/plugins/fzf-tab`), zsh-autosuggestions and
+zsh-syntax-highlighting (Homebrew), then Starship.
 
-On macOS, `.zshrc` also appends:
+## Startup speed
 
-```text
-macos brew
-```
+- `_cached_init` caches `starship init zsh` and `fzf --zsh` in `~/.cache/zsh`,
+  regenerated when the binary is newer than the cache.
+- The Starship cache bakes in the continuation prompt and sets `RPROMPT=''`
+  (this config has no right_format), so each prompt runs starship once.
+- compinit runs its security check once a day (`-C` otherwise) and the dump is
+  compiled with zcompile.
+- `~/.zprofile` (not tracked) holds a static copy of `brew shellenv`.
+
+## ls
+
+`ls`, `lsa`, `lt` and `lta` use eza with Omarchy's flags, but only when stdin
+is a terminal and `CLAUDECODE` is unset. Claude Code copies these aliases into
+its shell, where eza without a path waits on stdin and hangs.
 
 ## Secrets Management
 
 `~/.config/zsh/.zshenv.local` contains machine-local secrets and is gitignored.
-It is loaded at the top of `.zshrc` before p10k instant prompt.
+It is loaded at the top of `.zshrc`.
 
 Known referenced env vars include:
 
@@ -78,18 +91,14 @@ it comes from local shell config or another installed command.
 - `EDITOR` / `VISUAL` = `nvim`
 - Bat selects the built-in `ansi` theme in `~/.config/bat/config`
 - `TERM` = `xterm-256color`
-- direnv hook enabled
 - Claude Code no-flicker and tmux truecolor env flags are enabled
 - `ENABLE_CLAUDEAI_MCP_SERVERS=false` keeps claude.ai MCP servers out of Claude Code
 
 ## Prompt Configuration
 
-Powerlevel10k is configured via `mac/.p10k.zsh`, stowed to `~/.p10k.zsh`. The
-current wizard-generated setup uses the Lean style: one compact line,
-transparent segment backgrounds, space separators, icons before content, and
-transient prompts. The left side shows directory, Git status, and the prompt
-character; the OS icon is disabled. The right side retains status and
-environment/context segments, while the clock is disabled.
+Starship, configured in `mac/.config/starship.toml` (linked to
+`~/.config/starship.toml`): directory, Git branch and status, then the prompt
+character. The chevron is green on the Mac and cyan on omarchy.
 
 ## Syntax Highlighting
 
