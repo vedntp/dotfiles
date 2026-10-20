@@ -195,8 +195,6 @@ alias tw="task"
 
 # Mac-specific paths and tools
 if $IS_MAC; then
-    # Added by Windsurf
-    export PATH="$HOME/.codeium/windsurf/bin:$PATH"
     # opencode
     export PATH="$HOME/.opencode/bin:$PATH"
     # gsd-browser
@@ -308,8 +306,6 @@ export PATH="$HOME/.local/bin:$PATH"
 # omnara
 path=("/Users/vp/.omnara/bin" $path)
 
-# Added by Devin
-export PATH="/Users/vp/.codeium/windsurf/bin:$PATH"
 
 
 # Added by Antigravity CLI installer
