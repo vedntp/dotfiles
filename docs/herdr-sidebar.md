@@ -112,7 +112,7 @@ to the Claude logo's box so both logos look the same size.
 
 | Machine | Glyph | Codepoint | Colour |
 |---|---|---|---|
-| macOS (this Mac) | Apple | `U+E1B0` (from `U+F179`) | `#6B7089` (dim, the default) |
+| macOS (this Mac) | Apple | `U+E1B0` (from `U+F179`) | `#FFFFFF` (via a `contains` rule) |
 | Arch-based Linux (omarchy) | Arch | `U+E1B1` (from `U+F303`) | `#1793D1` (via a `contains` rule) |
 | Ubuntu | Ubuntu | `U+E1B2` (from `U+F31B`) | `#6B7089` |
 | other Linux | Tux | `U+E1B3` (from `U+F17C`) | `#6B7089` |
