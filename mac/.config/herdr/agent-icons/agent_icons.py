@@ -267,6 +267,10 @@ def main() -> int:
         elif os.environ.get("HERDR_PLUGIN_EVENT_JSON"):
             pane_id = event_pane(os.environ["HERDR_PLUGIN_EVENT_JSON"])
             targets = [] if pane_id is None else [current_target(herdr, pane_id)]
+            # The event carries the new state; `pane get` can still return the old one.
+            status = event_value(json.loads(os.environ["HERDR_PLUGIN_EVENT_JSON"]), "agent_status")
+            if status and targets:
+                targets = [(targets[0][0], targets[0][1], status)]
         else:
             targets = startup_targets(herdr)
     except (RuntimeError, json.JSONDecodeError) as error:
