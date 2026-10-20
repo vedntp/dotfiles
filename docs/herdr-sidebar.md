@@ -122,6 +122,20 @@ keeps its own live `~/.config/herdr/config.toml` with Linux keybindings, not a
 symlink to this repo, so sidebar row changes must be applied there separately.
 Its plugin is linked from its own `~/.dotfiles` checkout.
 
+## State emoji
+
+Agent rows start with `$state_emoji` instead of Herdr's dot, because the
+dots for done and idle were both green. `agent-icons/state_emoji.py` reports
+it on startup, `pane.agent_status_changed`, and `pane.focused` (which turns
+done into idle), under its own metadata source.
+
+| State | Emoji |
+|---|---|
+| blocked | 🚨 |
+| done | ✅ |
+| working | ⏳ |
+| idle | 💤 |
+
 ## Space logos
 
 `mac/.config/herdr/workspace-keepers/config.json` maps a space label to the
