@@ -181,7 +181,8 @@ def report_logo(
     if logo is None:
         arguments.extend(("--clear-token", TOKEN_NAME))
     else:
-        label = logo + "  " if agent == "amp" else f"{logo} {agent}"
+        # The logo alone identifies the agent; the name made rows too busy.
+        label = logo
         # One token, so Herdr draws no " · " between the state and the logo.
         emoji = STATE_EMOJIS.get(status or "")
         if emoji:
