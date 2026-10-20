@@ -124,8 +124,7 @@ Its plugin is linked from its own `~/.dotfiles` checkout.
 
 ## State emoji
 
-Each agent is two lines: state emoji, host logo, agent logo, space, tab, then
-the chat title (`terminal_title_stripped`) for a bigger click target.
+Each agent row is one line: state emoji, host logo, agent logo, space, tab.
 The agent-icons plugin reports `$state_emoji` alongside `$host_logo` and
 `$harness_logo` (logo only, no agent name), replacing Herdr's dot, since done
 and idle were both green. It reruns on `pane.agent_status_changed` and
