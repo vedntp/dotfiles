@@ -47,6 +47,10 @@ bindings = [
   { key = "Back", mods = "Alt", chars = "\u001b\u007f" },
   { key = "PageUp", mods = "Control", chars = "\u0002P" },
   { key = "PageDown", mods = "Control", chars = "\u0002N" },
+  # Ctrl+` / Ctrl+Shift+` hop to the next / previous Herdr space (prefix+N / prefix+P).
+  { key = "`", mods = "Control", chars = "\u0002N" },
+  { key = "`", mods = "Control|Shift", chars = "\u0002P" },
+  { key = "~", mods = "Control|Shift", chars = "\u0002P" },
   { key = "T", mods = "Command", action = "ReceiveChar" },
   { key = "T", mods = "Command|Shift", action = "ReceiveChar" },
   { key = "Z", mods = "Command", action = "ReceiveChar" },
