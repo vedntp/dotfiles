@@ -65,3 +65,8 @@ pi = [[{ token = "$state_emoji", rules = [{ contains = "\uE1B8", fg = "#F7C948" 
 # rules below colour the whole token by the label it contains.
 [ui.sidebar.spaces]
 rows = [["state_icon", { token = "$bte_logo", fg = "#A8ADB9", bold = true, dim = false, rules = [{ contains = "bte", fg = "#00D2BE" }, { contains = "stryde", fg = "#3B82F6" }, { contains = "vqa", fg = "#00B8F2" }] }], ["branch", "git_status"]]
+
+[terminal]
+# New panes, tabs and spaces start in ~ instead of following the focused
+# pane's directory (the default, "follow").
+new_cwd = "home"
