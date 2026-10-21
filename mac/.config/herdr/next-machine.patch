@@ -1,0 +1,212 @@
+diff --git a/src/client/shell/endpoint_navigation.rs b/src/client/shell/endpoint_navigation.rs
+index 3d99e5a..d87e154 100644
+--- a/src/client/shell/endpoint_navigation.rs
++++ b/src/client/shell/endpoint_navigation.rs
+@@ -107,7 +107,41 @@ impl ClientShellState {
+     ) -> bool {
+         use crate::input::KeybindAction;
+         if !self.multi_endpoint_active() {
+-            return false;
++            return action == KeybindAction::NextMachine;
++        }
++        if action == KeybindAction::NextMachine {
++            // Jump to the first workspace (sidebar order) of the next online machine.
++            let firsts = self
++                .endpoints
++                .iter()
++                .filter(|endpoint| endpoint.status == ClientEndpointStatus::Online)
++                .filter_map(|endpoint| {
++                    let snapshot = endpoint.snapshot.as_deref()?;
++                    let entry = render::workspace_entries(snapshot, &HashSet::new())
++                        .into_iter()
++                        .next()?;
++                    let workspace = snapshot.workspaces.get(entry.index)?;
++                    Some((endpoint.endpoint_id.clone(), workspace.workspace_id.clone()))
++                })
++                .collect::<Vec<_>>();
++            let current = firsts
++                .iter()
++                .position(|(endpoint_id, _)| endpoint_id == &self.active_endpoint_id);
++            let next = match current {
++                Some(index) => (index + 1) % firsts.len(),
++                None if firsts.is_empty() => return true,
++                None => 0,
++            };
++            if current == Some(next) {
++                return true;
++            }
++            let (endpoint_id, workspace_id) = firsts[next].clone();
++            self.focus_or_activate(
++                endpoint_id,
++                ClientEndpointFocusTarget::Workspace(workspace_id),
++                outcome,
++            );
++            return true;
+         }
+         if matches!(
+             action,
+diff --git a/src/client/shell/tests/endpoints.rs b/src/client/shell/tests/endpoints.rs
+index c0a7e52..a7f53ce 100644
+--- a/src/client/shell/tests/endpoints.rs
++++ b/src/client/shell/tests/endpoints.rs
+@@ -441,6 +441,44 @@ fn agent_navigation_reveals_offscreen_targets() {
+     }
+ }
+ 
++#[test]
++fn next_machine_targets_first_workspace_of_other_machine() {
++    use crate::input::KeybindAction;
++
++    let (mut state, remote) = state_with_scrollable_agents();
++    let first = |state: &ClientShellState, endpoint_id: &ClientEndpointId| {
++        let snapshot = state
++            .endpoints
++            .iter()
++            .find(|endpoint| &endpoint.endpoint_id == endpoint_id)
++            .unwrap()
++            .snapshot
++            .clone()
++            .unwrap();
++        let entry = render::workspace_entries(&snapshot, &HashSet::new())[0].clone();
++        snapshot.workspaces[entry.index].workspace_id.clone()
++    };
++
++    let remote_first = first(&state, &remote);
++    let mut outcome = ClientShellInput::default();
++    assert!(state.handle_endpoint_navigation(KeybindAction::NextMachine, &mut outcome));
++    assert!(matches!(
++        outcome.actions.as_slice(),
++        [ClientShellAction::ActivateEndpoint {
++            endpoint_id,
++            target: Some(ClientEndpointFocusTarget::Workspace(workspace_id)),
++        }] if endpoint_id == &remote && workspace_id == &remote_first
++    ));
++
++    assert!(state.activate_endpoint_projection(&remote));
++    let mut outcome = ClientShellInput::default();
++    assert!(state.handle_endpoint_navigation(KeybindAction::NextMachine, &mut outcome));
++    assert!(matches!(
++        outcome.actions.as_slice(),
++        [ClientShellAction::ActivateEndpoint { endpoint_id, .. }] if endpoint_id.is_local()
++    ));
++}
++
+ #[test]
+ fn agent_navigation_reveals_target_using_destination_sort() {
+     use crate::api::schema::{
+diff --git a/src/config/keybinds.rs b/src/config/keybinds.rs
+index 276764a..185cd7d 100644
+--- a/src/config/keybinds.rs
++++ b/src/config/keybinds.rs
+@@ -366,6 +366,7 @@ pub struct Keybinds {
+     pub open_notification_target: ActionKeybinds,
+     pub previous_workspace: ActionKeybinds,
+     pub next_workspace: ActionKeybinds,
++    pub next_machine: ActionKeybinds,
+     pub previous_agent: ActionKeybinds,
+     pub next_agent: ActionKeybinds,
+     pub focus_agent: Vec<IndexedKeybind>,
+@@ -549,6 +550,7 @@ impl Config {
+             open_notification_target: empty_action!(),
+             previous_workspace: empty_action!(),
+             next_workspace: empty_action!(),
++            next_machine: empty_action!(),
+             previous_agent: empty_action!(),
+             next_agent: empty_action!(),
+             focus_agent: Vec::new(),
+@@ -682,6 +684,7 @@ impl Config {
+             );
+             apply_action!(keybinds.previous_workspace, previous_workspace, source);
+             apply_action!(keybinds.next_workspace, next_workspace, source);
++            apply_action!(keybinds.next_machine, next_machine, source);
+             apply_action!(keybinds.previous_agent, previous_agent, source);
+             apply_action!(keybinds.next_agent, next_agent, source);
+             apply_indexed!(
+diff --git a/src/config/model.rs b/src/config/model.rs
+index 29802fd..2dec9e0 100644
+--- a/src/config/model.rs
++++ b/src/config/model.rs
+@@ -379,6 +379,7 @@ pub struct KeysConfig {
+     pub previous_workspace: BindingConfig,
+     /// Select the next workspace. Unset by default.
+     pub next_workspace: BindingConfig,
++    pub next_machine: BindingConfig,
+     /// Focus the previous agent shown in the agent panel. Unset by default.
+     pub previous_agent: BindingConfig,
+     /// Focus the next agent shown in the agent panel. Unset by default.
+@@ -516,6 +517,7 @@ pub(crate) struct KeysConfigOverlay {
+     previous_workspace: Option<BindingConfig>,
+     #[serde(skip_serializing_if = "Option::is_none")]
+     next_workspace: Option<BindingConfig>,
++    next_machine: Option<BindingConfig>,
+     #[serde(skip_serializing_if = "Option::is_none")]
+     previous_agent: Option<BindingConfig>,
+     #[serde(skip_serializing_if = "Option::is_none")]
+@@ -665,6 +667,7 @@ impl<'de> Deserialize<'de> for KeysConfig {
+         apply_field!(open_notification_target);
+         apply_field!(previous_workspace);
+         apply_field!(next_workspace);
++        apply_field!(next_machine);
+         apply_field!(previous_agent);
+         apply_field!(next_agent);
+         apply_field!(focus_agent);
+@@ -770,6 +773,7 @@ impl KeysConfig {
+         copy_effective_action_field!(open_notification_target, keybinds.open_notification_target);
+         copy_effective_action_field!(previous_workspace, keybinds.previous_workspace);
+         copy_effective_action_field!(next_workspace, keybinds.next_workspace);
++        copy_effective_action_field!(next_machine, keybinds.next_machine);
+         copy_effective_action_field!(previous_agent, keybinds.previous_agent);
+         copy_effective_action_field!(next_agent, keybinds.next_agent);
+         copy_effective_indexed_field!(focus_agent, keybinds.focus_agent);
+@@ -1142,6 +1146,7 @@ impl Default for KeysConfig {
+             open_notification_target: BindingConfig::one("prefix+o"),
+             previous_workspace: BindingConfig::empty(),
+             next_workspace: BindingConfig::empty(),
++            next_machine: BindingConfig::empty(),
+             previous_agent: BindingConfig::empty(),
+             next_agent: BindingConfig::empty(),
+             focus_agent: BindingConfig::empty(),
+diff --git a/src/input/keybind_help.rs b/src/input/keybind_help.rs
+index 8007948..4971efc 100644
+--- a/src/input/keybind_help.rs
++++ b/src/input/keybind_help.rs
+@@ -143,6 +143,7 @@ pub(crate) fn keybind_help_groups(
+                     "previous workspace",
+                 ),
+                 entry(binding_label(&keybinds.next_workspace), "next workspace"),
++                entry(binding_label(&keybinds.next_machine), "next machine"),
+                 entry(
+                     indexed_label(&keybinds.switch_workspace),
+                     "switch workspace 1-9",
+diff --git a/src/input/keybindings.rs b/src/input/keybindings.rs
+index 9ffce2e..8d1ef9e 100644
+--- a/src/input/keybindings.rs
++++ b/src/input/keybindings.rs
+@@ -30,6 +30,7 @@ pub(crate) enum KeybindAction {
+     WorkspacePicker,
+     PreviousWorkspace,
+     NextWorkspace,
++    NextMachine,
+     PreviousAgent,
+     NextAgent,
+     NewTab,
+@@ -110,6 +111,7 @@ pub(crate) fn resolve_non_indexed_action(
+             KeybindAction::PreviousWorkspace,
+         ),
+         (&keybinds.next_workspace, KeybindAction::NextWorkspace),
++        (&keybinds.next_machine, KeybindAction::NextMachine),
+         (&keybinds.previous_agent, KeybindAction::PreviousAgent),
+         (&keybinds.next_agent, KeybindAction::NextAgent),
+         (&keybinds.new_tab, KeybindAction::NewTab),
+diff --git a/src/main.rs b/src/main.rs
+index f97e7e2..1a5d359 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -159,6 +159,7 @@ const DEFAULT_CONFIG: &str = r##"# herdr configuration
+ # close_workspace = "prefix+shift+d"
+ # previous_workspace = "" # optional, unset by default
+ # next_workspace = ""     # optional, unset by default
++# next_machine = ""       # optional, first workspace of the next machine
+ # previous_agent = ""     # optional, unset by default
+ # next_agent = ""         # optional, unset by default
+ # focus_agent = ""        # optional indexed binding, e.g. "prefix+alt+1..9"

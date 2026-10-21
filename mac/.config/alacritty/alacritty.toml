@@ -47,8 +47,9 @@ bindings = [
   { key = "Back", mods = "Alt", chars = "\u001b\u007f" },
   { key = "PageUp", mods = "Control", chars = "\u0002P" },
   { key = "PageDown", mods = "Control", chars = "\u0002N" },
-  # Ctrl+` / Ctrl+Shift+` hop to the next / previous Herdr space (prefix+N / prefix+P).
-  { key = "`", mods = "Control", chars = "\u0002N" },
+  # Ctrl+` toggles between the first Herdr space on Local and on omarchy (prefix+m).
+  # Ctrl+Shift+` still hops to the previous space (prefix+P).
+  { key = "`", mods = "Control", chars = "\u0002m" },
   { key = "`", mods = "Control|Shift", chars = "\u0002P" },
   { key = "~", mods = "Control|Shift", chars = "\u0002P" },
   { key = "T", mods = "Command", action = "ReceiveChar" },

@@ -23,12 +23,13 @@ Last checked: 2026-10-07. Read this before updating or troubleshooting this user
 
 ## Current state (2026-10-20)
 
-- Installed: **0.9.5** from tag `v0.9.5` (commit `2ecf19a`) plus four patches saved here, SHA-256 `a877fcc3d16225a5...`:
+- Installed: **0.9.5** from tag `v0.9.5` (commit `2ecf19a`) plus five patches saved here, SHA-256 `33090352bb8f574f...`:
   - `initial-host-theme-replay.patch`: the theme patch below, rebased onto 0.9.5 (the 0.9.3 file no longer applied). Client side.
   - `remote-switch-seen.patch`: the server treated "client viewing another machine" as unknown focus, which counted as seen, so agents finishing there went idle instead of done. Server side, so it only takes effect after a server restart. omarchy (0.9.1) needs the same patch for the reverse direction.
   - `sidebar-row-indent.patch`: agent sidebar rows after the first start in the same column as the first. Client side.
   - `seen-status-event.patch`: emits `pane.agent_status_changed` when only `seen` flips (done to idle on viewing), which Herdr never did. Server side.
-- Rollback: `mv ~/.local/bin/herdr.0.9.5-pre-seen-fix ~/.local/bin/herdr`, then reattach.
+  - `next-machine.patch` (2026-10-22): new `keys.next_machine` action that jumps to the first space (sidebar order) of the next online machine, bound to `prefix+m` and sent by Alacritty's Ctrl+`. Client side; an unpatched server logs `unknown config key keys.next_machine` on reload, which is harmless. Installed SHA-256 `33090352bb8f574f...`.
+- Rollback: `mv ~/.local/bin/herdr.0.9.5-pre-next-machine ~/.local/bin/herdr` (drops only next-machine), or `mv ~/.local/bin/herdr.0.9.5-pre-seen-fix ~/.local/bin/herdr`, then reattach.
 - omarchy (2026-10-20): same patched 0.9.5 built in `~/.cache/herdr-build` (rustup and zig in user space) and installed over the pacman file `/usr/bin/herdr`, so a pacman update of `herdr` will replace it. Swapped in with `herdr server live-handoff --import-exe /usr/bin/herdr --expected-protocol 22`; panes and agents survived. Rollback: `sudo install -m755 ~/.local/bin/herdr.0.9.1-pacman /usr/bin/herdr`, then hand off again. Its state loop runs as the systemd user service `herdr-pulse`.
 
 ## Earlier state (2026-10-07, historical)
