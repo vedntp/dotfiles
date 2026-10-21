@@ -2,13 +2,11 @@
 # Use Ghostty for main terminal work, Alacritty for quick floating access
 
 [general]
-import = ["~/.config/alacritty/themes/carbonfox.toml"]
+# alacritty.local.toml (ignored by Git) holds the font size, which changes per monitor.
+import = ["~/.config/alacritty/themes/carbonfox.toml", "~/.config/alacritty/alacritty.local.toml"]
 
 [env]
 TERM = "xterm-256color"
-
-[font]
-size = 16
 
 [font.normal]
 family = "JetBrains Mono Herdr XL"
