@@ -443,7 +443,7 @@ run = ['exec-and-forget /bin/bash -c "aerospace list-workspaces --monitor focuse
     alt-8 = 'workspace 8'
     alt-9 = 'workspace 9'
     alt-0 = 'workspace 10'
-    # alt-a launches Claude Code in ~/Work (workspace A removed)
+    # alt-a launches Claude Code (workspace A removed)
     alt-a = 'exec-and-forget /bin/bash /Users/vp/.local/bin/aerospace-claude-work'
     alt-enter = 'exec-and-forget /bin/bash /Users/vp/.local/bin/alacritty-new-window --working-directory /Users/vp'
     alt-b = 'workspace B'

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Open Claude Code (bypass permissions) in ~/Work as a new Alacritty window
+# Open Claude Code (bypass permissions) as a new Alacritty window
 # on the first empty workspace of the focused monitor (stay put if none).
 # Bound to alt-a in aerospace.toml.
 
@@ -7,4 +7,4 @@ empty_ws=$(/opt/homebrew/bin/aerospace list-workspaces --monitor focused --empty
 [ -n "$empty_ws" ] && /opt/homebrew/bin/aerospace workspace "$empty_ws"
 
 exec /bin/bash "$HOME/.local/bin/alacritty-new-window" \
-  --working-directory "$HOME/Work" -e "$HOME/.local/bin/claude" --dangerously-skip-permissions
+  -e "$HOME/.local/bin/claude" --dangerously-skip-permissions
