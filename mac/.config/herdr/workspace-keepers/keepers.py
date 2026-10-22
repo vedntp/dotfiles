@@ -17,6 +17,14 @@ def cli(*args):
         raise RuntimeError(p.stderr.strip() or p.stdout.strip())
     return json.loads(p.stdout)["result"] if p.stdout.strip() else {}
 
+def report_logo(workspace, logo):
+    """Set $space_logo, the space's logo drawn after its name; clear it if none."""
+    if workspace.get("tokens", {}).get("space_logo", "") == logo:
+        return
+    token = ("--token", f"space_logo={logo}") if logo else ("--clear-token", "space_logo")
+    cli("workspace", "report-metadata", workspace["workspace_id"],
+        "--source", "local.workspace-keepers", *token)
+
 def main():
     if os.environ.get("HERDR_ENV") != "1":
         raise RuntimeError("Run inside Herdr or as a Herdr plugin.")
@@ -38,11 +46,7 @@ def main():
         # Display metadata is not retained across server restarts. Restore it
         # for every existing workspace, independently of resurrection protection.
         for workspace in workspaces:
-            label = workspace["label"]
-            display = configured.get(label, label)
-            if workspace.get("tokens", {}).get("bte_logo") != display:
-                cli("workspace", "report-metadata", workspace["workspace_id"],
-                    "--source", "local.workspace-keepers", "--token", f"bte_logo={display}")
+            report_logo(workspace, configured.get(workspace["label"], ""))
         for label, logo_token in configured.items():
             matches = [w for w in workspaces if w["label"] == label]
             if len(matches) > 1:
@@ -64,8 +68,7 @@ def main():
                 continue
             result = cli("workspace", "create", "--label", label, "--cwd", cwd, "--no-focus")
             workspace = result["workspace"]
-            cli("workspace", "report-metadata", workspace["workspace_id"],
-                "--source", "local.workspace-keepers", "--token", f"bte_logo={logo_token}")
+            report_logo(workspace, logo_token)
             record.update({"cwd": cwd, "created_at": time.time()})
             print("Recreated workspace:", label)
         tmp = state_file.with_suffix(".tmp")

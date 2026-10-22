@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Keep each agent's $state_emoji current.
+"""Keep each agent's $state_bar and each space's $space_bar current.
 
 Herdr sends no event when done turns into idle, so the plugin alone leaves a
-stale done mark. This loop rereads every pane each tick and sets the emoji for
-its state. It talks to Herdr's API socket directly, since launching the
+stale done mark. This loop rereads every pane and space each tick and sets the
+bar for its state. It talks to Herdr's API socket directly, since launching the
 CLI every tick cost about 10 ms of CPU. Run by a LaunchAgent (com.vp.herdr-pulse).
 """
 
@@ -14,7 +14,7 @@ import os
 import socket
 import time
 
-from agent_icons import STATE_EMOJIS, STATE_TOKEN_NAME
+from agent_icons import SPACE_STATE_TOKEN_NAME, STATE_BARS, STATE_TOKEN_NAME, space_bar
 
 SOCKET = os.path.expanduser("~/.config/herdr/herdr.sock")
 SOURCE = "plugin:moneycaringcoder.agent-icons"
@@ -50,15 +50,20 @@ def main() -> None:
             if herdr is None:
                 herdr = Herdr()
             for pane in herdr.call("pane.list", {})["panes"]:
-                status = pane.get("agent_status")
-                emoji = None
-                if pane.get("agent"):
-                    emoji = STATE_EMOJIS.get(status)
-                if emoji == pane.get("tokens", {}).get(STATE_TOKEN_NAME):
+                bar = STATE_BARS.get(pane.get("agent_status")) if pane.get("agent") else None
+                if bar == pane.get("tokens", {}).get(STATE_TOKEN_NAME):
                     continue
                 herdr.call(
                     "pane.report_metadata",
-                    {"pane_id": pane["pane_id"], "source": SOURCE, "tokens": {STATE_TOKEN_NAME: emoji}},
+                    {"pane_id": pane["pane_id"], "source": SOURCE, "tokens": {STATE_TOKEN_NAME: bar}},
+                )
+            for workspace in herdr.call("workspace.list", {})["workspaces"]:
+                bar = space_bar(workspace)
+                if bar == workspace.get("tokens", {}).get(SPACE_STATE_TOKEN_NAME):
+                    continue
+                herdr.call(
+                    "workspace.report_metadata",
+                    {"workspace_id": workspace["workspace_id"], "source": SOURCE, "tokens": {SPACE_STATE_TOKEN_NAME: bar}},
                 )
         except (OSError, ValueError, RuntimeError, KeyError):
             # Server restarting or not up yet: reconnect after a pause.

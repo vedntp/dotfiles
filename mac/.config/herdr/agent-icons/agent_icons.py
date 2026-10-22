@@ -51,14 +51,17 @@ TEXT_LOGOS = {
     "fx": "\ue1aa",
 }
 VARIANTS = ("auto", "font", "text", "none")
-# Agent state, the first item on each row. Loud for what needs you.
-STATE_TOKEN_NAME = "state_emoji"
-CLUSTER_TOKEN_NAME = "agent_cluster"
-STATE_EMOJIS = {
-    "blocked": "🚨",
-    "done": "✅",
-    "working": "\ue1b8\u2800",  # font square (fonts/build-fonts), smaller than 🟨
-    "idle": "🔘",  # not ⚪: the terminal font draws that as a small text circle
+# Agent state, drawn as a coloured bar down the left edge of each row. Herdr
+# colours a token by matching its text, so every state is the same bar plus a
+# different zero-width marker for config.toml's `contains` rules to find.
+# Idle has no marker and takes the token's default colour.
+STATE_TOKEN_NAME = "state_bar"
+SPACE_STATE_TOKEN_NAME = "space_bar"
+STATE_BARS = {
+    "blocked": "\u258e\u200b",
+    "done": "\u258e\u2060",
+    "working": "\u258e\ufeff",
+    "idle": "\u258e",
 }
 # Enlarged copies of the Nerd Font host glyphs, added by fonts/build-fonts.
 HOST_TOKEN_NAME = "host_logo"
@@ -189,15 +192,35 @@ def report_logo(
         arguments.extend(("--clear-token", HOST_TOKEN_NAME))
     else:
         arguments.extend(("--token", f"{HOST_TOKEN_NAME}={host_logo()}"))
-    emoji = STATE_EMOJIS.get(status or "") if logo is not None else None
-    if emoji is None:
-        arguments.extend(("--clear-token", STATE_TOKEN_NAME, "--clear-token", CLUSTER_TOKEN_NAME))
+    bar = STATE_BARS.get(status or "") if logo is not None else None
+    if bar is None:
+        arguments.extend(("--clear-token", STATE_TOKEN_NAME))
     else:
-        arguments.extend(("--token", f"{STATE_TOKEN_NAME}={emoji}"))
-        # State, host and agent in one token, so Herdr draws no " · " between them.
-        arguments.extend(("--token", f"{CLUSTER_TOKEN_NAME}={emoji} {host_logo()} {logo}"))
+        arguments.extend(("--token", f"{STATE_TOKEN_NAME}={bar}"))
     run_herdr(herdr, *arguments)
     return logo is not None
+
+
+def space_bar(workspace: dict[str, Any]) -> str:
+    """Bar for a space: Herdr's rolled-up state of its agents.
+
+    A space with no agents gets a blank cell (U+2800; Herdr drops a token that
+    is only a space) rather than no token, so its name stays in the same column
+    as the names beside a bar.
+    """
+    return STATE_BARS.get(workspace.get("agent_status") or "", "\u2800")
+
+
+def report_space_bars(herdr: str, source: str) -> None:
+    workspaces = run_herdr(herdr, "workspace", "list").get("result", {}).get("workspaces", [])
+    for workspace in workspaces:
+        bar = space_bar(workspace)
+        if bar == workspace.get("tokens", {}).get(SPACE_STATE_TOKEN_NAME):
+            continue
+        run_herdr(
+            herdr, "workspace", "report-metadata", workspace["workspace_id"],
+            "--source", source, "--token", f"{SPACE_STATE_TOKEN_NAME}={bar}",
+        )
 
 
 def event_value(value: Any, key: str) -> str | None:
@@ -279,6 +302,11 @@ def main() -> int:
             report_logo(herdr, source, pane_id, agent, variant, status)
         except (RuntimeError, json.JSONDecodeError) as error:
             failures.append(f"{pane_id}: {error}")
+
+    try:
+        report_space_bars(herdr, source)
+    except (RuntimeError, json.JSONDecodeError) as error:
+        failures.append(f"space bars: {error}")
 
     if failures:
         print("\n".join(failures), file=sys.stderr)
