@@ -127,6 +127,15 @@ compose the tile/maskable PNGs (Pillow via `uv run`).
   macOS behaviour); use Cmd+Q. Chrome can also stay alive for notifications
   unless Settings > System > Continue running background apps when Google
   Chrome is closed is off.
+- **YouTube (Brave) Picture-in-Picture needs Brave started first.** The PiP
+  window belongs to the main Brave process, not the app shim. When the YouTube
+  app is what launches Brave (`--no-startup-window`), that process runs with
+  the macOS "prohibited" activation policy and its PiP window is created but
+  never drawn on screen. Opening Brave Browser once switches the process to a
+  regular app, and PiP then works until Brave quits, even with no Brave window
+  open. Not an AeroSpace issue: AeroSpace never manages the PiP window
+  (layer 3), so floating rules do nothing. Found 2026-10-22; workaround is to
+  open Brave once before using PiP.
 - AeroSpace: Gmail goes to workspace `M` by bundle id. The generic
   `app-name-regex-substring = 'Chrome'` rule does not match PWAs, since their
   app name is the site name. Unassigned apps (Muse) fall to the catch-all.
