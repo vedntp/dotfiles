@@ -1,6 +1,8 @@
 add_newline = true
 command_timeout = 200
-format = "[$directory$git_branch$git_status]($style)$character"
+# Apple logo in a rounded pill, drawn across two cells (U+E1BB U+E1BC) from the
+# Herdr fonts (mac/.config/herdr/fonts/build-fonts).
+format = "[\ue0b6](#3a3a3c)[\ue1bb\ue1bc](fg:#FFFFFF bg:#3a3a3c)[\ue0b4](#3a3a3c) [$directory$git_branch$git_status]($style)$character"
 
 [character]
 error_symbol = "[✗](bold green)"

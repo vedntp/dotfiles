@@ -22,6 +22,8 @@ The live config is intentionally compact:
 - `background-opacity = 1`
 - `background-blur` is disabled
 - `font-family = JetBrainsMono Nerd Font Mono`
+- `font-codepoint-map = U+E1B9-U+E1BC=JetBrains Mono Herdr XL` for the
+  Starship prompt logos (see `mac/.config/zsh/CLAUDE.md`)
 - `font-size = 18`
 - `macos-titlebar-style = transparent`
 - `window-padding-x = 12`, `window-padding-y = 10`

@@ -96,8 +96,28 @@ it comes from local shell config or another installed command.
 ## Prompt Configuration
 
 Starship, configured in `mac/.config/starship.toml` (linked to
-`~/.config/starship.toml`): directory, Git branch and status, then the prompt
-character. The chevron is green on the Mac and cyan on omarchy.
+`~/.config/starship.toml`): a machine logo pill, directory, Git branch and
+status, then the prompt character. The chevron is green on the Mac and cyan
+on omarchy.
+
+The pill tells the machines apart at a glance:
+
+| Machine | Logo | Pill | Logo colour |
+|---|---|---|---|
+| Mac | Apple, `U+E1BB` `U+E1BC` | `#3a3a3c` | `#FFFFFF` |
+| omarchy | Arch, `U+E1B9` `U+E1BA` | `#163a4d` | `#1793D1` |
+
+omarchy's `~/.config/starship.toml` is its own file, not linked to this repo,
+so edit it there. Write the logos as `\uXXXX` escapes: Private Use Area
+characters are easy to lose in copy and paste. Each logo is two characters,
+the left and right halves of a logo built by
+`mac/.config/herdr/fonts/build-fonts` (see `docs/herdr-sidebar.md`), so it
+can be larger than one cell and still sit exactly centred in every terminal.
+The pill has no spaces inside its round caps: the halves' own margins pad
+the logo, so the pill is four cells wide. Alacritty and Herdr GPUI use the Herdr fonts directly, and Ghostty on both
+machines maps `U+E1B9-U+E1BC` to them with `font-codepoint-map`, because IBM
+Plex Sans TC on omarchy also covers that range. A terminal without the Herdr
+fonts shows empty boxes.
 
 ## Syntax Highlighting
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.11"
-# dependencies = ["fonttools"]
+# dependencies = ["fonttools", "skia-pathops"]
 # ///
 """Rebuild the JetBrains Mono Herdr fonts that carry the sidebar logo glyphs.
 
@@ -18,6 +18,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+import pathops
+from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.pens.recordingPen import RecordingPen
 from fontTools.pens.transformPen import TransformPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
@@ -31,7 +33,7 @@ FAMILIES = {
     "JetBrainsMonoHerdr": ("JetBrains Mono Herdr", "logos.ttf"),
     "JetBrainsMonoHerdrXL": ("JetBrains Mono Herdr XL", "logos-xl.ttf"),
 }
-FIRST, LAST = 0xE1A0, 0xE1BF  # logos, host logos, working square
+FIRST, LAST = 0xE1A0, 0xE1BF  # logos, host logos, working square, prompt logos
 # Host logos, copied from the base Nerd Font glyphs and scaled to fill the
 # Claude logo's box (U+E1A0), so they look the same size in the sidebar.
 HOST_LOGOS = {
@@ -40,6 +42,14 @@ HOST_LOGOS = {
     0xE1B2: 0xF31B,  # ubuntu
     0xE1B3: 0xF17C,  # linux
     0xE1B4: 0xF17A,  # windows
+}
+# Starship prompt logos, each drawn across two cells: the left half at the
+# codepoint and the right half at the next one. Each half stays inside its own
+# cell, so every terminal draws it the same way, and the logo's centre lands
+# on the line between the two cells. Values: source glyph, height in units.
+PROMPT_LOGOS = {
+    0xE1B9: (0xF303, 800),  # arch, U+E1B9 U+E1BA
+    0xE1BB: (0xF179, 715),  # apple, U+E1BB U+E1BC
 }
 # A filled square for the working state, smaller than the 🟨 emoji. Herdr
 # colours it through a `rules` entry in config.toml.
@@ -73,6 +83,42 @@ def add_host_logos(font, donor, order):
         for table in font["cmap"].tables:
             if table.isUnicode():
                 table.cmap[code] = name
+
+
+def add_prompt_logos(font, order):
+    glyf = font["glyf"]
+    cmap = font.getBestCmap()
+    glyphs = font.getGlyphSet()
+    advance = font["hmtx"]["space"][0]
+    for code, (source, height) in PROMPT_LOGOS.items():
+        src = glyf[cmap[source]]
+        src.recalcBounds(glyf)
+        scale = height / (src.yMax - src.yMin)
+        dx = advance - scale * (src.xMin + src.xMax) / 2
+        dy = (1 - scale) * (src.yMin + src.yMax) / 2
+        logo = pathops.Path()
+        glyphs[cmap[source]].draw(TransformPen(logo.getPen(), (scale, 0, 0, scale, dx, dy)))
+        for half in (0, 1):
+            left = half * advance
+            cell = pathops.Path()
+            pen = cell.getPen()
+            pen.moveTo((left, -2000))
+            pen.lineTo((left, 2000))
+            pen.lineTo((left + advance, 2000))
+            pen.lineTo((left + advance, -2000))
+            pen.closePath()
+            part = pathops.op(logo, cell, pathops.PathOp.INTERSECTION)
+            pen = TTGlyphPen(None)
+            part.draw(TransformPen(Cu2QuPen(pen, 1), (1, 0, 0, 1, -left, 0)))
+            name = f"herdrprompt{code + half:04X}"
+            order.append(name)
+            glyph = glyf[name] = pen.glyph()
+            glyph.recalcBounds(glyf)
+            # macOS places a glyph by its left side bearing, not its outline.
+            font["hmtx"][name] = (advance, glyph.xMin)
+            for table in font["cmap"].tables:
+                if table.isUnicode():
+                    table.cmap[code + half] = name
 
 
 def add_working_square(font, donor, order):
@@ -123,6 +169,7 @@ def build(stem, style, base_dir):
             if table.isUnicode():
                 table.cmap[code] = name
     add_host_logos(font, donor, order)
+    add_prompt_logos(font, order)
     add_working_square(font, donor, order)
     # Claude Code marks its messages with U+23FA, which the base font lacks.
     # Without this, Linux falls back to a colour emoji font and draws an
@@ -172,13 +219,14 @@ def main():
     for stem in FAMILIES:
         for style in STYLES:
             target = out / f"{stem}-{style}.ttf"
-            font = build(stem, style, args.base_dir)
+            build(stem, style, args.base_dir).save(target)
             if args.check:
+                # Compare saved files: saving rewrites outlines, so an
+                # unsaved build never matches an installed font.
                 installed = FONTS / target.name
-                if not installed.is_file() or fingerprint(TTFont(installed)) != fingerprint(font):
+                if not installed.is_file() or fingerprint(TTFont(installed)) != fingerprint(TTFont(target)):
                     stale.append(target.name)
                 continue
-            font.save(target)
             print(target)
     if args.check:
         print("stale or missing: " + ", ".join(stale) if stale else "installed fonts match a fresh build")

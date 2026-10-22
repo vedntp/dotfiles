@@ -118,6 +118,15 @@ to the Claude logo's box so both logos look the same size.
 | other Linux | Tux | `U+E1B3` (from `U+F17C`) | `#6B7089` |
 | Windows | Windows | `U+E1B4` (from `U+F17A`) | `#6B7089` |
 
+`build-fonts` also adds the Starship prompt logos (see
+`mac/.config/zsh/CLAUDE.md`), each split across two cells: Arch at `U+E1B9`
+`U+E1BA` (800 units tall) and Apple at `U+E1BB` `U+E1BC` (715, the stock
+size). `skia-pathops` cuts the scaled logo at the cell line, so each half
+stays inside its own cell. A one-cell logo larger than the cell spilled into
+its neighbours, which Ghostty on macOS drew shifted right and Alacritty on
+Linux drew no larger. Each half's left side bearing matches its outline,
+since macOS places glyphs by the bearing.
+
 omarchy (`vp@omarchy`) is a saved Herdr machine (`herdr machine list`). It
 keeps its own live `~/.config/herdr/config.toml` with Linux keybindings, not a
 symlink to this repo, so sidebar row changes must be applied there separately.
@@ -182,9 +191,15 @@ The base fonts must be installed first
 (`brew install --cask font-jetbrains-mono-nerd-font`). Restart Alacritty after
 installing so it loads the new files.
 
-`--check` compares names, the character map, glyph order, every advance
-width, and the logo outlines. It passed against the installed fonts on
-2026-10-07.
+`--check` saves a fresh build to a temporary folder, then compares names, the
+character map, glyph order, every advance width, and the logo outlines. It
+passed against the installed fonts on 2026-10-22.
+
+omarchy has the same eight files in `~/.local/share/fonts/herdr`, built from
+its own base fonts in `~/.local/share/fonts/JetBrainsMonoNerdFontMono`. The
+script installs only to `~/Library/Fonts`, so on omarchy build with
+`--base-dir ~/.local/share/fonts/JetBrainsMonoNerdFontMono`, copy `build/*.ttf`
+into `~/.local/share/fonts/herdr`, and run `fc-cache -f`.
 
 Other Herdr fonts in `~/Library/Fonts` are not produced by this script and are
 not referenced by any tracked config: `JetBrains Mono Herdr Large` (an unused
