@@ -1,0 +1,159 @@
+diff --git a/src/client/shell/agent_sidebar.rs b/src/client/shell/agent_sidebar.rs
+index 89ae329..60c0b68 100644
+--- a/src/client/shell/agent_sidebar.rs
++++ b/src/client/shell/agent_sidebar.rs
+@@ -17,6 +17,40 @@ pub(super) struct AgentRow {
+     pub(super) rows: Vec<Vec<crate::ui::ResolvedToken>>,
+ }
+ 
++/// Priority sort lists agents that need you, then working ones, then idle
++/// ones. Returns the group of an agent so the list can space the groups apart.
++pub(super) fn priority_group(
++    config: &ClientShellConfig,
++    agent_view_label: Option<&str>,
++    status: crate::api::schema::AgentStatus,
++) -> Option<u8> {
++    use crate::api::schema::AgentStatus;
++    if agent_view_label.is_some()
++        || config.agent_panel_sort != crate::config::AgentPanelSortConfig::Priority
++    {
++        return None;
++    }
++    Some(match status {
++        AgentStatus::Blocked | AgentStatus::Done => 0,
++        AgentStatus::Working => 1,
++        AgentStatus::Idle | AgentStatus::Unknown => 2,
++    })
++}
++
++/// Blank lines after each entry: the configured row gap, and at least one
++/// where the priority group changes.
++pub(super) fn agent_list_gaps(row_gap: u16, groups: &[Option<u8>]) -> Vec<u16> {
++    groups
++        .iter()
++        .enumerate()
++        .map(|(index, group)| match groups.get(index + 1) {
++            None => 0,
++            Some(next) if group.is_some() && next != group => row_gap.max(1),
++            Some(_) => row_gap,
++        })
++        .collect()
++}
++
+ pub(super) fn ordered_agent_pane_ids(
+     snapshot: &ClientShellSnapshot,
+     sort: crate::config::AgentPanelSortConfig,
+@@ -80,6 +114,7 @@ pub(super) fn render_agent_panel(
+         agent_scroll,
+         hits,
+         |row| row.rows.len(),
++        |row| priority_group(config, snapshot.agent_view_label.as_deref(), row.status),
+         |buffer, rect, row, hits| {
+             hits.agents.push((rect, row.pane_id.clone()));
+             render_agent_row(buffer, rect, row, config);
+@@ -160,6 +195,7 @@ pub(super) fn render_agent_list<T>(
+     agent_scroll: &mut usize,
+     hits: &mut ShellHitMap,
+     row_lines: impl Fn(&T) -> usize,
++    row_group: impl Fn(&T) -> Option<u8>,
+     mut render_row: impl FnMut(&mut Buffer, Rect, &T, &mut ShellHitMap),
+ ) {
+     let body = Rect::new(
+@@ -190,17 +226,8 @@ pub(super) fn render_agent_list<T>(
+         .iter()
+         .map(|row| row_lines(row).max(1).min(u16::MAX as usize) as u16)
+         .collect::<Vec<_>>();
+-    let gaps = rows
+-        .iter()
+-        .enumerate()
+-        .map(|(index, _)| {
+-            if index + 1 < rows.len() {
+-                config.agents.row_gap
+-            } else {
+-                0
+-            }
+-        })
+-        .collect::<Vec<_>>();
++    let groups = rows.iter().map(&row_group).collect::<Vec<_>>();
++    let gaps = agent_list_gaps(config.agents.row_gap, &groups);
+     let metrics =
+         super::scroll::list_scroll_metrics(&row_heights, &gaps, body.height, *agent_scroll);
+     hits.agent_max_scroll = metrics.max_offset_from_bottom;
+@@ -218,13 +245,7 @@ pub(super) fn render_agent_list<T>(
+         }
+         let rect = Rect::new(body.x, y, content_width, height);
+         render_row(buffer, rect, row, hits);
+-        y = y
+-            .saturating_add(height)
+-            .saturating_add(if index + 1 < rows.len() {
+-                config.agents.row_gap
+-            } else {
+-                0
+-            });
++        y = y.saturating_add(height).saturating_add(gaps[index]);
+     }
+ 
+     if show_scrollbar {
+@@ -396,3 +417,22 @@ fn sidebar_status_text(status: crate::api::schema::AgentStatus) -> &'static str
+         AgentStatus::Idle | AgentStatus::Unknown => "idle",
+     }
+ }
++
++#[cfg(test)]
++mod priority_gap_tests {
++    use super::agent_list_gaps;
++
++    #[test]
++    fn blank_line_where_priority_group_changes() {
++        let groups = [Some(0), Some(0), Some(1), Some(2), Some(2)];
++        assert_eq!(agent_list_gaps(0, &groups), vec![0, 1, 1, 0, 0]);
++        assert_eq!(agent_list_gaps(2, &groups), vec![2, 2, 2, 2, 0]);
++    }
++
++    #[test]
++    fn ungrouped_lists_keep_the_configured_gap() {
++        let groups = [None, None, None];
++        assert_eq!(agent_list_gaps(0, &groups), vec![0, 0, 0]);
++        assert_eq!(agent_list_gaps(1, &groups), vec![1, 1, 0]);
++    }
++}
+diff --git a/src/client/shell/endpoint_agents.rs b/src/client/shell/endpoint_agents.rs
+index b56b41f..05acb9a 100644
+--- a/src/client/shell/endpoint_agents.rs
++++ b/src/client/shell/endpoint_agents.rs
+@@ -71,6 +71,7 @@ pub(super) fn render_expanded(
+         agent_scroll,
+         hits,
+         |row| row.agent.rows.len(),
++        |row| super::agent_sidebar::priority_group(config, agent_view_label, row.agent.status),
+         |buffer, rect, row, hits| {
+             super::agent_sidebar::render_agent_row(buffer, rect, &row.agent, config);
+             if row.stale {
+@@ -108,10 +109,23 @@ impl ClientShellState {
+             .iter()
+             .map(|row| row.agent.rows.len().max(1).min(u16::MAX as usize) as u16)
+             .collect::<Vec<_>>();
+-        let mut gaps = vec![self.config.agents.row_gap; rows.len()];
+-        if let Some(last) = gaps.last_mut() {
+-            *last = 0;
+-        }
++        let agent_view_label = self
++            .endpoints
++            .iter()
++            .find(|endpoint| endpoint.endpoint_id == self.active_endpoint_id)
++            .and_then(|endpoint| endpoint.snapshot.as_deref())
++            .and_then(|snapshot| snapshot.agent_view_label.as_deref());
++        let groups = rows
++            .iter()
++            .map(|row| {
++                super::agent_sidebar::priority_group(
++                    &self.config,
++                    agent_view_label,
++                    row.agent.status,
++                )
++            })
++            .collect::<Vec<_>>();
++        let gaps = super::agent_sidebar::agent_list_gaps(self.config.agents.row_gap, &groups);
+         self.agent_scroll = super::scroll::list_scroll_start_to_reveal(
+             &heights,
+             &gaps,

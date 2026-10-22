@@ -1,0 +1,34 @@
+diff --git a/src/ui/sidebar/tokens.rs b/src/ui/sidebar/tokens.rs
+index c1e38aa..451ce82 100644
+--- a/src/ui/sidebar/tokens.rs
++++ b/src/ui/sidebar/tokens.rs
+@@ -178,8 +178,12 @@ pub(crate) fn space_rows(
+ }
+ 
+ pub(crate) fn separator(previous: &ResolvedToken, current: &ResolvedToken) -> &'static str {
++    // Plugin-reported tokens such as logos and state bars bring their own
++    // look, so they sit one space from their neighbours instead of " · ".
+     if matches!(previous.kind, ResolvedTokenKind::StateIcon)
+         || matches!(current.kind, ResolvedTokenKind::GitStatus { .. })
++        || matches!(previous.kind, ResolvedTokenKind::Custom(_))
++        || matches!(current.kind, ResolvedTokenKind::Custom(_))
+     {
+         " "
+     } else {
+@@ -190,6 +194,16 @@ pub(crate) fn separator(previous: &ResolvedToken, current: &ResolvedToken) -> &'
+ #[cfg(test)]
+ mod tests {
+     use super::*;
++
++    #[test]
++    fn custom_tokens_sit_one_space_from_neighbours() {
++        let custom = ResolvedToken::unstyled(ResolvedTokenKind::Custom("\u{e1a0}".into()));
++        let workspace = ResolvedToken::unstyled(ResolvedTokenKind::Workspace("repo".into()));
++        let tab = ResolvedToken::unstyled(ResolvedTokenKind::Tab("1".into()));
++        assert_eq!(separator(&custom, &workspace), " ");
++        assert_eq!(separator(&workspace, &custom), " ");
++        assert_eq!(separator(&workspace, &tab), " · ");
++    }
+     use crate::config::{AgentSidebarToken, SpaceSidebarToken};
+ 
+     struct Entry {

@@ -23,13 +23,16 @@ Last checked: 2026-10-07. Read this before updating or troubleshooting this user
 
 ## Current state (2026-10-20)
 
-- Installed: **0.9.5** from tag `v0.9.5` (commit `2ecf19a`) plus five patches saved here, SHA-256 `33090352bb8f574f...`:
+- Installed: **0.9.5** from tag `v0.9.5` (commit `2ecf19a`) plus seven patches saved here, applied in the order listed, SHA-256 `7a4ec0fcd4d771ba...`:
   - `initial-host-theme-replay.patch`: the theme patch below, rebased onto 0.9.5 (the 0.9.3 file no longer applied). Client side.
   - `remote-switch-seen.patch`: the server treated "client viewing another machine" as unknown focus, which counted as seen, so agents finishing there went idle instead of done. Server side, so it only takes effect after a server restart. omarchy (0.9.1) needs the same patch for the reverse direction.
   - `sidebar-row-indent.patch`: agent sidebar rows after the first start in the same column as the first. Client side.
   - `seen-status-event.patch`: emits `pane.agent_status_changed` when only `seen` flips (done to idle on viewing), which Herdr never did. Server side.
   - `next-machine.patch` (2026-10-22): new `keys.next_machine` action that jumps to the first space (sidebar order) of the next online machine, bound to `prefix+m` and sent by Alacritty's Ctrl+`. Client side; an unpatched server logs `unknown config key keys.next_machine` on reload, which is harmless. Installed SHA-256 `33090352bb8f574f...`.
-- Rollback: `mv ~/.local/bin/herdr.0.9.5-pre-next-machine ~/.local/bin/herdr` (drops only next-machine), or `mv ~/.local/bin/herdr.0.9.5-pre-seen-fix ~/.local/bin/herdr`, then reattach.
+  - `sidebar-custom-token-spacing.patch` (2026-10-23): plugin `$tokens` sit one space from their neighbours in sidebar rows instead of ` · `; rows of built-in tokens keep the dots, so upstream tests pass unchanged. Client side.
+  - `sidebar-priority-gaps.patch` (2026-10-23): with `agent_panel_sort = "priority"`, a blank line between agents that need you (blocked, done), working and idle ones. Client side. Layout in `docs/herdr-sidebar.md`.
+- Build: Homebrew's Zig is too new; unpack Zig 0.16.0 from ziglang.org and pass it as `ZIG=.../zig cargo build --release --bin herdr`. Install by copying next to `~/.local/bin/herdr` and `mv` over it, so the running server keeps its file; then reattach the client. In this sandbox the full `cargo test` run fails 13 plugin-path and manifest tests that pass when run alone, with or without these patches.
+- Rollback: `mv ~/.local/bin/herdr.0.9.5-pre-sidebar ~/.local/bin/herdr` (drops only the two sidebar patches), or `mv ~/.local/bin/herdr.0.9.5-pre-next-machine ~/.local/bin/herdr` (drops next-machine too), or `mv ~/.local/bin/herdr.0.9.5-pre-seen-fix ~/.local/bin/herdr`, then reattach.
 - omarchy (2026-10-20): same patched 0.9.5 built in `~/.cache/herdr-build` (rustup and zig in user space) and installed over the pacman file `/usr/bin/herdr`, so a pacman update of `herdr` will replace it. Swapped in with `herdr server live-handoff --import-exe /usr/bin/herdr --expected-protocol 22`; panes and agents survived. Rollback: `sudo install -m755 ~/.local/bin/herdr.0.9.1-pacman /usr/bin/herdr`, then hand off again. Its state loop runs as the systemd user service `herdr-pulse`.
 
 ## Earlier state (2026-10-07, historical)
