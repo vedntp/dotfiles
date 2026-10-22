@@ -7,8 +7,8 @@ tracked under `mac/.config/herdr/`.
 | Piece | Path | Job |
 |---|---|---|
 | Row layout and colours | `config.toml`, the `[ui.sidebar.*]` tables | Decides what each sidebar row shows and in which colour |
-| Agent logos | `agent-icons/` | Plugin that reports a `harness_logo` token for each agent pane |
-| Space logos | `workspace-keepers/config.json` | Maps each space label to its `bte_logo` token |
+| Agent logos and state bars | `agent-icons/` | Plugin that reports `harness_logo`, `host_logo` and `state_bar` for each agent pane, and `space_bar` for each space |
+| Space logos | `workspace-keepers/config.json` | Maps each space label to its `space_logo` glyph |
 | Glyphs | `fonts/` | Builds the terminal fonts that contain the logo glyphs |
 
 The logos are ordinary text. Each one is a private-use codepoint that only the
@@ -18,7 +18,7 @@ or a blank gap in the sidebar.
 ## How a logo reaches the screen
 
 1. A plugin reports a text token on a pane or a workspace. The token is the
-   glyph followed by a name, for example ` claude`.
+   bare glyph, for example `` for claude.
 2. `config.toml` places that token in a sidebar row and colours it.
 3. Alacritty draws the glyph using `JetBrains Mono Herdr XL`, set in
    `mac/.config/alacritty/alacritty.toml`.
@@ -39,7 +39,7 @@ or a blank gap in the sidebar.
 | `U+E1A9` | pi | agent | XL font only |
 | `U+E1AA` | fx | agent | XL font only |
 | `U+E1AB` | amp | agent | XL font only. A wordmark that overflows its cell, so the token is the glyph plus two spaces with no name |
-| `U+E1AC` | bte | space | XL font only. Double width, so `config.json` puts two spaces after it |
+| `U+E1AC` | bte | space | XL font only. Double width; it is last on its row, so it spills into empty cells |
 | `U+E1AD` | stryde | space | XL font only |
 | `U+E1AE` | vqa | space | XL font only |
 
@@ -48,8 +48,11 @@ or a blank gap in the sidebar.
 ## Colours
 
 Set in `config.toml`. Agents get one row definition each under
-`[ui.sidebar.agents.rows_by_agent]`. Spaces share a single row whose colour is
-picked by a `contains` rule on the label.
+`[ui.sidebar.agents.rows_by_agent]`, identical apart from the logo colour.
+Spaces share a single row whose logo colour is picked by a `contains` rule on
+the glyph; space names keep Herdr's own colours. Titles are `#D9DCE4` and the
+space name under an agent is `#50545F`. State bar colours are under
+[Agent and space layout](#agent-and-space-layout).
 
 | Item | Colour |
 |---|---|
@@ -58,11 +61,10 @@ picked by a `contains` rule on the label.
 | amp | `#DFDFC1` |
 | pi | `#FFFFFF` |
 | opencode and any other agent | `#A8ADB9` |
-| a token containing ` fx` | `#D6D6D6` |
 | bte | `#00D2BE` |
 | vqa | `#00B8F2` |
 | stryde | `#3B82F6` |
-| spaces without a rule (`general`, `personal`) | `#A8ADB9` |
+| space logos without a rule | `#A8ADB9` |
 
 After editing, apply with `herdr server reload-config`. It reports config
 diagnostics and does not restart panes.
@@ -104,7 +106,7 @@ the local link exists.
 
 ## Host logos
 
-Row 2 of every agent row starts with `$host_logo`, which shows the machine
+Line 2 of every agent entry starts, after the state bar, with `$host_logo`, which shows the machine
 the agent runs on. The same `agent-icons` plugin sets it on each pane. Plugins
 run on the server that owns the pane, so each machine reports its own glyph.
 `fonts/build-fonts` copies the stock Nerd Font glyphs to `U+E1B0` and up, scaled
@@ -132,30 +134,61 @@ keeps its own live `~/.config/herdr/config.toml` with Linux keybindings, not a
 symlink to this repo, so sidebar row changes must be applied there separately.
 Its plugin is linked from its own `~/.dotfiles` checkout.
 
-## State emoji
+## Agent and space layout
 
-Each agent row is one line: state emoji, host logo, agent logo, space, tab.
-The agent-icons plugin reports `$state_emoji` alongside `$host_logo` and
-`$harness_logo` (logo only, no agent name), replacing Herdr's dot, since done
-and idle were both green. It reruns on `pane.agent_status_changed` and
-`pane.focused` (which turns done into idle).
+Each agent is two lines, both led by a state bar:
 
-| State | Emoji |
-|---|---|
-| blocked | 🚨 |
-| done | ✅ |
-| working | yellow square `#F7C948`, font glyph `U+E1B8`, smaller than 🟨 |
-| idle | 🔘 |
+```text
+▎ Redesign the agent sidebar   <- terminal_title_stripped (the chat title)
+▎ <host> <agent> general       <- host logo, agent logo, space
+```
+
+`agent_panel_sort = "priority"` lists agents that need you (blocked, done)
+first, then working, then idle, and the patched Herdr puts a blank line
+between those groups (`sidebar-priority-gaps.patch`). Each space is one line:
+its bar, its name, then its logo.
+
+The bar is `$state_bar` on agents and `$space_bar` on spaces, both from
+agent-icons. Herdr colours a token by matching its text, so each state is the
+same `▎` (U+258E, which Alacritty draws edge to edge, so the bars join across
+lines) plus a different zero-width marker that the `contains` rules look for:
+
+| State | Marker | Colour |
+|---|---|---|
+| blocked | `U+200B` | `#F06A64` |
+| done | `U+2060` | `#63C08A` |
+| working | `U+FEFF` | `#E8B04B` |
+| idle | none | `#3A3D45` |
+
+A space with no agents gets `U+2800` (a blank braille cell) instead of a bar,
+so its name stays in line; Herdr drops a token that is only a space. The
+space's state is Herdr's own rolled-up `agent_status`.
+
+The plugin sets the bars on `pane.agent_detected`, `pane.agent_status_changed`
+and `pane.focused`. Herdr sends no event when done turns into idle, so
+`agent-icons/pulse.py` (LaunchAgent `com.vp.herdr-pulse`, a systemd user
+service on omarchy) rereads every pane and space each half second and fixes
+any stale bar.
+
+Plugin tokens sit one space from their neighbours instead of Herdr's ` · `
+(`sidebar-custom-token-spacing.patch`). Rows made only of built-in tokens keep
+the dots.
+
+A client only counts an agent as done if it saw the agent finish while
+attached. Right after a reattach, an agent that finished earlier keeps its
+green bar (the server still says done) but sorts with the idle group.
 
 After editing `config.toml`, run `herdr server reload-config`.
 
 ## Space logos
 
-`mac/.config/herdr/workspace-keepers/config.json` maps a space label to the
-text shown for it. `keepers.py` writes that text to the workspace as the
-`bte_logo` token on startup and on workspace events. The token is named
-`bte_logo` for historical reasons and carries the text for every space,
-including spaces with no logo, where it is just the label.
+`mac/.config/herdr/workspace-keepers/config.json` maps a space label to its
+logo glyph (empty for none). `keepers.py` writes the glyph to the workspace as
+the `space_logo` token on startup and on workspace events, and clears it for a
+space with no logo. The sidebar shows the space's own name first and the logo
+after it, coloured by a `contains` rule on the glyph. A `config.json` in the
+plugin's per-machine config dir replaces this one; the Mac's protects only
+`general`.
 
 Resurrection of closed spaces is a separate job of the same plugin. See
 `docs/herdr-workspace-keepers.md`.
@@ -217,8 +250,9 @@ middle size) and `Herdr Harness Logos` (the upstream plugin's standalone font).
    - agent: add the codepoint to `PUA_LOGOS` and a fallback to `TEXT_LOGOS` in
      `agent-icons/agent_icons.py`, then add a row under
      `[ui.sidebar.agents.rows_by_agent]` in `config.toml`
-   - space: add the label to `workspace-keepers/config.json`, then add a
-     `contains` colour rule under `[ui.sidebar.spaces]`
+   - space: add the label and glyph to `workspace-keepers/config.json`, then
+     add a `contains` rule for the glyph to `$space_logo` under
+     `[ui.sidebar.spaces]`
 4. Run `herdr server reload-config`, then the plugin's refresh or reconcile
    action.
 5. Update the glyph map and colour table above.
