@@ -141,22 +141,10 @@ my_terminal_font() {
 	fi
 
 	local size="$1"
-	local config
-	local ghostty_configs=(
-		"$HOME/.config/ghostty/config"
-		"$HOME/.dotfiles/mac/.config/ghostty/config"
-	)
-	local alacritty_configs=(
-		"$HOME/.config/alacritty/alacritty.toml"
-		"$HOME/.dotfiles/mac/.config/alacritty/alacritty.toml"
-	)
 
-	for config in $ghostty_configs; do
-		[[ -f "$config" ]] && sed -i '' -E "s/^font-size[[:space:]]*=.*/font-size = $size/" "$config"
-	done
-	for config in $alacritty_configs; do
-		[[ -f "$config" ]] && sed -i '' -E "s/^size[[:space:]]*=.*/size = $size/" "$config"
-	done
+	# Font size lives in Git-ignored local files, since it changes per monitor.
+	print "font-size = $size" > "$HOME/.config/ghostty/config.local"
+	print "[font]\nsize = $size" > "$HOME/.config/alacritty/alacritty.local.toml"
 
 	print "Terminal font size set to $size."
 }
