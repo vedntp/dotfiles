@@ -46,6 +46,7 @@ tmux source-file ~/.config/tmux/tmux.conf
 |       |-- aerospace/
 |       |-- ghostty/
 |       |-- herdr/
+|       |-- rex/                # Rex terminal: init.lua (omarchy host, host switch key)
 |       |-- alacritty/
 |       |-- linearmouse/
 |       |-- git/
