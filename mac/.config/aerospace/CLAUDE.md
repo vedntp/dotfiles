@@ -56,7 +56,7 @@ preserves the v1 behavior for all currently bound workspace keys.
 
 | Workspace | Apps |
 |-----------|------|
-| 1 | Persistent support workspace; Alacritty, cmux, and Warp tile where opened |
+| 1 | Persistent support workspace; Rex Beta; Alacritty, cmux, and Warp tile where opened |
 | 2 | Calendar |
 | 3 | Things, Linear |
 | 4-6 | TradingView, IB Gateway, TWS |
@@ -64,7 +64,7 @@ preserves the v1 behavior for all currently bound workspace keys.
 | 9 | Slack |
 | 10 | Spotify, YouTube Music |
 | B | Arc, Firefox, Brave, Helium |
-| C | ChatGPT, Chrome |
+| C | ChatGPT |
 | D | Emacs |
 | E | Finder (floating) |
 | F | Drafts |

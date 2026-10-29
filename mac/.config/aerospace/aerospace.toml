@@ -118,6 +118,11 @@ run = 'layout tiling'
 if.app-id = 'dev.warp.Warp-Stable'
 run = 'layout tiling'
 
+# Workspace 1 - Terminal (Rex)
+[[on-window-detected]]
+if.app-id = 'com.superlogical.rex'
+run = 'move-node-to-workspace 1'
+
 # Workspace 2 - Calendar
 [[on-window-detected]]
 if.app-name-regex-substring = 'Calendar'
@@ -206,10 +211,6 @@ run = 'move-node-to-workspace C'
 [[on-window-detected]]
 if.app-id = 'com.google.Chrome.app.fmgjjmmmlfnkbppncabfkddbjimcfncm'
 run = 'move-node-to-workspace M'
-
-[[on-window-detected]]
-if.app-name-regex-substring = 'Chrome'
-run = 'move-node-to-workspace C'
 
 # Workspace D - Development
 [[on-window-detected]]

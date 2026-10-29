@@ -133,7 +133,7 @@ export VISUAL='nvim'
 alias szsh='source ~/.zshrc'
 alias hetzner='ssh myserver'
 
-# Set the font size used by Ghostty and Alacritty.
+# Set the font size used by Ghostty, Alacritty and Rex.
 my_terminal_font() {
 	if (( $# != 1 )) || [[ ! "$1" =~ ^([1-9]|[1-9][0-9])([.][0-9]+)?$ ]]; then
 		print "Usage: my_terminal_font SIZE (for example: my_terminal_font 14)" >&2
@@ -145,6 +145,28 @@ my_terminal_font() {
 	# Font size lives in Git-ignored local files, since it changes per monitor.
 	print "font-size = $size" > "$HOME/.config/ghostty/config.local"
 	print "[font]\nsize = $size" > "$HOME/.config/alacritty/alacritty.local.toml"
+	# Rex ignores outside writes to its font pref and saves its own base size
+	# over them on quit, so resize the running app in its 1pt steps instead:
+	# reset to the base the pref holds, then step to the requested size.
+	if (( $+commands[rex] )); then
+		local rex_client base step
+		rex_client=$(rex client ls --json 2>/dev/null | jq -r '.clients[] | select(.info.kind == "app" and .connection_state == "connected") | .client_id' | head -1)
+		base=$(defaults read com.superlogical.rex Workspace.terminalFontPointSize 2>/dev/null)
+		if [[ -n $rex_client && -n $base ]]; then
+			local -i steps=$(( $(printf %.0f "$size") - $(printf %.0f "$base") ))
+			step=client.font.increase
+			(( steps < 0 )) && step=client.font.decrease && steps=$(( -steps ))
+			# Reset fails when the size is already at the base, which is fine.
+			# Steps fail unless Rex is the frontmost app.
+			rex -C "$rex_client" do client.font.reset >/dev/null 2>&1
+			repeat $steps; do
+				if ! rex -C "$rex_client" do "$step" >/dev/null 2>&1; then
+					print "Rex was not resized: run this from Rex while it is in front." >&2
+					break
+				fi
+			done
+		fi
+	fi
 
 	print "Terminal font size set to $size."
 }
