@@ -31,12 +31,6 @@ prompt_new_tab_name = false
 
 show_agent_labels_on_pane_borders = true
 
-# CPU and memory of the machine the focused space runs on. Herdr runs the
-# command on that machine's server, so omarchy spaces show omarchy's load.
-tab_bar_right = [
-  { type = "command", command = "$HOME/.dotfiles/mac/.config/herdr/load-status", interval_seconds = 5, timeout_seconds = 5 },
-]
-
 [ui.toast]
 # Herdr Focus Notify owns desktop notifications and click-to-focus behavior.
 # Keep Herdr's own toast available inside the app without duplicating desktop

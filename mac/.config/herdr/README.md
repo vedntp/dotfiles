@@ -5,7 +5,7 @@
 | Path | What it is | Docs |
 |---|---|---|
 | `config.toml` | Keybindings, UI, sidebar rows and colours | `docs/shortcut-reference.md`, `docs/herdr-sidebar.md` |
-| `load-status` | CPU, GPU and memory for the TUI tab bar (`ui.tab_bar_right`), macOS and Linux. GPU comes from `ioreg` on macOS and `nvidia-smi` (or amdgpu's `gpu_busy_percent`) on Linux. omarchy runs its own copy from its `~/.dotfiles` | `config.toml` |
+| `load-status` | CPU, GPU and memory for the TUI tab bar (`ui.tab_bar_right`), macOS and Linux. Not wired up on the Mac since 2026-10-29: its `top -l 2` cost about 30% of a core. GPU comes from `ioreg` on macOS and `nvidia-smi` (or amdgpu's `gpu_busy_percent`) on Linux. omarchy runs its own copy from its `~/.dotfiles` | nothing on the Mac |
 | `agent-icons/` | Local plugin that reports agent logos to the sidebar | `docs/herdr-sidebar.md` |
 | `workspace-keepers/` | Local plugin that restores protected spaces and sets their logos | `docs/herdr-workspace-keepers.md` |
 | `fonts/` | Donor glyphs and build script for the logo fonts | `docs/herdr-sidebar.md` |
