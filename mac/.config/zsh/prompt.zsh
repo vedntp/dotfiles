@@ -2,14 +2,22 @@
 # near-black to charcoal, a git segment (green clean, amber dirty), then the
 # chevron. Plain zsh: no prompt program runs per prompt, and git runs once,
 # only inside a repo. Colours are fixed hex, so the bar looks the same in every
-# terminal and theme; only the chevron uses the theme's green and red.
+# terminal and theme; only the chevron uses the theme's palette.
+#
+# Shared by the Mac and omarchy. The Mac loads it through the ~/.config/zsh
+# symlink; omarchy's ~/.zshrc sources ~/.dotfiles/mac/.config/zsh/prompt.zsh
+# from its clone. Per-machine settings (set before sourcing; Mac defaults):
+#   PROMPT_LOGO     logo text inside the pill   (Apple, Herdr font halves)
+#   PROMPT_LOGO_BG  pill colour                 (#333336)
+#   PROMPT_CHEVRON  chevron colour, zsh %F name (blue; red after a failure)
+# Full notes and repair steps: mac/.config/zsh/CLAUDE.md, "Prompt".
 
 typeset -ga _ramp_bg=('#141618' '#1a1d1f' '#212427' '#282c2f' '#303438')
-typeset -g  _ramp_fg='#e8eaed' _ramp_logo_bg='#333336' _ramp_ink='#16181a'
+typeset -g  _ramp_fg='#e8eaed' _ramp_ink='#16181a'
 typeset -g  _ramp_clean='#6fbf86' _ramp_dirty='#e0b25e'
-# Logo: the Herdr font pair by default; app terminals export PROMPT_LOGO
-# with the system Apple logo instead (see .zshrc).
 typeset -g  _ramp_logo=${PROMPT_LOGO:-$'\ue1bb\ue1bc'}
+typeset -g  _ramp_logo_bg=${PROMPT_LOGO_BG:-'#333336'}
+typeset -g  _ramp_chev=${PROMPT_CHEVRON:-blue}
 
 _ramp_esc() { REPLY=${1//\%/%%} }
 
@@ -86,7 +94,7 @@ _ramp_precmd() {
     prev=$_ramp_seg[1]
   fi
   s+="%k%F{$prev}"$'\ue0b0'"%f "
-  if (( exit )); then s+='%B%F{red}❯%f%b '; else s+='%B%F{green}❯%f%b '; fi
+  if (( exit )); then s+='%B%F{red}❯%f%b '; else s+="%B%F{$_ramp_chev}❯%f%b "; fi
   PROMPT=$s
 }
 

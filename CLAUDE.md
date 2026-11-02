@@ -62,7 +62,7 @@ tmux source-file ~/.config/tmux/tmux.conf
 
 Each app has its own docs with keybindings, settings, and gotchas:
 
-- `mac/.config/zsh/CLAUDE.md` - Shell, plugins, aliases, Claude Code setup
+- `mac/.config/zsh/CLAUDE.md` - Shell, plugins, aliases, Claude Code setup, shared Mac/omarchy prompt and how to repair it
 - `mac/.config/nvim/CLAUDE.md` - Neovim keybindings, lazy.nvim plugins
 - `mac/.config/tmux/CLAUDE.md` - tmux bindings, TPM plugins, statusline notes
 - `mac/.config/doom/CLAUDE.md` - Literate config, GTD setup, gptel
@@ -115,8 +115,9 @@ user to confirm both routing directions before calling a candidate solved.
 
 ## Color defaults
 
-Ghostty and Alacritty use their terminal palettes. macOS uses a plain-zsh
-powerline prompt (`mac/.config/zsh/prompt.zsh`) with a fixed Ink palette and
-the theme's green chevron, while the server keeps Powerlevel10k's upstream
+Ghostty and Alacritty use their terminal palettes. macOS and omarchy share a
+plain-zsh powerline prompt (`mac/.config/zsh/prompt.zsh`, see
+`mac/.config/zsh/CLAUDE.md`) with a fixed Ink palette and a theme-coloured
+chevron (blue on the Mac, teal on omarchy), while the server keeps Powerlevel10k's upstream
 rainbow layout. tmux inherits terminal colors, Ranger uses its bundled default, Bat
 uses `ansi`, Neovim uses Kanagawa Wave, and Doom Org faces inherit Doom One.

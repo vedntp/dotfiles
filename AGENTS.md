@@ -141,9 +141,10 @@ Machine-specific files are intentionally gitignored:
 
 Zsh:
 
-- Main files: `mac/.zshrc`, `mac/.config/zsh/CLAUDE.md`, `mac/.config/starship.toml`.
+- Main files: `mac/.zshrc`, `mac/.config/zsh/CLAUDE.md`, `mac/.config/zsh/prompt.zsh`.
 - Secrets load at the top from `~/.config/zsh/.zshenv.local`.
-- Plain zsh with Starship; no Oh My Zsh, p10k or direnv. Plugin order at the end of `.zshrc` matters.
+- Plain zsh with its own prompt (`prompt.zsh`); no Starship, Oh My Zsh, p10k or direnv. Plugin order at the end of `.zshrc` matters.
+- `prompt.zsh` is shared: omarchy sources it from its own `~/.dotfiles` clone. After changing it, push `main` and `git -C ~/.dotfiles pull --ff-only` on omarchy. Setup and repair steps are in `mac/.config/zsh/CLAUDE.md` under "Prompt Configuration".
 - `EDITOR` and `VISUAL` are `nvim`; Bat selects `ansi` in its config.
 - Claude aliases in tracked config include `cl`, `cld`, `cldr`, and `cldc`.
 

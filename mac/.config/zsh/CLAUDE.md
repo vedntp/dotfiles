@@ -98,7 +98,8 @@ it comes from local shell config or another installed command.
 ## Prompt Configuration
 
 `mac/.config/zsh/prompt.zsh` (replaced Starship on 2026-11-02, so each folder
-can have its own colour). A `precmd` hook rebuilds `PROMPT` each time:
+can have its own colour). **One file serves both machines**: the Mac and
+omarchy. A `precmd` hook rebuilds `PROMPT` each time:
 
 - Logo pill, then one powerline segment per folder (`~` or `/` first), each a
   step lighter: `#141618 #1a1d1f #212427 #282c2f #303438` ("Ink"), text
@@ -109,44 +110,103 @@ can have its own colour). A `precmd` hook rebuilds `PROMPT` each time:
   shows ahead/behind, conflicts, changed and untracked counts from one
   `git status --porcelain=v2 --branch`. Repos are found by walking up for
   `.git` in zsh, so other folders run no process.
-- Chevron uses the theme's ANSI green, red after a failed command, so it
+- Chevron uses a theme (ANSI) colour, red after a failed command, so it
   follows light and dark themes. The bar itself uses fixed hex colours and
-  looks the same in Rex, Ghostty, Alacritty and light themes.
+  looks the same in every terminal and theme.
 - `prompt_subst` is off: folder and branch names go into `PROMPT` verbatim,
   with `%` escaped.
+- Speed: under 0.1 ms outside a repo, about 10 to 15 ms inside one (Starship
+  took 20 to 30 ms).
 
-The pill tells the machines apart at a glance:
+### Per-machine settings
 
-| Machine | Logo | Pill | Logo colour |
-|---|---|---|---|
-| Mac | Apple, `U+E1BB` `U+E1BC` | `#3a3a3c` | `#FFFFFF` |
-| omarchy | Arch, `U+E1B9` `U+E1BA` | `#163a4d` | `#1793D1` |
+Set before the file is sourced. Unset means the Mac default.
 
-omarchy still uses Starship with its own `~/.config/starship.toml`, not
-linked to this repo, so edit it there. Write the logos as `\uXXXX` escapes: Private Use Area
-characters are easy to lose in copy and paste. Each logo is two characters,
-the left and right halves of a logo built by
+| Variable | Mac (default) | omarchy |
+|---|---|---|
+| `PROMPT_LOGO` | `$'\ue1bb\ue1bc'` Apple halves | `$'\ue1b9\ue1ba'` Arch halves |
+| `PROMPT_LOGO_BG` | `#333336` charcoal | `#1793D1` Arch blue |
+| `PROMPT_CHEVRON` | `blue` | `cyan` (teal) |
+
+Logo text is white on the pill. Write logos as `\uXXXX` escapes: Private Use
+Area characters are easy to lose in copy and paste.
+
+### How each machine loads it
+
+- **Mac**: `mac/.zshrc` runs `source ~/.config/zsh/prompt.zsh`.
+  `~/.config/zsh` is a Stow symlink to `mac/.config/zsh/`, so edits apply to
+  the next new shell (`exec zsh` in open ones).
+- **omarchy**: its `~/.zshrc` is a standalone file, not in this repo. Its
+  prompt block sets the three variables above and sources
+  `~/.dotfiles/mac/.config/zsh/prompt.zsh` from omarchy's own clone of this
+  repo (`https://github.com/vedntp/dotfiles`, branch `main`). If that file is
+  missing it falls back to a plain `%~ ❯` prompt, so a broken clone never
+  leaves the shell without a prompt. Starship is installed there but unused;
+  the old config is saved as `~/.config/starship.toml.bak`.
+
+### Changing the prompt
+
+1. Edit `mac/.config/zsh/prompt.zsh` on the Mac, check with
+   `zsh -n mac/.config/zsh/prompt.zsh`, then open a new shell.
+2. Commit and push `main`.
+3. On omarchy: `ssh omarchy 'git -C ~/.dotfiles pull --ff-only'`. New shells
+   there pick it up.
+
+Machine-specific looks (logo, pill, chevron) go in the variables, never as
+`if mac / if linux` branches in `prompt.zsh`.
+
+### Repairing omarchy's prompt
+
+Symptom: omarchy's prompt is old, plain `%~ ❯`, or differs from the Mac.
+
+1. Check the clone: `ssh omarchy 'git -C ~/.dotfiles status -sb; git -C ~/.dotfiles log --oneline -1'`.
+2. `behind N` with no local edits: `git -C ~/.dotfiles pull --ff-only`.
+3. Pull refused because of local edits: `git -C ~/.dotfiles stash`, pull,
+   then `git stash pop`. If the pop conflicts, keep both versions and ask the
+   user; never discard omarchy's local edits (it has had uncommitted Herdr
+   edits before).
+4. Clone missing: `git clone https://github.com/vedntp/dotfiles ~/.dotfiles`.
+5. Prompt block missing from `~/.zshrc`: restore it from the snippet below.
+6. Check: `ssh omarchy 'zsh -ic "_ramp_precmd; print -rP -- \$PROMPT"'`
+   prints the coloured bar.
+
+omarchy's `~/.zshrc` prompt block (replaces its old Starship lines):
+
+```zsh
+# Prompt: shared with the Mac, see ~/.dotfiles/mac/.config/zsh/CLAUDE.md
+PROMPT_LOGO=$'\ue1b9\ue1ba' PROMPT_LOGO_BG='#1793D1' PROMPT_CHEVRON=cyan
+[[ -n $PLAIN_PROMPT_LOGO ]] && PROMPT_LOGO=$' \uf303 '
+if [[ -r ~/.dotfiles/mac/.config/zsh/prompt.zsh ]]; then
+  source ~/.dotfiles/mac/.config/zsh/prompt.zsh
+else
+  PROMPT='%~ %F{cyan}❯%f '
+fi
+```
+
+### Logo fonts
+
+Each logo is two characters, the left and right halves of a logo built by
 `mac/.config/herdr/fonts/build-fonts` (see `docs/herdr-sidebar.md`), so it
 can be larger than one cell and still sit exactly centred in every terminal.
 The pill has no spaces inside its round caps: the halves' own margins pad
-the logo, so the pill is four cells wide. Alacritty and Herdr GPUI use the Herdr fonts directly, and Ghostty on both
-machines maps `U+E1B9-U+E1BC` to them with `font-codepoint-map`, because IBM
-Plex Sans TC on omarchy also covers that range. A terminal without the Herdr
-fonts shows empty boxes.
+the logo. Alacritty and Herdr GPUI use the Herdr fonts directly, Ghostty on
+both machines maps `U+E1B9-U+E1BC` to them with `font-codepoint-map` (IBM
+Plex Sans TC on omarchy also covers that range), and foot on omarchy reaches
+them through fontconfig fallback. A terminal without the Herdr fonts shows
+empty boxes.
 
 App terminals built on xterm.js (Claude, ChatGPT and T3 Code desktop apps,
 VS Code) can't map codepoints to a font, and macOS font fallback never
-reaches the Herdr fonts for Private Use Area characters. `.zshrc` spots them
-by the shell's parent process name and exports `PROMPT_LOGO=' \uf8ff '`.
-That is Apple's own logo codepoint, which the macOS system fonts cover, so it
-renders anywhere. `prompt.zsh` uses `PROMPT_LOGO` when set and the Herdr pair
-otherwise, so other terminals are unchanged.
+reaches the Herdr fonts for Private Use Area characters. `mac/.zshrc` spots
+them by the shell's parent process name and exports `PROMPT_LOGO=' \uf8ff '`,
+Apple's own logo codepoint, which the macOS system fonts cover.
 
-omarchy does the same with the Arch logo (`U+F303`, from the Nerd Font). `.zshrc`
-also exports `PLAIN_PROMPT_LOGO=1`, `~/.ssh/config` sends it with `SendEnv`,
-`/etc/ssh/sshd_config.d/30-plain-prompt-logo.conf` on omarchy accepts it, and
-omarchy's `~/.zshrc` turns it into its own `STARSHIP_LOGO`. A shared SSH
-connection that was opened before the variable was accepted won't carry it.
+omarchy does the same with the Arch logo (`U+F303`, from the Nerd Font).
+`mac/.zshrc` also exports `PLAIN_PROMPT_LOGO=1`, `~/.ssh/config` sends it with
+`SendEnv`, `/etc/ssh/sshd_config.d/30-plain-prompt-logo.conf` on omarchy
+accepts it, and omarchy's prompt block turns it into `PROMPT_LOGO`. A shared
+SSH connection that was opened before the variable was accepted won't carry
+it.
 
 ## Syntax Highlighting
 
