@@ -2,7 +2,7 @@
 
 ## Overview
 
-Plain zsh, no framework, with a Starship prompt. The tracked shell config is
+Plain zsh, no framework, with its own prompt in `prompt.zsh`. The tracked shell config is
 `mac/.zshrc`, stowed to `~/.zshrc`. Oh My Zsh, Powerlevel10k and direnv were
 removed on 2026-10-19; the "SHELL BASICS" block in `.zshrc` replaces the parts
 of Oh My Zsh that were in use (history, auto_cd, key bindings, completion,
@@ -12,14 +12,14 @@ window title).
 
 Loaded at the end of `.zshrc`, in this order: fzf-tab (cloned to
 `~/.local/share/zsh/plugins/fzf-tab`), zsh-autosuggestions and
-zsh-syntax-highlighting (Homebrew), then Starship.
+zsh-syntax-highlighting (Homebrew), then `prompt.zsh`.
 
 ## Startup speed
 
-- `_cached_init` caches `starship init zsh` and `fzf --zsh` in `~/.cache/zsh`,
-  regenerated when the binary is newer than the cache.
-- The Starship cache bakes in the continuation prompt and sets `RPROMPT=''`
-  (this config has no right_format), so each prompt runs starship once.
+- `_cached_init` caches `fzf --zsh` in `~/.cache/zsh`, regenerated when the
+  binary is newer than the cache.
+- The prompt runs no external program outside a git repo (under 0.1 ms) and
+  one `git status` inside one (about 10 to 15 ms). Starship took 20 to 30 ms.
 - compinit runs its security check once a day (`-C` otherwise) and the dump is
   compiled with zcompile.
 - `~/.zprofile` (not tracked) holds a static copy of `brew shellenv`.
@@ -97,10 +97,23 @@ it comes from local shell config or another installed command.
 
 ## Prompt Configuration
 
-Starship, configured in `mac/.config/starship.toml` (linked to
-`~/.config/starship.toml`): a machine logo pill, directory, Git branch and
-status, then the prompt character. The chevron is green on the Mac and cyan
-on omarchy.
+`mac/.config/zsh/prompt.zsh` (replaced Starship on 2026-11-02, so each folder
+can have its own colour). A `precmd` hook rebuilds `PROMPT` each time:
+
+- Logo pill, then one powerline segment per folder (`~` or `/` first), each a
+  step lighter: `#141618 #1a1d1f #212427 #282c2f #303438` ("Ink"), text
+  `#e8eaed`, current folder bold.
+- Paths deeper than five parts keep the first and last three. In narrow panes
+  middle folders fold into `…` until 30 columns stay free for typing.
+- Git segment: green `#6fbf86` when clean, amber `#e0b25e` with changes. It
+  shows ahead/behind, conflicts, changed and untracked counts from one
+  `git status --porcelain=v2 --branch`. Repos are found by walking up for
+  `.git` in zsh, so other folders run no process.
+- Chevron uses the theme's ANSI green, red after a failed command, so it
+  follows light and dark themes. The bar itself uses fixed hex colours and
+  looks the same in Rex, Ghostty, Alacritty and light themes.
+- `prompt_subst` is off: folder and branch names go into `PROMPT` verbatim,
+  with `%` escaped.
 
 The pill tells the machines apart at a glance:
 
@@ -109,8 +122,8 @@ The pill tells the machines apart at a glance:
 | Mac | Apple, `U+E1BB` `U+E1BC` | `#3a3a3c` | `#FFFFFF` |
 | omarchy | Arch, `U+E1B9` `U+E1BA` | `#163a4d` | `#1793D1` |
 
-omarchy's `~/.config/starship.toml` is its own file, not linked to this repo,
-so edit it there. Write the logos as `\uXXXX` escapes: Private Use Area
+omarchy still uses Starship with its own `~/.config/starship.toml`, not
+linked to this repo, so edit it there. Write the logos as `\uXXXX` escapes: Private Use Area
 characters are easy to lose in copy and paste. Each logo is two characters,
 the left and right halves of a logo built by
 `mac/.config/herdr/fonts/build-fonts` (see `docs/herdr-sidebar.md`), so it
@@ -124,11 +137,10 @@ fonts shows empty boxes.
 App terminals built on xterm.js (Claude, ChatGPT and T3 Code desktop apps,
 VS Code) can't map codepoints to a font, and macOS font fallback never
 reaches the Herdr fonts for Private Use Area characters. `.zshrc` spots them
-by the shell's parent process name and exports `STARSHIP_LOGO='  '`.
+by the shell's parent process name and exports `PROMPT_LOGO=' \uf8ff '`.
 That is Apple's own logo codepoint, which the macOS system fonts cover, so it
-renders anywhere. The Mac `starship.toml` prints the logo through
-`[env_var.STARSHIP_LOGO]`, whose default is the Herdr pair, so other terminals
-are unchanged.
+renders anywhere. `prompt.zsh` uses `PROMPT_LOGO` when set and the Herdr pair
+otherwise, so other terminals are unchanged.
 
 omarchy does the same with the Arch logo (`U+F303`, from the Nerd Font). `.zshrc`
 also exports `PLAIN_PROMPT_LOGO=1`, `~/.ssh/config` sends it with `SendEnv`,

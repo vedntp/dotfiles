@@ -115,7 +115,8 @@ user to confirm both routing directions before calling a candidate solved.
 
 ## Color defaults
 
-Ghostty and Alacritty use their terminal palettes. macOS uses a Starship
-prompt with a green chevron, while the server keeps Powerlevel10k's upstream
+Ghostty and Alacritty use their terminal palettes. macOS uses a plain-zsh
+powerline prompt (`mac/.config/zsh/prompt.zsh`) with a fixed Ink palette and
+the theme's green chevron, while the server keeps Powerlevel10k's upstream
 rainbow layout. tmux inherits terminal colors, Ranger uses its bundled default, Bat
 uses `ansi`, Neovim uses Kanagawa Wave, and Doom Org faces inherit Doom One.

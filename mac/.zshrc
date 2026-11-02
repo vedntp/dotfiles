@@ -35,17 +35,6 @@ _cached_init() {
   source $file
 }
 
-# Starship's init, with two per-shell costs baked in at cache time: the
-# continuation prompt (otherwise one starship run per new shell) and the
-# right prompt (otherwise one extra starship run per prompt; this config has
-# no right_format).
-_starship_init_static() {
-  local cont; cont=$(STARSHIP_SHELL=zsh starship prompt --continuation)
-  starship init zsh | grep -v '^PROMPT2=\|^RPROMPT='
-  print -r -- "PROMPT2=${(q)cont}"
-  print -r -- "RPROMPT=''"
-}
-
 # ===== SHELL BASICS =====
 # Plain zsh, no framework. These replace the parts of Oh My Zsh in use.
 
@@ -331,10 +320,10 @@ source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 # App terminals built on xterm.js (Claude, ChatGPT, T3 Code, VS Code) have no
 # font-codepoint-map, so the Herdr logo glyphs show as boxes. Give them the
-# system Apple logo (U+F8FF) instead; starship.toml reads STARSHIP_LOGO.
+# system Apple logo (U+F8FF) instead; prompt.zsh reads PROMPT_LOGO.
 # PLAIN_PROMPT_LOGO goes over SSH so omarchy can do the same with its Arch logo.
 case $(ps -o comm= -p $PPID 2>/dev/null) in
   *Claude\ Helper*|*ChatGPT*|*T3\ Code*|*Code\ Helper*)
-    export STARSHIP_LOGO=$' \uf8ff ' PLAIN_PROMPT_LOGO=1 ;;
+    export PROMPT_LOGO=$' \uf8ff ' PLAIN_PROMPT_LOGO=1 ;;
 esac
-_cached_init starship _starship_init_static
+source ~/.config/zsh/prompt.zsh
