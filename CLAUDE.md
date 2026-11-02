@@ -104,7 +104,7 @@ Meta bindings available for terminals that send Meta.
 - `~/.config/git/` -> `mac/.config/git/`
 
 **Claude Code**: `claude` is the default Claude Code command. The tracked
-`.zshrc` defines aliases such as `cl`, `cld`, `cldr`, and `cldc`. If `glm` is available, it comes from local shell config or another
+`.zshrc` defines aliases such as `cl`, `cld`, `cldr`, `cldc`, and `clf`. If `glm` is available, it comes from local shell config or another
 installed command, not from the tracked `.zshrc`.
 
 **AirPods banners**: Suppression is still under investigation. The old

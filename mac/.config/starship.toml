@@ -1,8 +1,13 @@
 add_newline = true
 command_timeout = 200
 # Apple logo in a rounded pill, drawn across two cells (U+E1BB U+E1BC) from the
-# Herdr fonts (mac/.config/herdr/fonts/build-fonts).
-format = "[\ue0b6](#3a3a3c)[\ue1bb\ue1bc](fg:#FFFFFF bg:#3a3a3c)[\ue0b4](#3a3a3c) [$directory$git_branch$git_status]($style)$character"
+# Herdr fonts (mac/.config/herdr/fonts/build-fonts). App terminals that can't
+# load those fonts set STARSHIP_LOGO in .zshrc to the system logo instead.
+format = "[\ue0b6](#333336)[${env_var.STARSHIP_LOGO}](fg:#FFFFFF bg:#333336)[\ue0b4](#333336) [$directory$git_branch$git_status]($style)$character"
+
+[env_var.STARSHIP_LOGO]
+default = "\ue1bb\ue1bc"
+format = "$env_value"
 
 [character]
 error_symbol = "[✗](bold green)"

@@ -254,10 +254,14 @@ alias vi="nvim"
 bindkey -r '^T'
 
 # === CLAUDE CODE PROVIDER SWITCHER ===
-alias cl="claude"
+# cl: default launcher, cld started in ~/scratch (subshell, so your cwd stays put)
+unalias cl 2>/dev/null  # old alias would hijack the function name on re-source
+cl() { (cd ~/scratch && claude --dangerously-skip-permissions "$@") }
 alias cld="claude --dangerously-skip-permissions"
 alias cldr="claude --resume --dangerously-skip-permissions"
 alias cldc="claude --continue --dangerously-skip-permissions"
+# cld, but started in ~/.dotfiles (subshell, so your cwd stays put)
+clf() { (cd ~/.dotfiles && claude --dangerously-skip-permissions "$@") }
 
 # Kick off the 5-hour usage window with the cheapest possible request
 # Optional arg: delay in minutes, e.g. `cc5 40` (keeps Mac awake while waiting).
@@ -304,6 +308,7 @@ alias ccum="ccusage monthly -b"
 alias ccup="ccusage -i"
 
 alias gfix="gcloud auth application-default login"
+alias menubar_restart="$HOME/.local/bin/menubar_restart"
 
 # Source machine-specific local overrides (not version controlled)
 [[ -f ~/.config/zsh/.zshrc.local ]] && source ~/.config/zsh/.zshrc.local
@@ -324,4 +329,12 @@ typeset -U path
 source ~/.local/share/zsh/plugins/fzf-tab/fzf-tab.zsh
 source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# App terminals built on xterm.js (Claude, ChatGPT, T3 Code, VS Code) have no
+# font-codepoint-map, so the Herdr logo glyphs show as boxes. Give them the
+# system Apple logo (U+F8FF) instead; starship.toml reads STARSHIP_LOGO.
+# PLAIN_PROMPT_LOGO goes over SSH so omarchy can do the same with its Arch logo.
+case $(ps -o comm= -p $PPID 2>/dev/null) in
+  *Claude\ Helper*|*ChatGPT*|*T3\ Code*|*Code\ Helper*)
+    export STARSHIP_LOGO=$' \uf8ff ' PLAIN_PROMPT_LOGO=1 ;;
+esac
 _cached_init starship _starship_init_static

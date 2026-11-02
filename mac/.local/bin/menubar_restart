@@ -1,0 +1,30 @@
+#!/bin/zsh
+# Fix a menu bar that looks normal but ignores clicks (macOS 27.2 MenuBarAgent hang).
+# Records the stuck state first, so repeat failures leave evidence behind.
+log=~/Library/Logs/menubar_restart.log
+
+old=$(pgrep -x MenuBarAgent)
+if [[ -n $old ]]; then
+  {
+    print "=== $(date '+%F %T')"
+    print "agent uptime: $(ps -o etime= -p $old)"
+    print "aerospace running: $(pgrep -x AeroSpace >/dev/null && echo yes || echo no)"
+    print "front app: $(lsappinfo info -only name "$(lsappinfo front)" 2>/dev/null | head -1)"
+    print "last wake: $(pmset -g log 2>/dev/null | grep -E ' Wake +	' | tail -1 | cut -c1-25)"
+    sample $old 1 2>/dev/null | sed -n '/Call graph/,/Total number/p' | head -25
+  } >> $log
+fi
+
+killall MenuBarAgent 2>/dev/null
+
+for i in {1..20}; do
+  new=$(pgrep -x MenuBarAgent)
+  if [[ -n $new && $new != $old ]]; then
+    print "Menu bar restarted (pid $new). Details logged to $log"
+    exit 0
+  fi
+  perl -e 'select(undef,undef,undef,0.25)'
+done
+
+print "MenuBarAgent did not come back. Try: killall SystemUIServer ControlCenter, or log out and back in." >&2
+exit 1

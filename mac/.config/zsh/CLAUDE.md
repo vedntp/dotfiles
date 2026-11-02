@@ -65,16 +65,18 @@ it comes from local shell config or another installed command.
 | `caff`/`uncaff` | caffeinate control | Keep-awake scripts |
 | `mynet`/`offmynet` | network scripts | Fast network toggle |
 | `gfix` | `gcloud auth application-default login` | Refresh ADC auth |
+| `menubar_restart` | `~/.local/bin/menubar_restart` | Unstick a menu bar ignoring clicks; logs to `~/Library/Logs/menubar_restart.log` |
 | `cxl` | `codex -p lean --dangerously-bypass-approvals-and-sandbox` | Codex lean profile with approvals and sandbox disabled |
 
 ### Claude Code Aliases
 
 | Alias | Command | Purpose |
 |-------|---------|---------|
-| `cl` | `claude` | Launch Claude Code |
+| `cl` | `cld` run from `~/scratch` (function, subshell) | Default launcher for chats with no project folder |
 | `cld` | `claude --dangerously-skip-permissions` | Skipped permissions, default model/effort |
 | `cldr` | `claude --resume --dangerously-skip-permissions` | Resume with skipped permissions |
 | `cldc` | `claude --continue --dangerously-skip-permissions` | Continue with skipped permissions |
+| `clf` | `cld` run from `~/.dotfiles` (function, subshell) | Skipped permissions in the dotfiles repo |
 
 ### Usage Aliases
 
@@ -118,6 +120,21 @@ the logo, so the pill is four cells wide. Alacritty and Herdr GPUI use the Herdr
 machines maps `U+E1B9-U+E1BC` to them with `font-codepoint-map`, because IBM
 Plex Sans TC on omarchy also covers that range. A terminal without the Herdr
 fonts shows empty boxes.
+
+App terminals built on xterm.js (Claude, ChatGPT and T3 Code desktop apps,
+VS Code) can't map codepoints to a font, and macOS font fallback never
+reaches the Herdr fonts for Private Use Area characters. `.zshrc` spots them
+by the shell's parent process name and exports `STARSHIP_LOGO='  '`.
+That is Apple's own logo codepoint, which the macOS system fonts cover, so it
+renders anywhere. The Mac `starship.toml` prints the logo through
+`[env_var.STARSHIP_LOGO]`, whose default is the Herdr pair, so other terminals
+are unchanged.
+
+omarchy does the same with the Arch logo (`U+F303`, from the Nerd Font). `.zshrc`
+also exports `PLAIN_PROMPT_LOGO=1`, `~/.ssh/config` sends it with `SendEnv`,
+`/etc/ssh/sshd_config.d/30-plain-prompt-logo.conf` on omarchy accepts it, and
+omarchy's `~/.zshrc` turns it into its own `STARSHIP_LOGO`. A shared SSH
+connection that was opened before the variable was accepted won't carry it.
 
 ## Syntax Highlighting
 
