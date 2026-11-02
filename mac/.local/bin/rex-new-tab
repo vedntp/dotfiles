@@ -1,0 +1,47 @@
+#!/bin/bash
+# Usage: rex-new-tab [DIR] [COMMAND ARGS...]
+# Open a new tab in the Rex session the Rex app is showing, starting in DIR
+# (default ~) and running COMMAND (default: your login shell). Shows that tab
+# in the app and has AeroSpace switch to Rex's workspace and focus its window.
+# Starts the Rex app if needed. Used by alt-enter (shell) and, through
+# rex-claude, alt-a.
+
+dir=${1:-$HOME}; [ $# -gt 0 ] && shift
+
+rex="$HOME/Library/Application Support/com.superlogical.rex/RexServer/Versions/Current/Rex Server.app/Contents/MacOS/rex"
+jq=/opt/homebrew/bin/jq
+
+aerospace=/opt/homebrew/bin/aerospace
+
+# The Rex app's client: prints "<client_id> <session it is showing>".
+app_client() {
+  "$rex" client ls --json 2>/dev/null | "$jq" -r '
+    [.clients[] | select(.info.kind == "app" and .connection_state == "connected")
+     | "\(.client_id) \(.session_ids[0] // "")"][0] // empty'
+}
+
+read -r client session <<<"$(app_client)"
+if [ -z "$client" ]; then
+  open -a "Rex Beta"
+  for _ in $(seq 80); do read -r client session <<<"$(app_client)"; [ -n "$client" ] && break; sleep 0.1; done
+fi
+[ -n "$session" ] || session=$("$rex" new main --json | "$jq" -r .session_id)
+
+if [ $# -gt 0 ]; then
+  window=$("$rex" window new -s "$session" -c "$dir" --json "$(basename "$1")" -- "$@" | "$jq" -r .window_id)
+else
+  window=$("$rex" window new -s "$session" -c "$dir" --json | "$jq" -r .window_id)
+fi
+
+# Show the new tab in the app.
+[ -n "$client" ] && "$rex" -C "$client" do session.select \
+  session_id="$session" window_id="$window" >/dev/null 2>&1
+
+# Switch AeroSpace to Rex's workspace and focus its window.
+rex_win=$("$aerospace" list-windows --all --format '%{window-id}|%{app-bundle-id}' \
+  | awk -F'|' '$2 == "com.superlogical.rex" {print $1; exit}')
+if [ -n "$rex_win" ]; then
+  "$aerospace" focus --window-id "$rex_win"
+else
+  open -a "Rex Beta"
+fi

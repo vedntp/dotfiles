@@ -1,0 +1,6 @@
+#!/bin/bash
+# Open the default agent, Claude Code (bypass permissions), in a new Rex tab
+# in ~/scratch, and take you to it. Bound to alt-a in aerospace.toml. To
+# switch agents, change the command below. The older Alacritty-window
+# version is ~/.local/bin/aerospace-claude-work.
+exec "$HOME/.local/bin/rex-new-tab" "$HOME/scratch" "$HOME/.local/bin/claude" --dangerously-skip-permissions
