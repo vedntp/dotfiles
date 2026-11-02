@@ -1,5 +1,9 @@
 # Aerospace Configuration Changelog
 
+## 2026-10-30
+- Changed inner and outer gaps from 0 to 8, with `outer.top` at 4, so tiled
+  windows have a small margin around them and between them.
+
 ## 2026-10-17
 - Routed the Grok Bot app (`com.anysphere.sand`) to workspace G.
 

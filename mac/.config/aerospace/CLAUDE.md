@@ -123,7 +123,7 @@ sticky-window rule or helper.
   separate windows and trigger unwanted BSP retiling, so Ghostty uses
   `layout floating`. Alacritty, cmux, and Warp use `layout tiling` where they
   open. Native tabs remain inside the terminal application.
-- **Zero gaps**: `[gaps]` section has all values at 0
+- **Small gaps**: `[gaps]` section has inner and outer values at 8, except `outer.top` at 4
 - **Mouse follows monitor**: When focus changes monitors, mouse moves to center
 - **No generic sticky windows**: Feature not yet supported (issue #2). The
   Codex Pet does not require it because AeroSpace recognizes the Pet as an

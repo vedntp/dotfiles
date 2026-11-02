@@ -39,7 +39,7 @@ Run `aerospace reload-config` after changing `aerospace.toml`. For documentation
   explicit workspace bindings when adding or removing one.
 - Default layout is `tiles`; root orientation is `auto`.
 - Accordion padding is `30`.
-- All inner and outer gaps are `0`.
+- All inner and outer gaps are `8`, except `outer.top` at `4`.
 - Mouse moves to lazy center when focus changes monitors.
 - macOS hidden apps are not automatically unhidden.
 
