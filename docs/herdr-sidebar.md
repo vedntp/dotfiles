@@ -122,8 +122,9 @@ to the Claude logo's box so both logos look the same size.
 
 `build-fonts` also adds the Starship prompt logos (see
 `mac/.config/zsh/CLAUDE.md`), each split across two cells: Arch at `U+E1B9`
-`U+E1BA` (800 units tall) and Apple at `U+E1BB` `U+E1BC` (715, the stock
-size). `skia-pathops` cuts the scaled logo at the cell line, so each half
+`U+E1BA` (800 units tall) and Apple at `U+E1BB` `U+E1BC` (760, nudged 80
+units left and 60 up so it looks centred in the pill: its leaf is light, and
+the pill's round cap outweighs the arrow tip). `skia-pathops` cuts the scaled logo at the cell line, so each half
 stays inside its own cell. A one-cell logo larger than the cell spilled into
 its neighbours, which Ghostty on macOS drew shifted right and Alacritty on
 Linux drew no larger. Each half's left side bearing matches its outline,
