@@ -125,7 +125,7 @@ Set before the file is sourced. Unset means the Mac default.
 | Variable | Mac (default) | omarchy |
 |---|---|---|
 | `PROMPT_LOGO` | `$'\ue1bb\ue1bc'` Apple halves | `$'\ue1b9\ue1ba'` Arch halves |
-| `PROMPT_LOGO_BG` | `#333336` charcoal | `#1793D1` Arch blue |
+| `PROMPT_LOGO_BG` | `#000000` black | `#1793D1` Arch blue |
 | `PROMPT_CHEVRON` | `blue` | `cyan` (teal) |
 
 Logo text is white on the pill. Write logos as `\uXXXX` escapes: Private Use

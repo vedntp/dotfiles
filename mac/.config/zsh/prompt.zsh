@@ -8,7 +8,7 @@
 # symlink; omarchy's ~/.zshrc sources ~/.dotfiles/mac/.config/zsh/prompt.zsh
 # from its clone. Per-machine settings (set before sourcing; Mac defaults):
 #   PROMPT_LOGO     logo text inside the pill   (Apple, Herdr font halves)
-#   PROMPT_LOGO_BG  pill colour                 (#333336)
+#   PROMPT_LOGO_BG  pill colour                 (#000000)
 #   PROMPT_CHEVRON  chevron colour, zsh %F name (blue; red after a failure)
 # Full notes and repair steps: mac/.config/zsh/CLAUDE.md, "Prompt".
 
@@ -16,7 +16,7 @@ typeset -ga _ramp_bg=('#141618' '#1a1d1f' '#212427' '#282c2f' '#303438')
 typeset -g  _ramp_fg='#e8eaed' _ramp_ink='#16181a'
 typeset -g  _ramp_clean='#6fbf86' _ramp_dirty='#e0b25e'
 typeset -g  _ramp_logo=${PROMPT_LOGO:-$'\ue1bb\ue1bc'}
-typeset -g  _ramp_logo_bg=${PROMPT_LOGO_BG:-'#333336'}
+typeset -g  _ramp_logo_bg=${PROMPT_LOGO_BG:-'#000000'}
 typeset -g  _ramp_chev=${PROMPT_CHEVRON:-blue}
 
 _ramp_esc() { REPLY=${1//\%/%%} }
