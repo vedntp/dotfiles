@@ -20,7 +20,7 @@ into workspace `B` like a normal browser window.
 
 ## Configuration
 
-Two additions to [aerospace.toml](../mac/.config/aerospace/aerospace.toml). No
+Two additions to [base.toml](../mac/.config/aerospace/base.toml). No
 existing rules, monitor assignments, or keybindings were changed.
 
 1. A float rule placed **before** the Helium rule (the first matching

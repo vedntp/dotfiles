@@ -1,7 +1,7 @@
 #!/bin/bash
 # Open Claude Code (bypass permissions) as a new Alacritty window
 # on the first empty workspace of the focused monitor (stay put if none).
-# Bound to alt-a in aerospace.toml.
+# Bound to alt-a in aerospace base.toml.
 
 empty_ws=$(/opt/homebrew/bin/aerospace list-workspaces --monitor focused --empty | head -1)
 [ -n "$empty_ws" ] && /opt/homebrew/bin/aerospace workspace "$empty_ws"

@@ -19,7 +19,7 @@ cd ~/.dotfiles && stow mac
 
 # Validate configs
 ghostty +validate-config --config-file ~/.config/ghostty/config
-aerospace reload-config
+aerospace-profile                          # rebuild + reload AeroSpace (edit base.toml; solo|duo switches profile)
 
 # Reload configs
 tmux source-file ~/.config/tmux/tmux.conf

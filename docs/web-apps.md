@@ -37,7 +37,7 @@ which apps exist, and the gotchas learned the hard way.
 6. If the icon is wrong, fix it with `webapp-icon set` (below).
 7. Add the app to the inventory table in this file. If it needs a workspace,
    add an `[[on-window-detected]]` rule by bundle id in
-   `mac/.config/aerospace/aerospace.toml` (above the catch-all).
+   `mac/.config/aerospace/base.toml` (above the catch-all).
 
 The app shim is created at `~/Applications/Chrome Apps.localized/<Name>.app`
 with bundle id `com.google.Chrome.app.<app-id>`. The app id is derived from the

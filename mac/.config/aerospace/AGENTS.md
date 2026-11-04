@@ -5,10 +5,12 @@ Guidance for Codex and other AI agents working in this AeroSpace config.
 ## Scope
 
 - Applies to `mac/.config/aerospace/` in the dotfiles repo.
-- This directory configures AeroSpace, the macOS tiling window manager, via `aerospace.toml`.
-- The config is managed through GNU Stow and is intended to appear at `~/.config/aerospace/aerospace.toml`.
-- Before behavioral edits, read `aerospace.toml`, `CLAUDE.md`, and `CHANGELOG.md`.
-- Treat `aerospace.toml` as the source of truth when docs disagree. `CLAUDE.md` is the best human summary.
+- This directory configures AeroSpace, the macOS tiling window manager.
+- AeroSpace reads `~/.config/aerospace/aerospace.toml`, but that file is
+  GENERATED and git-ignored: `~/.local/bin/aerospace-profile` writes it from
+  `base.toml` plus `profiles/<solo|duo>.toml`. Never edit `aerospace.toml`.
+- Before behavioral edits, read `base.toml`, the profiles, `CLAUDE.md`, and `CHANGELOG.md`.
+- Treat `base.toml` and `profiles/` as the source of truth when docs disagree. `CLAUDE.md` is the best human summary.
 
 ## Commands
 
@@ -20,11 +22,13 @@ aerospace list-apps              # Find bundle IDs for app matching rules
 osascript -e 'id of app "AppName"'  # Alternative bundle ID lookup
 ```
 
-Run `aerospace reload-config` after changing `aerospace.toml`. For documentation-only edits, no reload is needed.
+Run `aerospace-profile` (no argument keeps the current profile) after changing `base.toml` or a profile. It validates with `aerospace reload-config --dry-run`, restores the old file on failure, then reloads. For documentation-only edits, no reload is needed.
 
 ## Files
 
-- `aerospace.toml`: main config and source of truth.
+- `base.toml`: shared config (everything except monitor assignments).
+- `profiles/solo.toml`, `profiles/duo.toml`: `[workspace-to-monitor-force-assignment]` only. Keep both covering every workspace in `persistent-workspaces`.
+- `aerospace.toml`: generated, git-ignored; first line `# profile: <name>`.
 - `CLAUDE.md`: concise overview of commands, keybindings, workspace assignments, and gotchas.
 - `CHANGELOG.md`: dated behavior history; update it for meaningful config changes.
 - `AGENTS.md`: agent-facing working notes.
@@ -45,8 +49,11 @@ Run `aerospace reload-config` after changing `aerospace.toml`. For documentation
 
 ## Monitor Assignments
 
-- Primary letter workspaces are forced to `LG HDR 4K`, falling back to macOS `main`.
-- Workspace `1` plus workspaces `2`-`10`, `E`, `F`, `G`, `M`, `O`, `Y`, and `Z` are forced to the built-in display, falling back to `secondary` then `main`.
+Two profiles, switched with `aerospace-profile solo|duo` (a dotfiles script, not an AeroSpace feature). They only differ when the laptop is open with an external screen.
+
+- `duo`: primary letter workspaces are forced to `LG HDR 4K`, falling back to macOS `main`. Workspace `1` plus workspaces `2`-`10`, `E`, `F`, `G`, `M`, `O`, `Y`, and `Z` are forced to the built-in display, falling back to `secondary` then `main`.
+- `solo`: every workspace is `['built-in', 'main']` except `10`, which is `['^(?!built-in)', 'main']` (any non-built-in monitor; AeroSpace patterns are case-insensitive Swift regexes, and lookahead works).
+- `aerospace-display-watcher` (LaunchAgent `com.vp.aerospace-display-watcher`, Swift source next to it in `mac/.local/bin/`) prompts Solo/Duo when an external display is added with the lid open. Solo is the default and the 15s timeout choice. Keep it event-driven (CGDisplayRegisterReconfigurationCallback); do not add polling.
 - AeroSpace `main` follows macOS System Settings -> Displays -> Use as Main Display; prefer explicit monitor names when preserving the LG-primary layout matters.
 
 ## App Assignment Rules
@@ -182,6 +189,5 @@ open -a AeroSpace
 ## Known Doc Drift To Watch
 
 - `CLAUDE.md` is closer to current state, but verify workspace tables against `aerospace.toml` before editing.
-- The live config currently has no automatic VS Code assignment even though some docs mention workspace `P`.
 - The live config floats `mpv` in place. It has no workspace-following helper
   or fixed workspace `E` assignment.

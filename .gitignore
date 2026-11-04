@@ -30,3 +30,6 @@ mac/.config/herdr/plugins/herdr-focus-notify/
 mac/.config/alacritty/alacritty.toml.before-*
 mac/.config/herdr/initial-host-theme-replay.patch
 mac/.config/alacritty/alacritty.local.toml
+
+# AeroSpace: generated from base.toml + profiles/ by aerospace-profile
+mac/.config/aerospace/aerospace.toml

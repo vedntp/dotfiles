@@ -25,7 +25,7 @@ are obsolete. This applies to all managed mpv windows, not just one player.
 
 ## Configuration
 
-- [AeroSpace config](../mac/.config/aerospace/aerospace.toml) floats newly
+- [AeroSpace config](../mac/.config/aerospace/base.toml) floats newly
   detected mpv windows and runs `aerospace-pip-guardian auto` on workspace changes.
 - `aerospace-pip-guardian` (removed) matches the `io.mpv`
   bundle ID, applies floating layout, and moves each window to the destination

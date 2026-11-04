@@ -1,0 +1,41 @@
+# duo: both screens in use. The LG is the main screen for the primary letter
+# workspaces; the built-in display holds the support workspaces.
+# With only one screen connected, the fallbacks put everything on that screen.
+# Applied by `aerospace-profile duo`, which appends this file to base.toml.
+
+# Primary workspaces prefer the LG display when connected, with macOS main as
+# fallback. Support workspaces prefer the built-in display, then secondary/main.
+[workspace-to-monitor-force-assignment]
+# Primary / default workspace group
+B = ['LG HDR 4K', 'main']  # Browsers
+C = ['LG HDR 4K', 'main']  # AI/Chat
+D = ['LG HDR 4K', 'main']  # Development (Emacs)
+I = ['LG HDR 4K', 'main']
+N = ['LG HDR 4K', 'main']  # Safari/Notion
+P = ['LG HDR 4K', 'main']
+Q = ['LG HDR 4K', 'main']
+S = ['LG HDR 4K', 'main']  # Documents/Office
+T = ['LG HDR 4K', 'main']
+U = ['LG HDR 4K', 'main']
+V = ['LG HDR 4K', 'main']  # Claude AI
+W = ['LG HDR 4K', 'main']
+X = ['LG HDR 4K', 'main']  # Amp/Conductor
+
+# Support / secondary workspace group
+1 = ['built-in', 'secondary', 'main']  # Terminal
+2 = ['built-in', 'secondary', 'main']
+3 = ['built-in', 'secondary', 'main']
+4 = ['built-in', 'secondary', 'main']
+5 = ['built-in', 'secondary', 'main']
+6 = ['built-in', 'secondary', 'main']
+7 = ['built-in', 'secondary', 'main']
+8 = ['built-in', 'secondary', 'main']
+9 = ['built-in', 'secondary', 'main']  # Slack
+10 = ['built-in', 'secondary', 'main']
+E = ['built-in', 'secondary', 'main']  # File Management (Finder)
+F = ['built-in', 'secondary', 'main']  # Writing/Notes
+G = ['built-in', 'secondary', 'main']  # Gemini/Grok AI
+M = ['built-in', 'secondary', 'main']  # Mail (Gmail)
+O = ['built-in', 'secondary', 'main']  # Books/Obsidian
+Y = ['built-in', 'secondary', 'main']  # YouTube
+Z = ['built-in', 'secondary', 'main']  # Journal/Knowledge

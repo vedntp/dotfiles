@@ -1,5 +1,17 @@
 # Aerospace Configuration Changelog
 
+## 2026-11-04
+- Added monitor profiles. `aerospace.toml` was split into `base.toml` (shared,
+  edited by hand) and `profiles/duo.toml` (the previous monitor assignments,
+  unchanged) plus a new `profiles/solo.toml`. `~/.local/bin/aerospace-profile`
+  generates the git-ignored `aerospace.toml` and reloads. Verified that the
+  generated `duo` config is semantically identical to the old file.
+- `solo`: every workspace on the built-in display; workspace 10 on any external
+  screen (`^(?!built-in)`), as a scratch screen for the laptop-first setup.
+- Added `aerospace-display-watcher`, a LaunchAgent that asks Solo/Duo when an
+  external screen is connected (Solo after 15s by default).
+- Dropped the stale `P = VS Code` doc row; there is no rule for it.
+
 ## 2026-10-30
 - Changed inner and outer gaps from 0 to 8, with `outer.top` at 4, so tiled
   windows have a small margin around them and between them.

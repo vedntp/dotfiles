@@ -1,0 +1,43 @@
+# solo: the laptop is home. Every workspace stays on the built-in display, as if
+# it were the only screen, except workspace 10 (alt-0), which goes to whatever
+# external screen is connected (the LG, a projector, anything). Music lands
+# there by default; send anything else with alt-shift-0.
+# '^(?!built-in)' is a case-insensitive regex: any monitor whose name does not
+# start with "Built-in". With only one screen connected, 'main' puts everything
+# on that screen.
+# Applied by `aerospace-profile solo`, which appends this file to base.toml.
+
+[workspace-to-monitor-force-assignment]
+# Scratch / side screen
+10 = ['^(?!built-in)', 'main']
+
+# Everything else stays on the laptop
+1 = ['built-in', 'main']
+2 = ['built-in', 'main']
+3 = ['built-in', 'main']
+4 = ['built-in', 'main']
+5 = ['built-in', 'main']
+6 = ['built-in', 'main']
+7 = ['built-in', 'main']
+8 = ['built-in', 'main']
+9 = ['built-in', 'main']
+B = ['built-in', 'main']
+C = ['built-in', 'main']
+D = ['built-in', 'main']
+E = ['built-in', 'main']
+F = ['built-in', 'main']
+G = ['built-in', 'main']
+I = ['built-in', 'main']
+M = ['built-in', 'main']
+N = ['built-in', 'main']
+O = ['built-in', 'main']
+P = ['built-in', 'main']
+Q = ['built-in', 'main']
+S = ['built-in', 'main']
+T = ['built-in', 'main']
+U = ['built-in', 'main']
+V = ['built-in', 'main']
+W = ['built-in', 'main']
+X = ['built-in', 'main']
+Y = ['built-in', 'main']
+Z = ['built-in', 'main']

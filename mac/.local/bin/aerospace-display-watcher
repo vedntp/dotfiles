@@ -1,0 +1,21 @@
+#!/bin/sh
+# Compiles aerospace-display-watcher.swift on first run or after edits, then runs it.
+
+set -eu
+
+source_path="$HOME/.dotfiles/mac/.local/bin/aerospace-display-watcher.swift"
+binary_path="$HOME/Library/Caches/dotfiles/aerospace-display-watcher"
+module_cache_path="$HOME/Library/Caches/dotfiles/swift-module-cache"
+temporary_path="${binary_path}.tmp.$$"
+
+mkdir -p "$(dirname "$binary_path")" "$module_cache_path"
+
+if [ ! -x "$binary_path" ] || [ "$source_path" -nt "$binary_path" ]; then
+  trap 'rm -f "$temporary_path"' EXIT HUP INT TERM
+  /usr/bin/swiftc -O -module-cache-path "$module_cache_path" "$source_path" -o "$temporary_path"
+  /usr/bin/codesign --force --sign - --identifier com.vp.aerospace-display-watcher "$temporary_path"
+  mv "$temporary_path" "$binary_path"
+  trap - EXIT HUP INT TERM
+fi
+
+exec "$binary_path" "$@"
