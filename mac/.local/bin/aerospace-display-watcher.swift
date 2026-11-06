@@ -21,7 +21,7 @@ import Foundation
 
 private let settleDelay: TimeInterval = 2.5      // HDMI often flickers while connecting
 private let wakeGrace: TimeInterval = 20         // ignore display churn right after wake
-private let promptTimeout: Int = 15              // seconds before Solo is picked
+private let promptTimeout: Int = 5              // seconds before Solo is picked
 private let profileScript = FileManager.default.homeDirectoryForCurrentUser
     .appendingPathComponent(".local/bin/aerospace-profile").path
 private let logURL = FileManager.default.homeDirectoryForCurrentUser
@@ -97,7 +97,7 @@ private final class Watcher {
 
         let alert = NSAlert()
         alert.messageText = "Screen connected"
-        alert.informativeText = "Solo: everything on the laptop, workspace 10 (alt-0) on the external screen.\n"
+        alert.informativeText = "Solo: laptop is home, side-screen workspaces on the external screen.\n"
             + "Duo: the full two-screen split.\n\nPicking Solo in \(promptTimeout)s."
         let solo = alert.addButton(withTitle: "Solo")
         solo.keyEquivalent = "\r"

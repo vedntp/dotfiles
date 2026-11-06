@@ -1,15 +1,15 @@
 # solo: the laptop is home. Every workspace stays on the built-in display, as if
-# it were the only screen, except workspace 10 (alt-0), which goes to whatever
-# external screen is connected (the LG, a projector, anything). Music lands
-# there by default; send anything else with alt-shift-0.
+# it were the only screen, except the side-screen workspaces below, which go to
+# whatever external screen is connected (the LG, a projector, anything).
 # '^(?!built-in)' is a case-insensitive regex: any monitor whose name does not
 # start with "Built-in". With only one screen connected, 'main' puts everything
 # on that screen.
 # Applied by `aerospace-profile solo`, which appends this file to base.toml.
 
 [workspace-to-monitor-force-assignment]
-# Scratch / side screen
-10 = ['^(?!built-in)', 'main']
+# Side screen
+10 = ['^(?!built-in)', 'main']  # Scratch, music
+V = ['^(?!built-in)', 'main']  # Claude
 
 # Everything else stays on the laptop
 1 = ['built-in', 'main']
@@ -36,7 +36,6 @@ Q = ['built-in', 'main']
 S = ['built-in', 'main']
 T = ['built-in', 'main']
 U = ['built-in', 'main']
-V = ['built-in', 'main']
 W = ['built-in', 'main']
 X = ['built-in', 'main']
 Y = ['built-in', 'main']

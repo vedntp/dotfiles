@@ -52,8 +52,8 @@ Run `aerospace-profile` (no argument keeps the current profile) after changing `
 Two profiles, switched with `aerospace-profile solo|duo` (a dotfiles script, not an AeroSpace feature). They only differ when the laptop is open with an external screen.
 
 - `duo`: primary letter workspaces are forced to `LG HDR 4K`, falling back to macOS `main`. Workspace `1` plus workspaces `2`-`10`, `E`, `F`, `G`, `M`, `O`, `Y`, and `Z` are forced to the built-in display, falling back to `secondary` then `main`.
-- `solo`: every workspace is `['built-in', 'main']` except `10`, which is `['^(?!built-in)', 'main']` (any non-built-in monitor; AeroSpace patterns are case-insensitive Swift regexes, and lookahead works).
-- `aerospace-display-watcher` (LaunchAgent `com.vp.aerospace-display-watcher`, Swift source next to it in `mac/.local/bin/`) prompts Solo/Duo when an external display is added with the lid open. Solo is the default and the 15s timeout choice. Keep it event-driven (CGDisplayRegisterReconfigurationCallback); do not add polling.
+- `solo`: every workspace is `['built-in', 'main']` except the side-screen ones (currently `10` and `V`), which are `['^(?!built-in)', 'main']` (any non-built-in monitor; AeroSpace patterns are case-insensitive Swift regexes, and lookahead works).
+- `aerospace-display-watcher` (LaunchAgent `com.vp.aerospace-display-watcher`, Swift source next to it in `mac/.local/bin/`) prompts Solo/Duo when an external display is added with the lid open. Solo is the default and the 5s timeout choice. Keep it event-driven (CGDisplayRegisterReconfigurationCallback); do not add polling.
 - AeroSpace `main` follows macOS System Settings -> Displays -> Use as Main Display; prefer explicit monitor names when preserving the LG-primary layout matters.
 
 ## App Assignment Rules

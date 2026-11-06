@@ -73,13 +73,13 @@ With one screen, the `main` fallbacks put every workspace on it.
 - AeroSpace `main` follows macOS System Settings -> Displays -> Use as Main Display; the profile targets the LG by name so the main workspace group does not depend on that OS setting.
 
 **solo** (laptop is home, external is a scratch screen):
-- Every workspace except 10 is `['built-in', 'main']`, so the laptop works exactly as it does alone.
-- Workspace 10 (`alt-0`, music by default) is `['^(?!built-in)', 'main']`: any external screen (LG, projector), else the laptop. Send things there with `alt-shift-0`.
+- Side-screen workspaces use `['^(?!built-in)', 'main']`: any external screen (LG, projector), else the laptop. Currently 10 (`alt-0`, scratch and music) and V (Claude).
+- Every other workspace is `['built-in', 'main']`, so the laptop works exactly as it does alone.
 
 **Display watcher**: `~/.local/bin/aerospace-display-watcher` (Swift, compiled
 on first run to `~/Library/Caches/dotfiles/`) runs from the LaunchAgent
 `com.vp.aerospace-display-watcher`. When an external screen is added with the
-lid open, it asks Solo (Return, or automatic after 15s) or Duo (D) and runs
+lid open, it asks Solo (Return, or automatic after 5s) or Duo (D) and runs
 `aerospace-profile`. It does not ask at launch, on unplug, within 20s of wake,
 or with the lid closed. Event-driven, about 7 MB, 0% CPU idle. Log:
 `~/Library/Logs/aerospace-display-watcher.log`.
