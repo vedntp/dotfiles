@@ -1,5 +1,6 @@
-# Alacritty config for macOS - Dropdown terminal
-# Use Ghostty for main terminal work, Alacritty for quick floating access
+# Alacritty config for macOS: the quick-fix terminal. AeroSpace alt-enter
+# (shell) and alt-a (Claude Code) open a window here on the current workspace.
+# Herdr also runs in Alacritty, so these looks apply to it too.
 
 [general]
 # alacritty.local.toml (ignored by Git) holds the font size, which changes per monitor.
@@ -7,6 +8,12 @@ import = ["~/.config/alacritty/themes/carbonfox.toml", "~/.config/alacritty/alac
 
 [env]
 TERM = "xterm-256color"
+
+# Start zsh directly (as a login shell) instead of through /usr/bin/login,
+# which prints "Last login: ..." at the top of every window.
+[terminal.shell]
+program = "/bin/zsh"
+args = ["-l"]
 
 [font.normal]
 family = "JetBrains Mono Herdr XL"
@@ -24,16 +31,33 @@ style = "Light Italic"
 family = "JetBrains Mono Herdr XL"
 style = "Italic"
 
+# Overrides on top of carbonfox. The background sits between the Ink ramp
+# steps (#141618 #1a1d1f darker, #212427+ lighter) so the black logo pill and
+# the first folder segments read as dark chips on a soft charcoal.
+[colors.primary]
+background = "#1e2124"
+
+# Cursor in the prompt chevron's blue.
+[colors.cursor]
+text = "#1e2124"
+cursor = "#78a9ff"
+
+[cursor]
+style = { shape = "Block", blinking = "On" }
+blink_interval = 600
+unfocused_hollow = true
+
 [window]
-opacity = 0.97
-blur = true
+# Fully opaque: on a near-black theme, see-through wallpaper reads as smudges.
+opacity = 1.0
+blur = false
 decorations = "Buttonless"
 dynamic_padding = true
 option_as_alt = "Both"
 
 [window.padding]
-x = 12
-y = 10
+x = 18
+y = 16
 
 #[window.dimensions]
 #columns = 120
