@@ -29,9 +29,10 @@ preserves the v1 behavior for all currently bound workspace keys.
 
 **Workspaces**:
 - `alt-[1-0]` - Switch to workspace 1-10
-- `alt-[a-z]` - Switch to letter workspace (except r reserved, a launches Claude Code)
-- `alt-a` - Open the default agent, Claude Code (`claude --dangerously-skip-permissions`, in `~/scratch`), in a new Rex tab the same way (via `~/.local/bin/rex-claude`, a wrapper around `rex-new-tab`; change the agent there). The older launcher, `~/.local/bin/aerospace-claude-work`, opened an Alacritty window on the first empty workspace instead.
-- `alt-enter` - New shell in `~` as a new tab in the Rex session the Rex app is showing, then switch to Rex's workspace with that tab shown (via `~/.local/bin/rex-new-tab`; starts Rex if needed). Overrides Option+Return in apps such as Excel. The older version opened an Alacritty window on the current workspace (`~/.local/bin/alacritty-new-window`, still used for Herdr).
+- `alt-[a-z]` - Switch to letter workspace (except r reserved; a and f launch Claude Code)
+- `alt-a` - Quick-fix Claude Code (`claude --dangerously-skip-permissions`, in `~/scratch`) in a new Alacritty window tiled on the current workspace, so you never leave what you're doing (via `~/.local/bin/alacritty-new-window`). Rex alternative: `~/.local/bin/rex-claude`. The older `~/.local/bin/aerospace-claude-work` jumped to the first empty workspace first.
+- `alt-enter` - Quick-fix shell in `~` in a new Alacritty window tiled on the current workspace (via `~/.local/bin/alacritty-new-window`; reuses a running Alacritty, so Herdr windows are untouched). Overrides Option+Return in apps such as Excel. Rex alternative: `~/.local/bin/rex-new-tab ~`.
+- `alt-f` - Dotfiles quick fix: Claude Code (`claude --dangerously-skip-permissions`, in `~/.dotfiles`, like the `clf` shell function) in a new Alacritty window on the current workspace. Workspace F (Drafts) has no switch key; reach it with `alt-shift-f` to move a window there, or by clicking.
 - `alt-shift-[key]` - Move window to that workspace
 - `alt-tab` / `alt-shift-tab` - Herdr next / previous agent when Herdr is active
 - `alt-backtick` - Jump to next empty workspace
